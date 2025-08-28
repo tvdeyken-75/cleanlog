@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/popover"
 import { licensePlateAutocomplete } from "@/ai/flows/license-plate-autocomplete"
 import { useDebounce } from "@/hooks/use-debounce"
+import { Input } from "../ui/input"
 
 interface AutocompleteInputProps {
   value: string;
@@ -121,18 +122,4 @@ export function AutocompleteInput({ value, onChange, existingPlates, placeholder
       </PopoverContent>
     </Popover>
   )
-}
-
-// Simple debounce hook
-function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = React.useState<T>(value);
-  React.useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-  return debouncedValue;
 }
