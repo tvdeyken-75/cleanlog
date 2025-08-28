@@ -22,22 +22,22 @@ export function DashboardClient() {
           {activeTour && <p className="text-muted-foreground">Aktuelle Tour: {activeTour.transport_order}</p>}
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link href="/protocols/emergency" passHref>
-            <Button variant="destructive">
-              <Siren className="mr-2 h-4 w-4" />
-              Notfall
-            </Button>
-          </Link>
-          <Link href="/protocols/delivery" passHref>
+          <Link href="/protocols/new" passHref>
             <Button variant="outline">
-              <PackageCheck className="mr-2 h-4 w-4" />
-              Liefern
+              <Droplets className="mr-2 h-4 w-4" />
+              Reinigung
             </Button>
           </Link>
           <Link href="/protocols/laden" passHref>
             <Button variant="outline">
               <PackagePlus className="mr-2 h-4 w-4" />
               Laden
+            </Button>
+          </Link>
+          <Link href="/protocols/delivery" passHref>
+            <Button variant="outline">
+              <PackageCheck className="mr-2 h-4 w-4" />
+              Liefern
             </Button>
           </Link>
           <Link href="/protocols/pause" passHref>
@@ -52,10 +52,10 @@ export function DashboardClient() {
               Tanken
             </Button>
           </Link>
-          <Link href="/protocols/new" passHref>
-            <Button variant="outline">
-              <Droplets className="mr-2 h-4 w-4" />
-              Reinigung
+          <Link href="/protocols/emergency" passHref>
+            <Button variant="destructive">
+              <Siren className="mr-2 h-4 w-4" />
+              Notfall
             </Button>
           </Link>
         </div>
