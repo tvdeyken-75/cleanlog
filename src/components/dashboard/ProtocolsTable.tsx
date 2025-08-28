@@ -1,7 +1,7 @@
 
 "use client";
 
-import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol, LoadingProtocol, DeliveryProtocol, EmergencyProtocol } from "@/lib/types";
+import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol, LoadingProtocol, DeliveryProtocol, EmergencyProtocol, MaintenanceProtocol } from "@/lib/types";
 import {
   Table,
   TableBody,
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Truck, AlertTriangle, CheckCircle2, Droplets, Fuel, Coffee, PackagePlus, PackageCheck, Siren, Camera } from "lucide-react";
+import { Truck, AlertTriangle, CheckCircle2, Droplets, Fuel, Coffee, PackagePlus, PackageCheck, Siren, Camera, Wrench } from "lucide-react";
 
 interface ProtocolsTableProps {
   protocols: Protocol[];
@@ -124,6 +124,23 @@ const renderEmergencyDetails = (protocol: EmergencyProtocol) => (
     </>
 );
 
+const renderMaintenanceDetails = (protocol: MaintenanceProtocol) => (
+    <>
+      <TableCell>
+        <div className="font-medium capitalize">{protocol.reason}</div>
+        <div className="text-sm text-muted-foreground">{protocol.maintenance_type}</div>
+      </TableCell>
+      <TableCell className="text-center">
+        {protocol.documents && protocol.documents.length > 0 && (
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                <Camera className="h-4 w-4" />
+                <span>{protocol.documents.length}</span>
+            </div>
+        )}
+      </TableCell>
+    </>
+);
+
 
 const renderProtocolDetails = (protocol: Protocol) => {
     switch (protocol.type) {
@@ -139,6 +156,8 @@ const renderProtocolDetails = (protocol: Protocol) => {
             return renderDeliveryDetails(protocol as DeliveryProtocol);
         case 'emergency':
             return renderEmergencyDetails(protocol as EmergencyProtocol);
+        case 'maintenance':
+            return renderMaintenanceDetails(protocol as MaintenanceProtocol);
         default:
             return <><TableCell></TableCell><TableCell></TableCell></>;
     }
@@ -189,6 +208,8 @@ export function ProtocolsTable({ protocols, isLoading }: ProtocolsTableProps) {
             return <PackageCheck className="h-5 w-5 text-indigo-500" />;
         case 'emergency':
             return <Siren className="h-5 w-5 text-red-500" />;
+        case 'maintenance':
+            return <Wrench className="h-5 w-5 text-gray-500" />;
         default:
             return <Truck className="h-5 w-5 text-gray-400" />;
     }

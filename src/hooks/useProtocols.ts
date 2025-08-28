@@ -2,16 +2,25 @@
 
 "use client";
 import { useState, useEffect, useCallback } from 'react';
-import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol, LoadingProtocol, DeliveryProtocol, EmergencyProtocol } from '@/lib/types';
+import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol, LoadingProtocol, DeliveryProtocol, EmergencyProtocol, MaintenanceProtocol } from '@/lib/types';
 
-type NewProtocol = Omit<CleaningProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | Omit<FuelProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | Omit<PauseProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | Omit<LoadingProtocol, 'id' | 'driverId' | 'end_time' | 'type' | 'loading_protocol_number'> | Omit<DeliveryProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | Omit<EmergencyProtocol, 'id' | 'driverId' | 'end_time' | 'type'>;
+type NewProtocolPayload = 
+    Omit<CleaningProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | 
+    Omit<FuelProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | 
+    Omit<PauseProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | 
+    Omit<LoadingProtocol, 'id' | 'driverId' | 'end_time' | 'type' | 'loading_protocol_number'> | 
+    Omit<DeliveryProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | 
+    Omit<EmergencyProtocol, 'id' | 'driverId' | 'end_time' | 'type'> |
+    Omit<MaintenanceProtocol, 'id' | 'driverId' | 'end_time' | 'type'>;
+    
+type ProtocolType = Protocol['type'];
 
 export function useProtocols(userId: string | null) {
   const [protocols, setProtocols] = useState<Protocol[]>([]);
   const [vehicles, setVehicles] = useState<{truck: string[], trailer: string[]}>({ truck: [], trailer: [] });
   const [isLoading, setIsLoading] = useState(true);
 
-  const getProtocolsStorageKey = useCallback(() => `fahrerLogbuchProtocols_v3_${userId}`, [userId]);
+  const getProtocolsStorageKey = useCallback(() => `fahrerLogbuchProtocols_v4_${userId}`, [userId]);
   const getVehiclesStorageKey = () => `fahrerLogbuchVehicles_v1`;
 
   useEffect(() => {
@@ -47,32 +56,33 @@ export function useProtocols(userId: string | null) {
     }
   }, [userId, getProtocolsStorageKey]);
 
-  const addProtocol = (newProtocol: NewProtocol, type: 'cleaning' | 'fuel' | 'pause' | 'loading' | 'delivery' | 'emergency') => {
+  const addProtocol = (newProtocol: NewProtocolPayload, type: ProtocolType) => {
     if (!userId) return;
     
     let protocolWithMetadata: Protocol;
+    const baseMetadata = {
+        id: new Date().toISOString() + Math.random(),
+        driverId: userId,
+        start_time: newProtocol.start_time || new Date().toISOString(),
+        end_time: new Date().toISOString(),
+    };
 
     if (type === 'loading') {
-        const loadingProtocolsCount = protocols.filter(p => p.type === 'loading' && p.transport_order === (newProtocol as LoadingProtocol).transport_order).length;
+        const loadingPayload = newProtocol as Omit<LoadingProtocol, 'id' | 'driverId' | 'end_time' | 'type' | 'loading_protocol_number'>;
+        const loadingProtocolsCount = protocols.filter(p => p.type === 'loading' && p.transport_order === loadingPayload.transport_order).length;
         const nextId = (loadingProtocolsCount + 1).toString().padStart(2, '0');
-        const loadingProtocolNumber = `${(newProtocol as LoadingProtocol).transport_order}-${nextId}`;
+        const loadingProtocolNumber = `${loadingPayload.transport_order}-${nextId}`;
 
         protocolWithMetadata = {
-            ...newProtocol,
-            id: new Date().toISOString() + Math.random(),
-            driverId: userId,
-            start_time: newProtocol.start_time || new Date().toISOString(),
-            end_time: new Date().toISOString(),
+            ...loadingPayload,
+            ...baseMetadata,
             type: 'loading',
             loading_protocol_number: loadingProtocolNumber
         } as LoadingProtocol;
     } else {
         protocolWithMetadata = {
           ...newProtocol,
-          id: new Date().toISOString() + Math.random(),
-          driverId: userId,
-          start_time: newProtocol.start_time || new Date().toISOString(),
-          end_time: new Date().toISOString(),
+          ...baseMetadata,
           type: type,
         } as Protocol;
     }
@@ -106,7 +116,7 @@ export function useProtocols(userId: string | null) {
 
   const getUniqueLicensePlates = (type: 'truck' | 'trailer'): string[] => {
     const key = type === 'truck' ? 'truck_license_plate' : 'trailer_license_plate';
-    const protocolPlates = protocols.map(p => p[key]);
+    const protocolPlates = protocols.map(p => p[key]).filter((p): p is string => !!p);
     const adminPlates = vehicles[type];
     return [...new Set([...protocolPlates, ...adminPlates])];
   };

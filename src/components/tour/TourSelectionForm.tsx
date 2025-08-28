@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,13 +15,21 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { AutocompleteInput } from '../protocols/AutocompleteInput';
-import { Play } from 'lucide-react';
+import { Play, Wrench } from 'lucide-react';
 import { LabelWithTooltip } from '../ui/label-with-tooltip';
+import { Checkbox } from '../ui/checkbox';
 
 const tourSelectionSchema = z.object({
-  truck_license_plate: z.string().min(1, "LKW-Kennzeichen ist ein Pflichtfeld."),
-  trailer_license_plate: z.string().min(1, "Anhänger-Kennzeichen ist ein Pflichtfeld."),
-  transport_order: z.string().min(1, "Transportauftrag ist ein Pflichtfeld."),
+  truck_license_plate: z.string().optional(),
+  trailer_license_plate: z.string().optional(),
+  transport_order: z.string().optional(),
+  is_maintenance: z.boolean().default(false),
+}).refine(data => data.is_maintenance || (data.truck_license_plate && data.trailer_license_plate && data.transport_order), {
+    message: "Alle Felder sind für eine Tour erforderlich.",
+    path: ["transport_order"], 
+}).refine(data => !data.is_maintenance || (data.truck_license_plate || data.trailer_license_plate), {
+    message: "Für die Wartung muss mindestens ein LKW oder Anhänger ausgewählt werden.",
+    path: ["truck_license_plate"],
 });
 
 type TourSelectionFormValues = z.infer<typeof tourSelectionSchema>;
@@ -28,7 +37,7 @@ type TourSelectionFormValues = z.infer<typeof tourSelectionSchema>;
 export function TourSelectionForm() {
   const router = useRouter();
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
-  const { startTour, activeTour } = useTour();
+  const { startTour, activeTour, startMaintenanceMode } = useTour();
   const { getUniqueLicensePlates } = useProtocols(user);
 
   const form = useForm<TourSelectionFormValues>({
@@ -37,8 +46,11 @@ export function TourSelectionForm() {
       truck_license_plate: '',
       trailer_license_plate: '',
       transport_order: '',
+      is_maintenance: false,
     }
   });
+
+  const isMaintenance = form.watch('is_maintenance');
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -50,8 +62,21 @@ export function TourSelectionForm() {
   }, [authLoading, isAuthenticated, activeTour, router]);
 
   const onSubmit = (data: TourSelectionFormValues) => {
-    startTour(data);
-    router.push('/');
+    if (data.is_maintenance) {
+        startMaintenanceMode({
+            truck_license_plate: data.truck_license_plate || '',
+            trailer_license_plate: data.trailer_license_plate || '',
+            transport_order: '', // Not applicable
+        });
+        router.push('/protocols/maintenance');
+    } else {
+        startTour({
+            truck_license_plate: data.truck_license_plate!,
+            trailer_license_plate: data.trailer_license_plate!,
+            transport_order: data.transport_order!,
+        });
+        router.push('/');
+    }
   };
 
   if (authLoading) {
@@ -63,13 +88,33 @@ export function TourSelectionForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <FormField
           control={form.control}
+          name="is_maintenance"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4 shadow">
+                <FormControl>
+                    <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                    />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                    <LabelWithTooltip tooltipText="Для протокола технического обслуживания/ремонта">
+                        Wartungs/Reparaturprotokoll einfüllen
+                    </LabelWithTooltip>
+                </div>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
           name="truck_license_plate"
           render={({ field }) => (
             <FormItem>
               <LabelWithTooltip tooltipText="Номерной знак грузовика">LKW-Kennzeichen</LabelWithTooltip>
               <FormControl>
                 <AutocompleteInput 
-                  value={field.value}
+                  value={field.value || ''}
                   onChange={field.onChange}
                   existingPlates={getUniqueLicensePlates('truck')}
                   placeholder="z.B. B-XY-123"
@@ -87,7 +132,7 @@ export function TourSelectionForm() {
               <LabelWithTooltip tooltipText="Номерной знак прицепа">Anhänger-Kennzeichen</LabelWithTooltip>
               <FormControl>
                 <AutocompleteInput 
-                  value={field.value}
+                  value={field.value || ''}
                   onChange={field.onChange}
                   existingPlates={getUniqueLicensePlates('trailer')}
                   placeholder="z.B. B-AB-456"
@@ -97,22 +142,24 @@ export function TourSelectionForm() {
             </FormItem>
           )}
         />
-        <FormField
-          control={form.control}
-          name="transport_order"
-          render={({ field }) => (
-            <FormItem>
-              <LabelWithTooltip tooltipText="Заказ на перевозку">Transportauftrag</LabelWithTooltip>
-              <FormControl>
-                <Input {...field} placeholder="z.B. T-54321" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        {!isMaintenance && (
+            <FormField
+            control={form.control}
+            name="transport_order"
+            render={({ field }) => (
+                <FormItem>
+                <LabelWithTooltip tooltipText="Заказ на перевозку">Transportauftrag</LabelWithTooltip>
+                <FormControl>
+                    <Input {...field} placeholder="z.B. T-54321" />
+                </FormControl>
+                <FormMessage />
+                </FormItem>
+            )}
+            />
+        )}
         <Button type="submit" className="w-full text-lg py-6" disabled={form.formState.isSubmitting}>
-            <Play className="mr-2 h-5 w-5" />
-            Tour starten
+            {isMaintenance ? <Wrench className="mr-2 h-5 w-5" /> : <Play className="mr-2 h-5 w-5" />}
+            {isMaintenance ? 'Wartungsprotokoll hinzufügen' : 'Tour starten'}
         </Button>
       </form>
     </Form>

@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect } from 'react';
@@ -11,17 +12,17 @@ import { Skeleton } from '@/components/ui/skeleton';
 export default function DashboardPage() {
   const router = useRouter();
   const { isAuthenticated, isLoading: authLoading } = useAuth();
-  const { activeTour, isLoading: tourLoading } = useTour();
+  const { activeTour, isLoading: tourLoading, isMaintenanceMode } = useTour();
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.replace('/login');
-    } else if (!authLoading && isAuthenticated && !tourLoading && !activeTour) {
+    } else if (!authLoading && isAuthenticated && !tourLoading && !activeTour && !isMaintenanceMode) {
       router.replace('/tour-selection');
     }
-  }, [authLoading, isAuthenticated, tourLoading, activeTour, router]);
+  }, [authLoading, isAuthenticated, tourLoading, activeTour, isMaintenanceMode, router]);
 
-  const isLoading = authLoading || tourLoading || !isAuthenticated || !activeTour;
+  const isLoading = authLoading || tourLoading || !isAuthenticated || (!activeTour && !isMaintenanceMode);
 
   if (isLoading) {
     return (

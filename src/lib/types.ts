@@ -6,7 +6,7 @@ export interface ContaminationDetails {
   corrective_actions: string;
 }
 
-export type ProtocolType = 'cleaning' | 'fuel' | 'pause' | 'loading' | 'delivery' | 'emergency';
+export type ProtocolType = 'cleaning' | 'fuel' | 'pause' | 'loading' | 'delivery' | 'emergency' | 'maintenance';
 
 export interface Tour {
   truck_license_plate: string;
@@ -14,13 +14,16 @@ export interface Tour {
   transport_order: string;
 }
 
-interface BaseProtocol extends Tour {
+interface BaseProtocol {
     id: string;
     driverId: string;
     type: ProtocolType;
     location: string;
     start_time: string; // Should be part of all protocols for consistency
     end_time: string;
+    truck_license_plate?: string;
+    trailer_license_plate?: string;
+    transport_order?: string;
 }
 
 export interface CleaningProtocol extends BaseProtocol {
@@ -102,8 +105,18 @@ export interface EmergencyProtocol extends BaseProtocol {
     vehicle_immobile?: boolean; // For delay, breakdown
 }
 
+export interface MaintenanceProtocol extends BaseProtocol {
+    type: 'maintenance';
+    maintenance_type: 'Eigenleistung' | 'Werkstatt';
+    reason: string;
+    description: string;
+    duration: number; // in minutes
+    odometer_reading?: number;
+    documents?: Photo[];
+}
 
-export type Protocol = CleaningProtocol | FuelProtocol | PauseProtocol | LoadingProtocol | DeliveryProtocol | EmergencyProtocol;
+
+export type Protocol = CleaningProtocol | FuelProtocol | PauseProtocol | LoadingProtocol | DeliveryProtocol | EmergencyProtocol | MaintenanceProtocol;
 
 
     

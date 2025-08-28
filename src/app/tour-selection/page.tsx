@@ -1,6 +1,6 @@
 import { TourSelectionForm } from '@/components/tour/TourSelectionForm';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Map } from 'lucide-react';
+import { Map, Wrench } from 'lucide-react';
 
 export default function TourSelectionPage() {
   return (
@@ -9,10 +9,10 @@ export default function TourSelectionPage() {
         <Card className="shadow-2xl">
           <CardHeader className="text-center">
             <div className="mx-auto bg-primary text-primary-foreground rounded-full p-3 w-fit mb-4">
-              <Map className="h-8 w-8" />
+                <Wrench className="h-8 w-8" />
             </div>
-            <CardTitle className="font-headline text-3xl">Tour beginnen</CardTitle>
-            <CardDescription>Geben Sie die Details Ihrer aktuellen Tour ein, um fortzufahren.</CardDescription>
+            <CardTitle className="font-headline text-3xl">Tour oder Wartung</CardTitle>
+            <CardDescription>Beginnen Sie eine neue Tour oder erstellen Sie ein Wartungsprotokoll.</CardDescription>
           </CardHeader>
           <CardContent>
             <TourSelectionForm />
