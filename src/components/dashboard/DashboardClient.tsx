@@ -23,38 +23,38 @@ export function DashboardClient() {
         </div>
         <div className="flex flex-wrap gap-2">
           <Link href="/protocols/new" passHref>
-            <Button variant="outline">
-              <Droplets className="mr-2 h-4 w-4" />
+            <Button variant="outline" size="lg">
+              <Droplets className="mr-2 h-5 w-5" />
               Reinigung
             </Button>
           </Link>
           <Link href="/protocols/laden" passHref>
-            <Button variant="outline">
-              <PackagePlus className="mr-2 h-4 w-4" />
+            <Button variant="outline" size="lg">
+              <PackagePlus className="mr-2 h-5 w-5" />
               Laden
             </Button>
           </Link>
           <Link href="/protocols/delivery" passHref>
-            <Button variant="outline">
-              <PackageCheck className="mr-2 h-4 w-4" />
+            <Button variant="outline" size="lg">
+              <PackageCheck className="mr-2 h-5 w-5" />
               Liefern
             </Button>
           </Link>
           <Link href="/protocols/pause" passHref>
-            <Button variant="outline">
-              <Coffee className="mr-2 h-4 w-4" />
+            <Button variant="outline" size="lg">
+              <Coffee className="mr-2 h-5 w-5" />
               Pause
             </Button>
           </Link>
           <Link href="/protocols/fuel" passHref>
-            <Button variant="outline">
-              <Fuel className="mr-2 h-4 w-4" />
+            <Button variant="outline" size="lg">
+              <Fuel className="mr-2 h-5 w-5" />
               Tanken
             </Button>
           </Link>
           <Link href="/protocols/emergency" passHref>
-            <Button variant="destructive">
-              <Siren className="mr-2 h-4 w-4" />
+            <Button variant="destructive" size="lg">
+              <Siren className="mr-2 h-5 w-5" />
               Notfall
             </Button>
           </Link>
