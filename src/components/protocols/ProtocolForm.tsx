@@ -103,7 +103,7 @@ export function ProtocolForm() {
         corrective_actions: data.corrective_actions || '',
       } : undefined,
     };
-    addProtocol(protocolData);
+    addProtocol(protocolData, 'cleaning');
     toast({
       title: "Protokoll gespeichert",
       description: "Ihr Reinigungsprotokoll wurde erfolgreich hinzugefügt.",

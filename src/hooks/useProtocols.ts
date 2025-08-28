@@ -1,12 +1,14 @@
 "use client";
 import { useState, useEffect, useCallback } from 'react';
-import type { Protocol } from '@/lib/types';
+import type { Protocol, CleaningProtocol, FuelProtocol } from '@/lib/types';
+
+type NewProtocol = Omit<CleaningProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | Omit<FuelProtocol, 'id' | 'driverId' | 'end_time' | 'type'>;
 
 export function useProtocols(userId: string | null) {
   const [protocols, setProtocols] = useState<Protocol[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const getStorageKey = useCallback(() => `fahrerLogbuchProtocols_${userId}`, [userId]);
+  const getStorageKey = useCallback(() => `fahrerLogbuchProtocols_v2_${userId}`, [userId]);
 
   useEffect(() => {
     if (userId) {
@@ -30,7 +32,7 @@ export function useProtocols(userId: string | null) {
     }
   }, [userId, getStorageKey]);
 
-  const addProtocol = (newProtocol: Omit<Protocol, 'id' | 'driverId' | 'end_time'>) => {
+  const addProtocol = (newProtocol: NewProtocol, type: 'cleaning' | 'fuel') => {
     if (!userId) return;
     
     const protocolWithMetadata: Protocol = {
@@ -38,7 +40,8 @@ export function useProtocols(userId: string | null) {
       id: new Date().toISOString() + Math.random(),
       driverId: userId,
       end_time: new Date().toISOString(),
-    };
+      type: type,
+    } as Protocol;
 
     setProtocols(prevProtocols => {
       const updatedProtocols = [protocolWithMetadata, ...prevProtocols];
@@ -53,7 +56,15 @@ export function useProtocols(userId: string | null) {
 
   const getUniqueLicensePlates = (type: 'truck' | 'trailer'): string[] => {
     const key = type === 'truck' ? 'truck_license_plate' : 'trailer_license_plate';
-    const plates = protocols.map(p => p[key]);
+    const allPlates = protocols.map(p => p[key]);
+    const truckPlates = protocols
+        .filter(p => p.type === 'cleaning' || p.type === 'fuel')
+        .map(p => p.truck_license_plate);
+    const trailerPlates = protocols
+        .filter(p => p.type === 'cleaning' || p.type === 'fuel')
+        .map(p => p.trailer_license_plate);
+    
+    const plates = type === 'truck' ? truckPlates : trailerPlates;
     return [...new Set(plates)];
   };
 
