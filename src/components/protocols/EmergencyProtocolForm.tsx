@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
@@ -80,6 +81,13 @@ export function EmergencyProtocolForm() {
     defaultValues: {
       location: '',
       photos: [],
+      emergency_type: undefined,
+      description: '',
+      reference_number: '',
+      incident_type_description: '',
+      help_called: undefined,
+      estimated_duration: undefined,
+      vehicle_immobile: undefined,
     }
   });
 
