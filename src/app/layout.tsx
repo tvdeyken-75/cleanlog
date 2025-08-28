@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'CleanLog',
+  title: 'FahrerLogbuch',
   description: 'Protokoll-Manager für die Reinigung von Kühlladeräumen',
 };
 

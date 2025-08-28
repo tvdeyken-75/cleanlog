@@ -6,7 +6,7 @@ export function useProtocols(userId: string | null) {
   const [protocols, setProtocols] = useState<Protocol[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const getStorageKey = useCallback(() => `cleanLogProtocols_${userId}`, [userId]);
+  const getStorageKey = useCallback(() => `fahrerLogbuchProtocols_${userId}`, [userId]);
 
   useEffect(() => {
     if (userId) {

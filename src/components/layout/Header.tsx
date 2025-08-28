@@ -35,7 +35,7 @@ export function Header() {
         <div className="mr-4 flex">
           <Link href="/" className="flex items-center space-x-2">
             <Truck className="h-6 w-6 text-primary" />
-            <span className="inline-block font-bold font-headline text-xl">CleanLog</span>
+            <span className="inline-block font-bold font-headline text-xl">FahrerLogbuch</span>
           </Link>
         </div>
         

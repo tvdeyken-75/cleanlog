@@ -18,7 +18,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   
   useEffect(() => {
     try {
-      const storedUser = localStorage.getItem('cleanLogUser');
+      const storedUser = localStorage.getItem('fahrerLogbuchUser');
       if (storedUser) {
         setUser(storedUser);
       }
@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = (username: string) => {
     try {
-      localStorage.setItem('cleanLogUser', username);
+      localStorage.setItem('fahrerLogbuchUser', username);
       setUser(username);
     } catch (error) {
       console.error("Could not write to localStorage", error);
@@ -40,7 +40,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     try {
-      localStorage.removeItem('cleanLogUser');
+      localStorage.removeItem('fahrerLogbuchUser');
       setUser(null);
     } catch (error) {
       console.error("Could not remove from localStorage", error);

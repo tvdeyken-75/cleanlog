@@ -11,7 +11,7 @@ export default function LoginPage() {
             <div className="mx-auto bg-primary text-primary-foreground rounded-full p-3 w-fit mb-4">
               <Truck className="h-8 w-8" />
             </div>
-            <CardTitle className="font-headline text-3xl">CleanLog</CardTitle>
+            <CardTitle className="font-headline text-3xl">FahrerLogbuch</CardTitle>
             <CardDescription>Anmelden, um Protokolle zu verwalten</CardDescription>
           </CardHeader>
           <CardContent>
