@@ -1,3 +1,4 @@
+
 export interface ContaminationDetails {
   types: string[];
   description: string;
@@ -55,6 +56,7 @@ export interface LoadingProtocol extends BaseProtocol {
   type: 'loading';
   goods_type: GoodsType;
   articles?: string;
+  articles_other?: string;
   quantity?: number;
   packaging?: string;
   weight?: number;
@@ -70,3 +72,6 @@ export interface LoadingProtocol extends BaseProtocol {
 
 
 export type Protocol = CleaningProtocol | FuelProtocol | PauseProtocol | LoadingProtocol;
+
+
+    

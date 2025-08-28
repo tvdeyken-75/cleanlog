@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -32,6 +33,7 @@ const loadingProtocolFormSchema = z.object({
   goods_type: z.enum(['food', 'non-food', 'empties'], { required_error: "Warenart ist ein Pflichtfeld." }),
   required_temperature: z.coerce.number(),
   articles: z.string().optional(),
+  articles_other: z.string().optional(),
   quantity: z.coerce.number().optional(),
   packaging: z.string().optional(),
   weight: z.coerce.number().optional(),
@@ -42,7 +44,12 @@ const loadingProtocolFormSchema = z.object({
   has_seal: z.boolean().default(false),
 }).superRefine((data, ctx) => {
     if (data.goods_type === 'food' || data.goods_type === 'non-food') {
-        if (!data.articles) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Artikel ist ein Pflichtfeld.", path: ['articles'] });
+        if (!data.articles) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Artikel ist ein Pflichtfeld.", path: ['articles'] });
+        }
+        if (data.articles === 'sonstiges' && !data.articles_other) {
+            ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Bitte beschreiben Sie die sonstigen Artikel.", path: ['articles_other'] });
+        }
     }
     if (data.goods_type === 'empties') {
         if (!data.pallets) ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Palettenanzahl ist ein Pflichtfeld.", path: ['pallets'] });
@@ -51,6 +58,22 @@ const loadingProtocolFormSchema = z.object({
 });
 
 type LoadingProtocolFormValues = z.infer<typeof loadingProtocolFormSchema>;
+
+const articleOptions = {
+    food: [
+        { value: 'frisches-fleisch', label: 'Frisches Fleisch' },
+        { value: 'halbe-schweine', label: 'Halbe Schweine' },
+        { value: 'obst', label: 'Obst' },
+        { value: 'gemuese', label: 'Gemüse' },
+        { value: 'fleisch-in-dose', label: 'Fleisch in Dose' },
+        { value: 'sonstiges', label: 'Sonstiges' },
+    ],
+    'non-food': [
+        { value: 'blumen', label: 'Blumen' },
+        { value: 'sonstiges', label: 'Sonstiges' },
+    ],
+};
+
 
 export function LoadingProtocolForm() {
   const router = useRouter();
@@ -71,6 +94,11 @@ export function LoadingProtocolForm() {
   });
 
   const watchGoodsType = form.watch('goods_type');
+  const watchArticles = form.watch('articles');
+
+  useEffect(() => {
+    form.setValue('articles', undefined);
+  }, [watchGoodsType, form]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -97,6 +125,7 @@ export function LoadingProtocolForm() {
     
     addProtocol({
         ...data,
+        articles: data.articles === 'sonstiges' ? data.articles_other : data.articles,
         truck_license_plate: activeTour.truck_license_plate,
         trailer_license_plate: activeTour.trailer_license_plate,
         transport_order: activeTour.transport_order,
@@ -251,54 +280,78 @@ export function LoadingProtocolForm() {
                 )}
             />
             {(watchGoodsType === 'food' || watchGoodsType === 'non-food') && (
-                <div className='grid md:grid-cols-2 gap-6 p-4 border rounded-md'>
+                <div className='space-y-6 p-4 border rounded-md'>
                     <FormField
                         control={form.control}
                         name="articles"
                         render={({ field }) => (
-                        <FormItem className="md:col-span-2">
+                        <FormItem>
                             <FormLabel>Artikel</FormLabel>
-                            <FormControl><Textarea {...field} placeholder="Welche Artikel werden geladen?" /></FormControl>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl>
+                                <SelectTrigger><SelectValue placeholder="Wählen Sie einen Artikel" /></SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    {(articleOptions[watchGoodsType] || []).map(option => (
+                                        <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
                             <FormMessage />
                         </FormItem>
                         )}
                     />
-                     <FormField
-                        control={form.control}
-                        name="quantity"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Menge (Stück)</FormLabel>
-                            <FormControl><Input type="number" {...field} placeholder="z.B. 100" /></FormControl>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
-                     <FormField
-                        control={form.control}
-                        name="packaging"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Verpackungsform</FormLabel>
-                            <FormControl><Input {...field} placeholder="z.B. Karton, Kiste" /></FormControl>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
-                     <FormField
-                        control={form.control}
-                        name="weight"
-                        render={({ field }) => (
-                        <FormItem>
-                            <FormLabel>Gewicht</FormLabel>
-                             <div className="relative">
-                                <FormControl><Input type="number" {...field} placeholder="z.B. 500" className="pr-8"/></FormControl>
-                                <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">kg</span>
-                            </div>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
+                    {watchArticles === 'sonstiges' && (
+                         <FormField
+                            control={form.control}
+                            name="articles_other"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Beschreibung für sonstige Artikel</FormLabel>
+                                <FormControl><Textarea {...field} placeholder="Welche Artikel werden geladen?" /></FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                    )}
+                    <div className="grid md:grid-cols-2 gap-6">
+                        <FormField
+                            control={form.control}
+                            name="quantity"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Menge (Stück)</FormLabel>
+                                <FormControl><Input type="number" {...field} placeholder="z.B. 100" /></FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="packaging"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Verpackungsform</FormLabel>
+                                <FormControl><Input {...field} placeholder="z.B. Karton, Kiste" /></FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="weight"
+                            render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Gewicht</FormLabel>
+                                <div className="relative">
+                                    <FormControl><Input type="number" {...field} placeholder="z.B. 500" className="pr-8"/></FormControl>
+                                    <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">kg</span>
+                                </div>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                    </div>
                 </div>
             )}
              {watchGoodsType === 'empties' && (
@@ -394,3 +447,6 @@ export function LoadingProtocolForm() {
     </Form>
   );
 }
+
+
+    
