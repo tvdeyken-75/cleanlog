@@ -84,11 +84,16 @@ export interface DeliveryProtocol extends BaseProtocol {
 
 export type EmergencyType = 'vehicle-damage' | 'goods-blocked' | 'personal-injury' | 'delay' | 'break-in' | 'health-incident' | 'breakdown' | 'other';
 
+export interface Photo {
+    dataUrl: string; // data URI
+    mimeType: string;
+}
+
 export interface EmergencyProtocol extends BaseProtocol {
     type: 'emergency';
     emergency_type: EmergencyType;
     description: string;
-    photos: string[]; // data URIs
+    photos: Photo[];
     // Conditional fields
     reference_number?: string; // For vehicle damage, goods blocked
     incident_type_description?: string; // For personal injury, health incident

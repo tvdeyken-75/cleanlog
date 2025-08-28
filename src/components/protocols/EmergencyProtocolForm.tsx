@@ -11,7 +11,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useProtocols } from '@/hooks/useProtocols';
 import { useToast } from '@/hooks/use-toast';
 import { useTour } from '@/context/TourContext';
-import type { EmergencyType } from '@/lib/types';
+import type { EmergencyType, Photo } from '@/lib/types';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,7 +26,7 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 
 
 import { LocationInput } from './LocationInput';
-import { ArrowLeft, Truck, CalendarClock, ChevronsUpDown, Siren, FileText, Camera, MapPin, CircleCheck, Trash2 } from 'lucide-react';
+import { ArrowLeft, Truck, CalendarClock, ChevronsUpDown, Siren, FileText, Camera, MapPin, CircleCheck, Trash2, File, Upload } from 'lucide-react';
 import { LabelWithTooltip } from '../ui/label-with-tooltip';
 
 const emergencyTypes: { value: EmergencyType, label: string }[] = [
@@ -40,11 +40,16 @@ const emergencyTypes: { value: EmergencyType, label: string }[] = [
     { value: 'other', label: 'Sonstiger Vorfall' },
 ];
 
+const photoSchema = z.object({
+  dataUrl: z.string(),
+  mimeType: z.string(),
+});
+
 const emergencyProtocolSchema = z.object({
   emergency_type: z.enum(['vehicle-damage', 'goods-blocked', 'personal-injury', 'delay', 'break-in', 'health-incident', 'breakdown', 'other'], { required_error: "Meldungstyp ist ein Pflichtfeld." }),
   description: z.string().min(10, "Beschreibung muss mindestens 10 Zeichen lang sein."),
   location: z.string().min(1, "Ort ist ein Pflichtfeld."),
-  photos: z.array(z.string()).min(1, "Mindestens ein Foto ist erforderlich."),
+  photos: z.array(photoSchema).min(1, "Mindestens ein Foto oder Dokument ist erforderlich."),
   reference_number: z.string().optional(),
   incident_type_description: z.string().optional(),
   help_called: z.enum(['yes', 'no']).optional(),
@@ -66,8 +71,9 @@ export function EmergencyProtocolForm() {
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
-  const [photos, setPhotos] = useState<string[]>([]);
+  const [photos, setPhotos] = useState<Photo[]>([]);
 
   const form = useForm<EmergencyProtocolFormValues>({
     resolver: zodResolver(emergencyProtocolSchema),
@@ -126,10 +132,29 @@ export function EmergencyProtocolForm() {
             canvas.height = video.videoHeight;
             context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
             const dataUrl = canvas.toDataURL('image/jpeg');
-            const newPhotos = [...photos, dataUrl];
+            const newPhotos: Photo[] = [...photos, { dataUrl, mimeType: 'image/jpeg' }];
             setPhotos(newPhotos);
             form.setValue('photos', newPhotos, { shouldValidate: true });
         }
+    }
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files) return;
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        if (dataUrl) {
+            const newPhotos: Photo[] = [...photos, { dataUrl, mimeType: file.type }];
+            setPhotos(newPhotos);
+            form.setValue('photos', newPhotos, { shouldValidate: true });
+        }
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -282,7 +307,7 @@ export function EmergencyProtocolForm() {
         )}
 
         <Card>
-          <CardHeader><CardTitle className="flex items-center gap-2"><Camera className="text-primary"/>Fotodokumentation</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="flex items-center gap-2"><Camera className="text-primary"/>Foto- & Dokumentendokumentation</CardTitle></CardHeader>
           <CardContent className="space-y-4">
              {hasCameraPermission === false && (
                 <Alert variant="destructive">
@@ -290,21 +315,41 @@ export function EmergencyProtocolForm() {
                     <AlertDescription>Bitte erlauben Sie den Zugriff auf die Kamera, um Fotos aufzunehmen. Möglicherweise müssen Sie die Seite neu laden.</AlertDescription>
                 </Alert>
              )}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
-              <div className="w-full aspect-video bg-muted rounded-md overflow-hidden relative">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+              <div className="w-full aspect-video bg-muted rounded-md overflow-hidden relative md:col-span-2">
                 <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
                 <canvas ref={canvasRef} className="hidden" />
               </div>
-              <Button type="button" onClick={takePhoto} disabled={!hasCameraPermission} size="lg">
-                <Camera className="mr-2 h-5 w-5"/> Foto aufnehmen
-              </Button>
+              <div className="flex flex-col gap-2">
+                <Button type="button" onClick={takePhoto} disabled={!hasCameraPermission} size="lg">
+                    <Camera className="mr-2 h-5 w-5"/> Foto aufnehmen
+                </Button>
+                <Button type="button" onClick={() => fileInputRef.current?.click()} variant="outline" size="lg">
+                    <Upload className="mr-2 h-5 w-5"/> Dokument hochladen
+                </Button>
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    accept="image/*,application/pdf"
+                    multiple
+                />
+              </div>
             </div>
             <FormField control={form.control} name="photos" render={({ field }) => (
                 <FormItem>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
                         {photos.map((photo, index) => (
                             <div key={index} className="relative group">
-                                <Image src={photo} alt={`Foto ${index + 1}`} width={200} height={150} className="rounded-md object-cover aspect-video"/>
+                                {photo.mimeType.startsWith('image/') ? (
+                                    <Image src={photo.dataUrl} alt={`Dokument ${index + 1}`} width={200} height={150} className="rounded-md object-cover aspect-video"/>
+                                ) : (
+                                    <div className="w-full aspect-video bg-muted rounded-md flex flex-col items-center justify-center p-2">
+                                        <File className="h-10 w-10 text-muted-foreground"/>
+                                        <p className="text-xs text-center text-muted-foreground mt-1 truncate">Dokument</p>
+                                    </div>
+                                )}
                                 <Button type="button" variant="destructive" size="icon" className="absolute top-1 right-1 h-7 w-7 opacity-0 group-hover:opacity-100" onClick={() => removePhoto(index)}>
                                     <Trash2 className="h-4 w-4"/>
                                 </Button>
