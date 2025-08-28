@@ -54,6 +54,7 @@ export type GoodsType = 'food' | 'non-food' | 'empties';
 
 export interface LoadingProtocol extends BaseProtocol {
   type: 'loading';
+  loading_protocol_number: string;
   goods_type: GoodsType;
   articles?: string;
   articles_other?: string;

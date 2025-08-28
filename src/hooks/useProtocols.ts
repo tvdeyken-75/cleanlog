@@ -1,8 +1,9 @@
+
 "use client";
 import { useState, useEffect, useCallback } from 'react';
 import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol, LoadingProtocol } from '@/lib/types';
 
-type NewProtocol = Omit<CleaningProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | Omit<FuelProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | Omit<PauseProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | Omit<LoadingProtocol, 'id' | 'driverId' | 'end_time' | 'type'>;
+type NewProtocol = Omit<CleaningProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | Omit<FuelProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | Omit<PauseProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | Omit<LoadingProtocol, 'id' | 'driverId' | 'end_time' | 'type' | 'loading_protocol_number'>;
 
 export function useProtocols(userId: string | null) {
   const [protocols, setProtocols] = useState<Protocol[]>([]);
@@ -48,14 +49,33 @@ export function useProtocols(userId: string | null) {
   const addProtocol = (newProtocol: NewProtocol, type: 'cleaning' | 'fuel' | 'pause' | 'loading') => {
     if (!userId) return;
     
-    const protocolWithMetadata: Protocol = {
-      ...newProtocol,
-      id: new Date().toISOString() + Math.random(),
-      driverId: userId,
-      start_time: newProtocol.start_time || new Date().toISOString(), // Ensure start_time exists
-      end_time: new Date().toISOString(),
-      type: type,
-    } as Protocol;
+    let protocolWithMetadata: Protocol;
+
+    if (type === 'loading') {
+        const loadingProtocolsCount = protocols.filter(p => p.type === 'loading' && p.transport_order === (newProtocol as LoadingProtocol).transport_order).length;
+        const nextId = (loadingProtocolsCount + 1).toString().padStart(2, '0');
+        const loadingProtocolNumber = `${(newProtocol as LoadingProtocol).transport_order}-${nextId}`;
+
+        protocolWithMetadata = {
+            ...newProtocol,
+            id: new Date().toISOString() + Math.random(),
+            driverId: userId,
+            start_time: newProtocol.start_time || new Date().toISOString(),
+            end_time: new Date().toISOString(),
+            type: 'loading',
+            loading_protocol_number: loadingProtocolNumber
+        } as LoadingProtocol;
+    } else {
+        protocolWithMetadata = {
+          ...newProtocol,
+          id: new Date().toISOString() + Math.random(),
+          driverId: userId,
+          start_time: newProtocol.start_time || new Date().toISOString(),
+          end_time: new Date().toISOString(),
+          type: type,
+        } as Protocol;
+    }
+
 
     setProtocols(prevProtocols => {
       const updatedProtocols = [protocolWithMetadata, ...prevProtocols];

@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol, LoadingProtocol } from "@/lib/types";
@@ -75,6 +76,7 @@ const renderLoadingDetails = (protocol: LoadingProtocol) => (
     <TableCell>
       <div className="font-medium capitalize">{protocol.goods_type.replace('-', ' ')}</div>
       <div className="text-sm text-muted-foreground">{protocol.location}</div>
+      <div className="text-xs text-muted-foreground mt-1 font-mono">{protocol.loading_protocol_number}</div>
     </TableCell>
     <TableCell className="text-center">
         <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
