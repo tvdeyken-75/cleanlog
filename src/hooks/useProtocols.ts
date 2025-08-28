@@ -63,7 +63,7 @@ export function useProtocols(userId: string | null) {
     const baseMetadata = {
         id: new Date().toISOString() + Math.random(),
         driverId: userId,
-        start_time: newProtocol.start_time || new Date().toISOString(),
+        start_time: (newProtocol as any).start_time || new Date().toISOString(),
         end_time: new Date().toISOString(),
     };
 

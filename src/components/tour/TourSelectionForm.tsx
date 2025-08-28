@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -37,7 +37,7 @@ type TourSelectionFormValues = z.infer<typeof tourSelectionSchema>;
 export function TourSelectionForm() {
   const router = useRouter();
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
-  const { startTour, activeTour, startMaintenanceMode } = useTour();
+  const { startTour, activeTour } = useTour();
   const { getUniqueLicensePlates } = useProtocols(user);
 
   const form = useForm<TourSelectionFormValues>({
@@ -63,12 +63,10 @@ export function TourSelectionForm() {
 
   const onSubmit = (data: TourSelectionFormValues) => {
     if (data.is_maintenance) {
-        startMaintenanceMode({
-            truck_license_plate: data.truck_license_plate || '',
-            trailer_license_plate: data.trailer_license_plate || '',
-            transport_order: '', // Not applicable
-        });
-        router.push('/protocols/maintenance');
+        const params = new URLSearchParams();
+        if (data.truck_license_plate) params.set('truck', data.truck_license_plate);
+        if (data.trailer_license_plate) params.set('trailer', data.trailer_license_plate);
+        router.push(`/protocols/maintenance?${params.toString()}`);
     } else {
         startTour({
             truck_license_plate: data.truck_license_plate!,

@@ -20,11 +20,11 @@ export function DashboardClient() {
       <div className="flex items-center justify-between gap-4">
         <div>
           <h1 className="font-headline text-2xl font-semibold md:text-3xl">Meine Protokolle</h1>
-          {activeTour && <p className="text-muted-foreground">Aktuelle Tour: {activeTour.transport_order}</p>}
+          {activeTour && !isMaintenanceMode && <p className="text-muted-foreground">Aktuelle Tour: {activeTour.transport_order}</p>}
           {isMaintenanceMode && <p className="text-muted-foreground">Wartungsmodus für: {activeTour?.truck_license_plate}{activeTour?.truck_license_plate && activeTour?.trailer_license_plate && ', '}{activeTour?.trailer_license_plate}</p>}
         </div>
         <div className="flex flex-wrap gap-2">
-          <Link href="/protocols/new" passHref>
+           <Link href="/protocols/new" passHref>
             <Button variant="outline" size="lg">
               <Droplets className="mr-2 h-5 w-5" />
               Reinigung
@@ -54,16 +54,16 @@ export function DashboardClient() {
               Tanken
             </Button>
           </Link>
-           <Link href="/tour-selection" passHref>
-            <Button variant="outline" size="lg">
-                <Wrench className="mr-2 h-5 w-5" />
-                Wartung
-            </Button>
-          </Link>
           <Link href="/protocols/emergency" passHref>
             <Button variant="destructive" size="lg">
               <Siren className="mr-2 h-5 w-5" />
               Notfall
+            </Button>
+          </Link>
+          <Link href="/tour-selection" passHref>
+            <Button variant="outline" size="lg">
+                <Wrench className="mr-2 h-5 w-5" />
+                Wartung
             </Button>
           </Link>
         </div>

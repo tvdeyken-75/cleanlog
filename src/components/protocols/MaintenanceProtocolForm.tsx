@@ -2,7 +2,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,7 +11,6 @@ import { z } from 'zod';
 import { useAuth } from '@/context/AuthContext';
 import { useProtocols } from '@/hooks/useProtocols';
 import { useToast } from '@/hooks/use-toast';
-import { useTour } from '@/context/TourContext';
 import type { Photo as DocumentPhoto } from '@/lib/types';
 
 import { Button } from '@/components/ui/button';
@@ -48,8 +47,8 @@ type MaintenanceProtocolFormValues = z.infer<typeof maintenanceProtocolSchema>;
 
 export function MaintenanceProtocolForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
-  const { activeTour, isMaintenanceMode } = useTour();
   const { addProtocol } = useProtocols(user);
   const { toast } = useToast();
   
@@ -61,6 +60,9 @@ export function MaintenanceProtocolForm() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const [documents, setDocuments] = useState<DocumentPhoto[]>([]);
+
+  const truckLicensePlate = searchParams.get('truck');
+  const trailerLicensePlate = searchParams.get('trailer');
 
   const form = useForm<MaintenanceProtocolFormValues>({
     resolver: zodResolver(maintenanceProtocolSchema),
@@ -78,10 +80,14 @@ export function MaintenanceProtocolForm() {
   }, []);
   
   useEffect(() => {
-    if (!authLoading && (!isAuthenticated || !isMaintenanceMode)) {
-      router.replace('/tour-selection');
+    if (!authLoading && !isAuthenticated) {
+      router.replace('/login');
     }
-  }, [authLoading, isAuthenticated, isMaintenanceMode, router]);
+    if (!authLoading && (!truckLicensePlate && !trailerLicensePlate)) {
+        toast({ variant: 'destructive', title: "Kein Fahrzeug ausgewählt", description: "Bitte gehen Sie zurück und wählen Sie ein Fahrzeug für die Wartung aus."})
+        router.replace('/tour-selection');
+    }
+  }, [authLoading, isAuthenticated, router, truckLicensePlate, trailerLicensePlate, toast]);
   
   useEffect(() => {
     async function getCameraPermission() {
@@ -146,19 +152,10 @@ export function MaintenanceProtocolForm() {
 
 
   const onSubmit = (data: MaintenanceProtocolFormValues) => {
-    if (!activeTour) {
-      toast({
-        variant: "destructive",
-        title: "Fehler",
-        description: "Kein Fahrzeug ausgewählt. Bitte kehren Sie zurück und wählen Sie ein Fahrzeug aus.",
-      });
-      return;
-    }
-    
     addProtocol({
         ...data,
-        truck_license_plate: activeTour.truck_license_plate,
-        trailer_license_plate: activeTour.trailer_license_plate,
+        truck_license_plate: truckLicensePlate || undefined,
+        trailer_license_plate: trailerLicensePlate || undefined,
     }, 'maintenance');
 
     toast({
@@ -168,7 +165,7 @@ export function MaintenanceProtocolForm() {
     router.push('/');
   };
   
-  if (authLoading || !isAuthenticated || !activeTour) {
+  if (authLoading || !isAuthenticated || (!truckLicensePlate && !trailerLicensePlate)) {
     return (
       <div className="container max-w-4xl mx-auto p-4 md:p-8 space-y-8">
         <Skeleton className="h-8 w-48" />
@@ -201,11 +198,11 @@ export function MaintenanceProtocolForm() {
               <CollapsibleContent>
                 <CardContent className="pt-0">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                        {activeTour.truck_license_plate && (
-                            <div><p className="text-muted-foreground">LKW</p><p className="font-medium">{activeTour.truck_license_plate}</p></div>
+                        {truckLicensePlate && (
+                            <div><p className="text-muted-foreground">LKW</p><p className="font-medium">{truckLicensePlate}</p></div>
                         )}
-                        {activeTour.trailer_license_plate && (
-                            <div><p className="text-muted-foreground">Anhänger</p><p className="font-medium">{activeTour.trailer_license_plate}</p></div>
+                        {trailerLicensePlate && (
+                            <div><p className="text-muted-foreground">Anhänger</p><p className="font-medium">{trailerLicensePlate}</p></div>
                         )}
                         <div><p className="text-muted-foreground flex items-center gap-1.5"><CalendarClock className="h-4 w-4"/>Datum & Zeit</p><p className="font-medium">{currentTime || "..."}</p></div>
                     </div>
@@ -258,7 +255,7 @@ export function MaintenanceProtocolForm() {
                 </FormItem>
               )}
             />
-            {activeTour.truck_license_plate && (
+            {truckLicensePlate && (
                  <FormField
                   control={form.control}
                   name="odometer_reading"

@@ -7,9 +7,8 @@ import { useAuth } from './AuthContext';
 
 interface TourContextType {
   activeTour: Tour | null;
-  isMaintenanceMode: boolean;
+  isMaintenanceMode: boolean; // This will now be derived, not a separate state
   startTour: (tour: Tour) => void;
-  startMaintenanceMode: (vehicles: Omit<Tour, 'transport_order'>) => void;
   endTour: () => void;
   isLoading: boolean;
 }
@@ -19,91 +18,64 @@ const TourContext = createContext<TourContextType | undefined>(undefined);
 export function TourProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const [activeTour, setActiveTour] = useState<Tour | null>(null);
-  const [isMaintenanceMode, setIsMaintenanceMode] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  // We can derive maintenance mode from the activeTour object
+  const isMaintenanceMode = activeTour ? !activeTour.transport_order : false;
 
   const getStorageKey = useCallback((base: string) => {
     if (!user) return null;
-    return `fahrerLogbuch${base}_${user}`;
+    // Simplified to one key for tour/maintenance session per user
+    return `fahrerLogbuchActiveSession_${user}`;
   }, [user]);
 
   useEffect(() => {
     setIsLoading(true);
     if (user) {
       try {
-        const tourKey = getStorageKey('ActiveTour');
-        const maintenanceKey = getStorageKey('MaintenanceMode');
-        
-        const storedTour = tourKey ? localStorage.getItem(tourKey) : null;
-        const storedMaintenance = maintenanceKey ? localStorage.getItem(maintenanceKey) : null;
+        const sessionKey = getStorageKey('');
+        const storedSession = sessionKey ? localStorage.getItem(sessionKey) : null;
 
-        if (storedTour) {
-          setActiveTour(JSON.parse(storedTour));
-          setIsMaintenanceMode(false);
-        } else if (storedMaintenance) {
-          setActiveTour(JSON.parse(storedMaintenance));
-          setIsMaintenanceMode(true);
+        if (storedSession) {
+          setActiveTour(JSON.parse(storedSession));
         } else {
           setActiveTour(null);
-          setIsMaintenanceMode(false);
         }
       } catch (error) {
-        console.error("Could not access localStorage for tour/maintenance", error);
+        console.error("Could not access localStorage for session", error);
         setActiveTour(null);
-        setIsMaintenanceMode(false);
       } finally {
         setIsLoading(false);
       }
     } else {
       setActiveTour(null);
-      setIsMaintenanceMode(false);
       setIsLoading(false);
     }
   }, [user, getStorageKey]);
 
   const startTour = (tour: Tour) => {
-    const tourKey = getStorageKey('ActiveTour');
-    if (!tourKey) return;
+    const sessionKey = getStorageKey('');
+    if (!sessionKey) return;
     try {
-      endTour(); // Clear any existing tour/maintenance
-      localStorage.setItem(tourKey, JSON.stringify(tour));
+      localStorage.setItem(sessionKey, JSON.stringify(tour));
       setActiveTour(tour);
-      setIsMaintenanceMode(false);
     } catch (error) {
       console.error("Could not write tour to localStorage", error);
     }
   };
-  
-  const startMaintenanceMode = (vehicles: Omit<Tour, 'transport_order'>) => {
-    const maintenanceKey = getStorageKey('MaintenanceMode');
-    if (!maintenanceKey) return;
-    try {
-        endTour(); // Clear any existing tour/maintenance
-        const maintenanceTour = { ...vehicles, transport_order: '' };
-        localStorage.setItem(maintenanceKey, JSON.stringify(maintenanceTour));
-        setActiveTour(maintenanceTour);
-        setIsMaintenanceMode(true);
-    } catch (error) {
-        console.error("Could not write maintenance mode to localStorage", error);
-    }
-  };
-
 
   const endTour = () => {
-    const tourKey = getStorageKey('ActiveTour');
-    const maintenanceKey = getStorageKey('MaintenanceMode');
+    const sessionKey = getStorageKey('');
     try {
-      if(tourKey) localStorage.removeItem(tourKey);
-      if(maintenanceKey) localStorage.removeItem(maintenanceKey);
+      if(sessionKey) localStorage.removeItem(sessionKey);
       setActiveTour(null);
-      setIsMaintenanceMode(false);
     } catch (error) {
-      console.error("Could not remove tour/maintenance from localStorage", error);
+      console.error("Could not remove session from localStorage", error);
     }
   };
 
   return (
-    <TourContext.Provider value={{ activeTour, isMaintenanceMode, startTour, startMaintenanceMode, endTour, isLoading }}>
+    <TourContext.Provider value={{ activeTour, isMaintenanceMode, startTour, endTour, isLoading }}>
       {children}
     </TourContext.Provider>
   );
