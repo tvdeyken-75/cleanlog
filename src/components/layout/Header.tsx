@@ -4,7 +4,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useTour } from '@/context/TourContext';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Truck, LogOut, Map } from 'lucide-react';
+import { Truck, LogOut, Map, UserCog } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,7 +17,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Link from 'next/link';
 
 export function Header() {
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, logout, isAuthenticated, userRole } = useAuth();
   const { endTour, activeTour } = useTour();
   const router = useRouter();
 
@@ -62,7 +62,7 @@ export function Header() {
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium leading-none">Angemeldet als</p>
                     <p className="text-xs leading-none text-muted-foreground">
-                      {user}
+                      {user} ({userRole})
                     </p>
                   </div>
                 </DropdownMenuLabel>
@@ -77,6 +77,12 @@ export function Header() {
                   </DropdownMenuLabel>
                 )}
                 <DropdownMenuSeparator />
+                {userRole === 'admin' && (
+                  <DropdownMenuItem onClick={() => router.push('/admin')}>
+                    <UserCog className="mr-2 h-4 w-4" />
+                    <span>Admin Panel</span>
+                  </DropdownMenuItem>
+                )}
                 {activeTour && (
                   <DropdownMenuItem onClick={handleEndTour}>
                     <Map className="mr-2 h-4 w-4" />

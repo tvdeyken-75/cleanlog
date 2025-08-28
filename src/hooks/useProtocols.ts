@@ -6,15 +6,28 @@ type NewProtocol = Omit<CleaningProtocol, 'id' | 'driverId' | 'end_time' | 'type
 
 export function useProtocols(userId: string | null) {
   const [protocols, setProtocols] = useState<Protocol[]>([]);
+  const [vehicles, setVehicles] = useState<{truck: string[], trailer: string[]}>({ truck: [], trailer: [] });
   const [isLoading, setIsLoading] = useState(true);
 
-  const getStorageKey = useCallback(() => `fahrerLogbuchProtocols_v3_${userId}`, [userId]);
+  const getProtocolsStorageKey = useCallback(() => `fahrerLogbuchProtocols_v3_${userId}`, [userId]);
+  const getVehiclesStorageKey = () => `fahrerLogbuchVehicles_v1`;
 
   useEffect(() => {
+    // Load vehicles (global for all users)
+    try {
+      const storedVehicles = localStorage.getItem(getVehiclesStorageKey());
+      if (storedVehicles) {
+        setVehicles(JSON.parse(storedVehicles));
+      }
+    } catch (error) {
+      console.error("Could not access localStorage for vehicles", error);
+    }
+
+    // Load protocols (user-specific)
     if (userId) {
       setIsLoading(true);
       try {
-        const storedProtocols = localStorage.getItem(getStorageKey());
+        const storedProtocols = localStorage.getItem(getProtocolsStorageKey());
         if (storedProtocols) {
           setProtocols(JSON.parse(storedProtocols));
         } else {
@@ -30,7 +43,7 @@ export function useProtocols(userId: string | null) {
       setProtocols([]);
       setIsLoading(false);
     }
-  }, [userId, getStorageKey]);
+  }, [userId, getProtocolsStorageKey]);
 
   const addProtocol = (newProtocol: NewProtocol, type: 'cleaning' | 'fuel') => {
     if (!userId) return;
@@ -46,7 +59,7 @@ export function useProtocols(userId: string | null) {
     setProtocols(prevProtocols => {
       const updatedProtocols = [protocolWithMetadata, ...prevProtocols];
       try {
-        localStorage.setItem(getStorageKey(), JSON.stringify(updatedProtocols));
+        localStorage.setItem(getProtocolsStorageKey(), JSON.stringify(updatedProtocols));
       } catch (error) {
         console.error("Could not write protocols to localStorage", error);
       }
@@ -54,11 +67,27 @@ export function useProtocols(userId: string | null) {
     });
   };
 
-  const getUniqueLicensePlates = (type: 'truck' | 'trailer'): string[] => {
-    const key = type === 'truck' ? 'truck_license_plate' : 'trailer_license_plate';
-    const allPlates = protocols.map(p => p[key]);
-    return [...new Set(allPlates)];
+  const addVehicle = (type: 'truck' | 'trailer', licensePlate: string) => {
+    setVehicles(prevVehicles => {
+        const newVehicles = { ...prevVehicles };
+        if (!newVehicles[type].includes(licensePlate)) {
+            newVehicles[type] = [...newVehicles[type], licensePlate];
+            try {
+                localStorage.setItem(getVehiclesStorageKey(), JSON.stringify(newVehicles));
+            } catch (error) {
+                console.error("Could not write vehicles to localStorage", error);
+            }
+        }
+        return newVehicles;
+    });
   };
 
-  return { protocols, addProtocol, isLoading, getUniqueLicensePlates };
+  const getUniqueLicensePlates = (type: 'truck' | 'trailer'): string[] => {
+    const key = type === 'truck' ? 'truck_license_plate' : 'trailer_license_plate';
+    const protocolPlates = protocols.map(p => p[key]);
+    const adminPlates = vehicles[type];
+    return [...new Set([...protocolPlates, ...adminPlates])];
+  };
+
+  return { protocols, addProtocol, isLoading, getUniqueLicensePlates, addVehicle };
 }
