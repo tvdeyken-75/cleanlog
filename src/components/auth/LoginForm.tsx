@@ -18,7 +18,7 @@ export function LoginForm() {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (username.trim() && password.trim()) {
+    if (username === 'demo' && password === 'demo123') {
       login(username);
       toast({
         title: "Anmeldung erfolgreich",
@@ -29,7 +29,7 @@ export function LoginForm() {
       toast({
         variant: "destructive",
         title: "Fehler bei der Anmeldung",
-        description: "Bitte geben Sie Benutzername und Passwort ein.",
+        description: "Ungültiger Benutzername oder Passwort.",
       });
     }
   };
@@ -41,7 +41,7 @@ export function LoginForm() {
         <Input
           id="username"
           type="text"
-          placeholder="z.B. f.franz"
+          placeholder="demo"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
@@ -52,7 +52,7 @@ export function LoginForm() {
         <Input
           id="password"
           type="password"
-          placeholder="••••••••"
+          placeholder="demo123"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
