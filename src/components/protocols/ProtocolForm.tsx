@@ -73,6 +73,7 @@ export function ProtocolForm() {
     resolver: zodResolver(protocolFormSchema),
     defaultValues: {
       contamination_types: [],
+      location: '',
     }
   });
 
