@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -20,7 +20,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { LocationInput } from './LocationInput';
-import { ArrowLeft, Truck, Thermometer, MapPin, CircleCheck, Lock, Award, Coffee, MessageSquare, Timer } from 'lucide-react';
+import { ArrowLeft, Truck, Thermometer, MapPin, CircleCheck, Lock, Award, Coffee, MessageSquare, Timer, CalendarClock } from 'lucide-react';
 
 const pauseProtocolFormSchema = z.object({
   location: z.string().min(1, "Ort ist ein Pflichtfeld."),
@@ -39,6 +39,7 @@ export function PauseProtocolForm() {
   const { activeTour } = useTour();
   const { addProtocol } = useProtocols(user);
   const { toast } = useToast();
+  const [currentTime, setCurrentTime] = useState("");
 
   const form = useForm<PauseProtocolFormValues>({
     resolver: zodResolver(pauseProtocolFormSchema),
@@ -48,6 +49,13 @@ export function PauseProtocolForm() {
       has_seal: false,
     }
   });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date().toLocaleString('de-DE', { dateStyle: 'medium', timeStyle: 'medium' }));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
   
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -104,7 +112,7 @@ export function PauseProtocolForm() {
                 <CardTitle className="flex items-center gap-2"><Truck className="text-primary"/>Tour-Informationen</CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="grid grid-cols-3 gap-4 text-sm">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
                         <p className="text-muted-foreground">LKW</p>
                         <p className="font-medium">{activeTour.truck_license_plate}</p>
@@ -116,6 +124,10 @@ export function PauseProtocolForm() {
                     <div>
                         <p className="text-muted-foreground">Transportauftrag</p>
                         <p className="font-medium">{activeTour.transport_order}</p>
+                    </div>
+                     <div>
+                        <p className="text-muted-foreground flex items-center gap-1.5"><CalendarClock className="h-4 w-4"/>Datum & Zeit</p>
+                        <p className="font-medium">{currentTime || "..."}</p>
                     </div>
                 </div>
             </CardContent>

@@ -21,7 +21,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { LocationInput } from './LocationInput';
-import { ArrowLeft, Sparkles, Truck, ClipboardList, Thermometer, Droplets, MapPin, AlertTriangle, CircleCheck } from 'lucide-react';
+import { ArrowLeft, Sparkles, Truck, ClipboardList, Thermometer, Droplets, MapPin, AlertTriangle, CircleCheck, CalendarClock } from 'lucide-react';
 
 const contaminationTypes = [
   { id: 'chemical', label: 'Chemisch (Reinigungsmittelrückstand)' },
@@ -65,7 +65,8 @@ export function ProtocolForm() {
   const { activeTour } = useTour();
   const { addProtocol } = useProtocols(user);
   const { toast } = useToast();
-  const [startTime] = useState(new Date().toISOString());
+  const [startTime, setStartTime] = useState(new Date().toISOString());
+  const [currentTime, setCurrentTime] = useState("");
 
   const form = useForm<ProtocolFormValues>({
     resolver: zodResolver(protocolFormSchema),
@@ -76,6 +77,14 @@ export function ProtocolForm() {
   });
 
   const watchControlResult = form.watch('control_result');
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date().toLocaleString('de-DE', { dateStyle: 'medium', timeStyle: 'medium' }));
+    }, 1000);
+    setStartTime(new Date().toISOString()); // Keep start time for saving
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -143,7 +152,7 @@ export function ProtocolForm() {
                 <CardTitle className="flex items-center gap-2"><Truck className="text-primary"/>Tour-Informationen</CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="grid grid-cols-3 gap-4 text-sm">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
                         <p className="text-muted-foreground">LKW</p>
                         <p className="font-medium">{activeTour.truck_license_plate}</p>
@@ -155,6 +164,10 @@ export function ProtocolForm() {
                     <div>
                         <p className="text-muted-foreground">Transportauftrag</p>
                         <p className="font-medium">{activeTour.transport_order}</p>
+                    </div>
+                     <div>
+                        <p className="text-muted-foreground flex items-center gap-1.5"><CalendarClock className="h-4 w-4"/>Datum & Zeit</p>
+                        <p className="font-medium">{currentTime || "..."}</p>
                     </div>
                 </div>
             </CardContent>

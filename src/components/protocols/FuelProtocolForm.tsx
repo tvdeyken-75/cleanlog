@@ -19,7 +19,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { LocationInput } from './LocationInput';
-import { ArrowLeft, Truck, Fuel, Thermometer, MapPin, CircleCheck, Lock, Award } from 'lucide-react';
+import { ArrowLeft, Truck, Fuel, Thermometer, MapPin, CircleCheck, Lock, Award, CalendarClock } from 'lucide-react';
 
 const fuelProtocolFormSchema = z.object({
   location: z.string().min(1, "Ort ist ein Pflichtfeld."),
@@ -37,6 +37,7 @@ export function FuelProtocolForm() {
   const { activeTour } = useTour();
   const { addProtocol } = useProtocols(user);
   const { toast } = useToast();
+  const [currentTime, setCurrentTime] = useState("");
 
   const form = useForm<FuelProtocolFormValues>({
     resolver: zodResolver(fuelProtocolFormSchema),
@@ -46,6 +47,13 @@ export function FuelProtocolForm() {
       has_seal: false,
     }
   });
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date().toLocaleString('de-DE', { dateStyle: 'medium', timeStyle: 'medium' }));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
   
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -101,7 +109,7 @@ export function FuelProtocolForm() {
                 <CardTitle className="flex items-center gap-2"><Truck className="text-primary"/>Tour-Informationen</CardTitle>
             </CardHeader>
             <CardContent>
-                <div className="grid grid-cols-3 gap-4 text-sm">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                     <div>
                         <p className="text-muted-foreground">LKW</p>
                         <p className="font-medium">{activeTour.truck_license_plate}</p>
@@ -113,6 +121,10 @@ export function FuelProtocolForm() {
                     <div>
                         <p className="text-muted-foreground">Transportauftrag</p>
                         <p className="font-medium">{activeTour.transport_order}</p>
+                    </div>
+                    <div>
+                        <p className="text-muted-foreground flex items-center gap-1.5"><CalendarClock className="h-4 w-4"/>Datum & Zeit</p>
+                        <p className="font-medium">{currentTime || "..."}</p>
                     </div>
                 </div>
             </CardContent>
