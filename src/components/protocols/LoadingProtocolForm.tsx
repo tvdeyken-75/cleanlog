@@ -93,7 +93,7 @@ export function LoadingProtocolForm() {
       odometer_reading: undefined,
       goods_type: undefined,
       required_temperature: undefined,
-      articles: undefined,
+      articles: '',
       articles_other: '',
       quantity: undefined,
       packaging: '',
@@ -110,7 +110,7 @@ export function LoadingProtocolForm() {
   const watchArticles = form.watch('articles');
 
   useEffect(() => {
-    form.setValue('articles', undefined);
+    form.setValue('articles', '');
   }, [watchGoodsType, form]);
 
   useEffect(() => {
