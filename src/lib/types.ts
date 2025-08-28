@@ -1,11 +1,12 @@
 
+
 export interface ContaminationDetails {
   types: string[];
   description: string;
   corrective_actions: string;
 }
 
-export type ProtocolType = 'cleaning' | 'fuel' | 'pause' | 'loading';
+export type ProtocolType = 'cleaning' | 'fuel' | 'pause' | 'loading' | 'delivery';
 
 export interface Tour {
   truck_license_plate: string;
@@ -71,8 +72,18 @@ export interface LoadingProtocol extends BaseProtocol {
   cargo_area_temperature: number;
 }
 
+export interface DeliveryProtocol extends BaseProtocol {
+    type: 'delivery';
+    loading_protocol_number: string;
+    unloading_duration: number;
+    message: string;
+    cargo_area_closed: boolean;
+    has_seal: boolean;
+    cargo_area_temperature: number;
+}
 
-export type Protocol = CleaningProtocol | FuelProtocol | PauseProtocol | LoadingProtocol;
+
+export type Protocol = CleaningProtocol | FuelProtocol | PauseProtocol | LoadingProtocol | DeliveryProtocol;
 
 
     

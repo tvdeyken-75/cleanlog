@@ -1,7 +1,7 @@
 
 "use client";
 
-import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol, LoadingProtocol } from "@/lib/types";
+import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol, LoadingProtocol, DeliveryProtocol } from "@/lib/types";
 import {
   Table,
   TableBody,
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Truck, AlertTriangle, CheckCircle2, Droplets, Fuel, Coffee, PackagePlus } from "lucide-react";
+import { Truck, AlertTriangle, CheckCircle2, Droplets, Fuel, Coffee, PackagePlus, PackageCheck } from "lucide-react";
 
 interface ProtocolsTableProps {
   protocols: Protocol[];
@@ -89,6 +89,23 @@ const renderLoadingDetails = (protocol: LoadingProtocol) => (
   </>
 );
 
+const renderDeliveryDetails = (protocol: DeliveryProtocol) => (
+    <>
+      <TableCell>
+        <div className="font-medium">Lieferung an</div>
+        <div className="text-sm text-muted-foreground">{protocol.location}</div>
+        <div className="text-xs text-muted-foreground mt-1 font-mono">Von: {protocol.loading_protocol_number}</div>
+      </TableCell>
+      <TableCell className="text-center">
+          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+              <CheckCircle2 className={`h-4 w-4 ${protocol.cargo_area_closed ? 'text-green-500' : 'text-gray-300'}`} />
+              <span>Laderaum</span>
+              <CheckCircle2 className={`h-4 w-4 ${protocol.has_seal ? 'text-green-500' : 'text-gray-300'}`} />
+              <span>Siegel</span>
+          </div>
+        </TableCell>
+    </>
+  );
 
 const renderProtocolDetails = (protocol: Protocol) => {
     switch (protocol.type) {
@@ -100,6 +117,8 @@ const renderProtocolDetails = (protocol: Protocol) => {
             return renderPauseDetails(protocol as PauseProtocol);
         case 'loading':
             return renderLoadingDetails(protocol as LoadingProtocol);
+        case 'delivery':
+            return renderDeliveryDetails(protocol as DeliveryProtocol);
         default:
             return <><TableCell></TableCell><TableCell></TableCell></>;
     }
@@ -146,6 +165,8 @@ export function ProtocolsTable({ protocols, isLoading }: ProtocolsTableProps) {
             return <Coffee className="h-5 w-5 text-purple-500" />;
         case 'loading':
             return <PackagePlus className="h-5 w-5 text-green-500" />;
+        case 'delivery':
+            return <PackageCheck className="h-5 w-5 text-indigo-500" />;
         default:
             return <Truck className="h-5 w-5 text-gray-400" />;
     }
