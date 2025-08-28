@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -51,6 +52,10 @@ export function DeliveryProtocolForm() {
     resolver: zodResolver(deliveryProtocolFormSchema),
     defaultValues: {
       location: '',
+      loading_protocol_number: undefined,
+      unloading_duration: undefined,
+      message: '',
+      cargo_area_temperature: undefined,
       cargo_area_closed: false,
       has_seal: false,
     }

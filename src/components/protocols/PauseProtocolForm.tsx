@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -48,6 +49,9 @@ export function PauseProtocolForm() {
     resolver: zodResolver(pauseProtocolFormSchema),
     defaultValues: {
       location: '',
+      duration: undefined,
+      message: '',
+      cargo_area_temperature: undefined,
       cargo_area_closed: false,
       has_seal: false,
     }

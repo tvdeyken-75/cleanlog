@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -74,8 +75,16 @@ export function ProtocolForm() {
   const form = useForm<ProtocolFormValues>({
     resolver: zodResolver(protocolFormSchema),
     defaultValues: {
-      contamination_types: [],
       location: '',
+      cleaning_type: undefined,
+      cleaning_products: '',
+      control_type: undefined,
+      control_result: undefined,
+      water_temperature: undefined,
+      water_quality: undefined,
+      contamination_types: [],
+      contamination_description: '',
+      corrective_actions: '',
     }
   });
 

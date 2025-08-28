@@ -68,6 +68,11 @@ export function MaintenanceProtocolForm() {
     resolver: zodResolver(maintenanceProtocolSchema),
     defaultValues: {
       location: '',
+      maintenance_type: undefined,
+      reason: '',
+      description: '',
+      duration: undefined,
+      odometer_reading: undefined,
       documents: [],
     }
   });

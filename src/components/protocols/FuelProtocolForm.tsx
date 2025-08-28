@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -46,6 +47,8 @@ export function FuelProtocolForm() {
     resolver: zodResolver(fuelProtocolFormSchema),
     defaultValues: {
       location: '',
+      liters: undefined,
+      cargo_area_temperature: undefined,
       cargo_area_closed: false,
       has_seal: false,
     }
