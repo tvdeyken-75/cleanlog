@@ -54,7 +54,7 @@ export function DashboardClient() {
               Tanken
             </Button>
           </Link>
-           <Link href="/protocols/maintenance" passHref>
+           <Link href="/tour-selection" passHref>
             <Button variant="outline" size="lg">
                 <Wrench className="mr-2 h-5 w-5" />
                 Wartung
