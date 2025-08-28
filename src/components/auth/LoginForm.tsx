@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useToast } from "@/hooks/use-toast";
 import { LogIn } from 'lucide-react';
+import { LabelWithTooltip } from '../ui/label-with-tooltip';
 
 export function LoginForm() {
   const [username, setUsername] = useState('');
@@ -51,7 +51,7 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="space-y-2">
-        <Label htmlFor="username">Benutzerkennung</Label>
+        <LabelWithTooltip htmlFor="username" tooltipText="Имя пользователя">Benutzerkennung</LabelWithTooltip>
         <Input
           id="username"
           type="text"
@@ -62,7 +62,7 @@ export function LoginForm() {
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="password">Passwort</Label>
+        <LabelWithTooltip htmlFor="password" tooltipText="Пароль">Passwort</LabelWithTooltip>
         <Input
           id="password"
           type="password"

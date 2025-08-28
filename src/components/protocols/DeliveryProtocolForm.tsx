@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -15,7 +14,7 @@ import type { LoadingProtocol } from '@/lib/types';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
@@ -25,6 +24,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 
 import { LocationInput } from './LocationInput';
 import { ArrowLeft, Truck, Thermometer, MapPin, CircleCheck, Lock, Award, PackageCheck, MessageSquare, Timer, CalendarClock, ChevronsUpDown, PackageSearch } from 'lucide-react';
+import { LabelWithTooltip } from '../ui/label-with-tooltip';
 
 const deliveryProtocolFormSchema = z.object({
   loading_protocol_number: z.string({ required_error: "Ladeprotokoll ist ein Pflichtfeld." }),
@@ -161,7 +161,7 @@ export function DeliveryProtocolForm() {
               name="loading_protocol_number"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2"><PackageSearch className="h-4 w-4" />Zugehöriges Ladeprotokoll</FormLabel>
+                  <LabelWithTooltip tooltipText="Соответствующий протокол погрузки" className="flex items-center gap-2"><PackageSearch className="h-4 w-4" />Zugehöriges Ladeprotokoll</LabelWithTooltip>
                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl><SelectTrigger><SelectValue placeholder="Wählen Sie das Ladeprotokoll" /></SelectTrigger></FormControl>
                     <SelectContent>
@@ -185,7 +185,7 @@ export function DeliveryProtocolForm() {
                 name="location"
                 render={({ field }) => (
                 <FormItem>
-                    <FormLabel className="flex items-center gap-2"><MapPin className="h-4 w-4"/>Ort der Lieferung</FormLabel>
+                    <LabelWithTooltip tooltipText="Место доставки" className="flex items-center gap-2"><MapPin className="h-4 w-4"/>Ort der Lieferung</LabelWithTooltip>
                     <FormControl><LocationInput value={field.value} onChange={field.onChange} /></FormControl>
                     <FormMessage />
                 </FormItem>
@@ -196,7 +196,7 @@ export function DeliveryProtocolForm() {
               name="unloading_duration"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2"><Timer className="h-4 w-4" />Dauer der Entladung</FormLabel>
+                  <LabelWithTooltip tooltipText="Продолжительность разгрузки" className="flex items-center gap-2"><Timer className="h-4 w-4" />Dauer der Entladung</LabelWithTooltip>
                   <div className="relative">
                     <FormControl><Input type="number" {...field} placeholder="z.B. 30" className="pr-12"/></FormControl>
                     <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">Minuten</span>
@@ -210,7 +210,7 @@ export function DeliveryProtocolForm() {
                 name="message"
                 render={({ field }) => (
                 <FormItem className="md:col-span-2">
-                    <FormLabel className="flex items-center gap-2"><MessageSquare className="h-4 w-4"/>Meldung / Anmerkung (optional)</FormLabel>
+                    <LabelWithTooltip tooltipText="Сообщение / Примечание (необязательно)" className="flex items-center gap-2"><MessageSquare className="h-4 w-4"/>Meldung / Anmerkung (optional)</LabelWithTooltip>
                     <FormControl><Textarea {...field} placeholder="Besondere Vorkommnisse bei der Lieferung..." /></FormControl>
                     <FormMessage />
                 </FormItem>
@@ -229,7 +229,7 @@ export function DeliveryProtocolForm() {
               name="cargo_area_temperature"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2"><Thermometer className="h-4 w-4"/>Temperatur des Laderaums</FormLabel>
+                  <LabelWithTooltip tooltipText="Температура в грузовом отсеке" className="flex items-center gap-2"><Thermometer className="h-4 w-4"/>Temperatur des Laderaums</LabelWithTooltip>
                   <div className="relative">
                     <FormControl><Input type="number" {...field} placeholder="z.B. 2" className="pr-8"/></FormControl>
                     <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">°C</span>
@@ -247,10 +247,10 @@ export function DeliveryProtocolForm() {
                         <FormControl>
                             <Checkbox checked={field.value} onCheckedChange={field.onChange} id="cargo_area_closed" />
                         </FormControl>
-                        <FormLabel htmlFor="cargo_area_closed" className="font-normal flex items-center gap-2">
+                        <LabelWithTooltip htmlFor="cargo_area_closed" tooltipText="Грузовой отсек заперт" className="font-normal flex items-center gap-2">
                             <Lock className="h-4 w-4"/>
                             Laderaum abgeschlossen
-                        </FormLabel>
+                        </LabelWithTooltip>
                     </FormItem>
                 )}
                 />
@@ -262,10 +262,10 @@ export function DeliveryProtocolForm() {
                         <FormControl>
                             <Checkbox checked={field.value} onCheckedChange={field.onChange} id="has_seal" />
                         </FormControl>
-                        <FormLabel htmlFor="has_seal" className="font-normal flex items-center gap-2">
+                        <LabelWithTooltip htmlFor="has_seal" tooltipText="Пломба в наличии" className="font-normal flex items-center gap-2">
                             <Award className="h-4 w-4"/>
                             Siegel vorhanden
-                        </FormLabel>
+                        </LabelWithTooltip>
                     </FormItem>
                 )}
                 />

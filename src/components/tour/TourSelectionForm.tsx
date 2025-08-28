@@ -11,10 +11,11 @@ import { useTour } from '@/context/TourContext';
 import { useProtocols } from '@/hooks/useProtocols';
 
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { AutocompleteInput } from '../protocols/AutocompleteInput';
 import { Play } from 'lucide-react';
+import { LabelWithTooltip } from '../ui/label-with-tooltip';
 
 const tourSelectionSchema = z.object({
   truck_license_plate: z.string().min(1, "LKW-Kennzeichen ist ein Pflichtfeld."),
@@ -65,7 +66,7 @@ export function TourSelectionForm() {
           name="truck_license_plate"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>LKW-Kennzeichen</FormLabel>
+              <LabelWithTooltip tooltipText="Номерной знак грузовика">LKW-Kennzeichen</LabelWithTooltip>
               <FormControl>
                 <AutocompleteInput 
                   value={field.value}
@@ -83,7 +84,7 @@ export function TourSelectionForm() {
           name="trailer_license_plate"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Anhänger-Kennzeichen</FormLabel>
+              <LabelWithTooltip tooltipText="Номерной знак прицепа">Anhänger-Kennzeichen</LabelWithTooltip>
               <FormControl>
                 <AutocompleteInput 
                   value={field.value}
@@ -101,7 +102,7 @@ export function TourSelectionForm() {
           name="transport_order"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Transportauftrag</FormLabel>
+              <LabelWithTooltip tooltipText="Заказ на перевозку">Transportauftrag</LabelWithTooltip>
               <FormControl>
                 <Input {...field} placeholder="z.B. T-54321" />
               </FormControl>

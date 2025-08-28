@@ -13,7 +13,7 @@ import { useTour } from '@/context/TourContext';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -23,6 +23,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 
 import { LocationInput } from './LocationInput';
 import { ArrowLeft, Sparkles, Truck, ClipboardList, Thermometer, Droplets, MapPin, AlertTriangle, CircleCheck, CalendarClock, ChevronsUpDown } from 'lucide-react';
+import { LabelWithTooltip } from '../ui/label-with-tooltip';
 
 const contaminationTypes = [
   { id: 'chemical', label: 'Chemisch (Reinigungsmittelrückstand)' },
@@ -195,7 +196,7 @@ export function ProtocolForm() {
               name="cleaning_type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Art der Reinigung</FormLabel>
+                  <LabelWithTooltip tooltipText="Вид уборки">Art der Reinigung</LabelWithTooltip>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger><SelectValue placeholder="Wählen Sie eine Art" /></SelectTrigger>
@@ -215,7 +216,7 @@ export function ProtocolForm() {
               name="cleaning_products"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Verwendete Reinigungs-/Desinfektionsmittel</FormLabel>
+                  <LabelWithTooltip tooltipText="Используемые чистящие/дезинфицирующие средства">Verwendete Reinigungs-/Desinfektionsmittel</LabelWithTooltip>
                   <FormControl><Input {...field} placeholder="z.B. Desinfekto-123" /></FormControl>
                   <FormMessage />
                 </FormItem>
@@ -234,7 +235,7 @@ export function ProtocolForm() {
               name="control_type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Art der Kontrolle</FormLabel>
+                  <LabelWithTooltip tooltipText="Вид контроля">Art der Kontrolle</LabelWithTooltip>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl><SelectTrigger><SelectValue placeholder="Wählen Sie eine Art" /></SelectTrigger></FormControl>
                     <SelectContent>
@@ -252,7 +253,7 @@ export function ProtocolForm() {
               name="control_result"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Ergebnis der Kontrolle</FormLabel>
+                  <LabelWithTooltip tooltipText="Результат контроля">Ergebnis der Kontrolle</LabelWithTooltip>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl><SelectTrigger><SelectValue placeholder="Wählen Sie ein Ergebnis" /></SelectTrigger></FormControl>
                     <SelectContent>
@@ -279,7 +280,7 @@ export function ProtocolForm() {
                   name="contamination_types"
                   render={() => (
                     <FormItem>
-                      <FormLabel>Art der Kontamination</FormLabel>
+                      <LabelWithTooltip tooltipText="Вид загрязнения">Art der Kontamination</LabelWithTooltip>
                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {contaminationTypes.map((item) => (
                           <FormField
@@ -299,7 +300,7 @@ export function ProtocolForm() {
                                       }}
                                     />
                                   </FormControl>
-                                  <FormLabel className="font-normal">{item.label}</FormLabel>
+                                  <LabelWithTooltip tooltipText="Вид загрязнения" className="font-normal">{item.label}</LabelWithTooltip>
                                 </FormItem>
                               );
                             }}
@@ -315,7 +316,7 @@ export function ProtocolForm() {
                 name="contamination_description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Beschreibung der festgestellten Kontamination</FormLabel>
+                    <LabelWithTooltip tooltipText="Описание выявленного загрязнения">Beschreibung der festgestellten Kontamination</LabelWithTooltip>
                     <FormControl><Textarea {...field} placeholder="Beschreiben Sie die Kontamination im Detail..."/></FormControl>
                     <FormMessage />
                   </FormItem>
@@ -326,7 +327,7 @@ export function ProtocolForm() {
                 name="corrective_actions"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Durchgeführte Korrekturmaßnahmen</FormLabel>
+                    <LabelWithTooltip tooltipText="Проведенные корректирующие мероприятия">Durchgeführte Korrekturmaßnahmen</LabelWithTooltip>
                     <FormControl><Textarea {...field} placeholder="z.B. Erneute Reinigung durchgeführt, Werkstatt gemeldet..."/></FormControl>
                     <FormMessage />
                   </FormItem>
@@ -347,7 +348,7 @@ export function ProtocolForm() {
                   name="location"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex items-center gap-2"><MapPin className="h-4 w-4"/>Ort</FormLabel>
+                      <LabelWithTooltip tooltipText="Место" className="flex items-center gap-2"><MapPin className="h-4 w-4"/>Ort</LabelWithTooltip>
                       <FormControl><LocationInput value={field.value} onChange={field.onChange} /></FormControl>
                       <FormMessage />
                     </FormItem>
@@ -358,7 +359,7 @@ export function ProtocolForm() {
                   name="water_temperature"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="flex items-center gap-2"><Thermometer className="h-4 w-4"/>Wassertemperatur</FormLabel>
+                      <LabelWithTooltip tooltipText="Температура воды" className="flex items-center gap-2"><Thermometer className="h-4 w-4"/>Wassertemperatur</LabelWithTooltip>
                       <div className="relative">
                         <FormControl><Input type="number" {...field} placeholder="z.B. 45" className="pr-8"/></FormControl>
                         <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">°C</span>
@@ -373,7 +374,7 @@ export function ProtocolForm() {
               name="water_quality"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2"><Droplets className="h-4 w-4"/>Wasserqualität</FormLabel>
+                  <LabelWithTooltip tooltipText="Качество воды" className="flex items-center gap-2"><Droplets className="h-4 w-4"/>Wasserqualität</LabelWithTooltip>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl><SelectTrigger><SelectValue placeholder="Wählen Sie eine Qualität" /></SelectTrigger></FormControl>
                     <SelectContent>

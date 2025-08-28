@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from 'react';
@@ -15,7 +14,7 @@ import type { GoodsType } from '@/lib/types';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -25,6 +24,7 @@ import { Textarea } from '../ui/textarea';
 
 import { LocationInput } from './LocationInput';
 import { ArrowLeft, Truck, Thermometer, MapPin, CircleCheck, Lock, Award, PackagePlus, Gauge, Timer, CalendarClock, ChevronsUpDown, Layers, Box } from 'lucide-react';
+import { LabelWithTooltip } from '../ui/label-with-tooltip';
 
 const loadingProtocolFormSchema = z.object({
   location: z.string().min(1, "Ort ist ein Pflichtfeld."),
@@ -203,7 +203,7 @@ export function LoadingProtocolForm() {
               name="location"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2"><MapPin className="h-4 w-4"/>Ort der Beladung</FormLabel>
+                  <LabelWithTooltip tooltipText="Место погрузки" className="flex items-center gap-2"><MapPin className="h-4 w-4"/>Ort der Beladung</LabelWithTooltip>
                   <FormControl><LocationInput value={field.value} onChange={field.onChange} /></FormControl>
                   <FormMessage />
                 </FormItem>
@@ -214,7 +214,7 @@ export function LoadingProtocolForm() {
               name="duration"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2"><Timer className="h-4 w-4" />Dauer der Beladung</FormLabel>
+                  <LabelWithTooltip tooltipText="Продолжительность погрузки" className="flex items-center gap-2"><Timer className="h-4 w-4" />Dauer der Beladung</LabelWithTooltip>
                   <div className="relative">
                     <FormControl><Input type="number" {...field} placeholder="z.B. 60" className="pr-12"/></FormControl>
                     <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">Minuten</span>
@@ -228,7 +228,7 @@ export function LoadingProtocolForm() {
               name="odometer_reading"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2"><Gauge className="h-4 w-4"/>Kilometerstand</FormLabel>
+                  <LabelWithTooltip tooltipText="Показания одометра" className="flex items-center gap-2"><Gauge className="h-4 w-4"/>Kilometerstand</LabelWithTooltip>
                   <div className="relative">
                     <FormControl><Input type="number" {...field} placeholder="z.B. 123456" className="pr-8"/></FormControl>
                     <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">km</span>
@@ -242,7 +242,7 @@ export function LoadingProtocolForm() {
               name="required_temperature"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2"><Thermometer className="h-4 w-4"/>Temperaturanforderungen</FormLabel>
+                  <LabelWithTooltip tooltipText="Требования к температуре" className="flex items-center gap-2"><Thermometer className="h-4 w-4"/>Temperaturanforderungen</LabelWithTooltip>
                   <div className="relative">
                     <FormControl><Input type="number" {...field} placeholder="z.B. 5" className="pr-8"/></FormControl>
                     <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">°C</span>
@@ -264,7 +264,7 @@ export function LoadingProtocolForm() {
                 name="goods_type"
                 render={({ field }) => (
                 <FormItem>
-                    <FormLabel>Art der Ware</FormLabel>
+                    <LabelWithTooltip tooltipText="Тип товаров">Art der Ware</LabelWithTooltip>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger><SelectValue placeholder="Wählen Sie eine Art" /></SelectTrigger>
@@ -286,7 +286,7 @@ export function LoadingProtocolForm() {
                         name="articles"
                         render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Artikel</FormLabel>
+                            <LabelWithTooltip tooltipText="Артикул">Artikel</LabelWithTooltip>
                             <Select onValueChange={field.onChange} defaultValue={field.value}>
                                 <FormControl>
                                 <SelectTrigger><SelectValue placeholder="Wählen Sie einen Artikel" /></SelectTrigger>
@@ -307,7 +307,7 @@ export function LoadingProtocolForm() {
                             name="articles_other"
                             render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Beschreibung für sonstige Artikel</FormLabel>
+                                <LabelWithTooltip tooltipText="Описание для 'прочее'">Beschreibung für sonstige Artikel</LabelWithTooltip>
                                 <FormControl><Textarea {...field} placeholder="Welche Artikel werden geladen?" /></FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -320,7 +320,7 @@ export function LoadingProtocolForm() {
                             name="quantity"
                             render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Menge (Stück)</FormLabel>
+                                <LabelWithTooltip tooltipText="Количество (штук)">Menge (Stück)</LabelWithTooltip>
                                 <FormControl><Input type="number" {...field} placeholder="z.B. 100" /></FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -331,7 +331,7 @@ export function LoadingProtocolForm() {
                             name="packaging"
                             render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Verpackungsform</FormLabel>
+                                <LabelWithTooltip tooltipText="Форма упаковки">Verpackungsform</LabelWithTooltip>
                                 <FormControl><Input {...field} placeholder="z.B. Karton, Kiste" /></FormControl>
                                 <FormMessage />
                             </FormItem>
@@ -342,7 +342,7 @@ export function LoadingProtocolForm() {
                             name="weight"
                             render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Gewicht</FormLabel>
+                                <LabelWithTooltip tooltipText="Вес">Gewicht</LabelWithTooltip>
                                 <div className="relative">
                                     <FormControl><Input type="number" {...field} placeholder="z.B. 500" className="pr-8"/></FormControl>
                                     <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">kg</span>
@@ -361,7 +361,7 @@ export function LoadingProtocolForm() {
                         name="pallets"
                         render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="flex items-center gap-2"><Layers className='h-4 w-4' />Anzahl Paletten</FormLabel>
+                            <LabelWithTooltip tooltipText="Количество поддонов" className="flex items-center gap-2"><Layers className='h-4 w-4' />Anzahl Paletten</LabelWithTooltip>
                             <FormControl><Input type="number" {...field} placeholder="z.B. 10" /></FormControl>
                             <FormMessage />
                         </FormItem>
@@ -372,7 +372,7 @@ export function LoadingProtocolForm() {
                         name="crates"
                         render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="flex items-center gap-2"><Box className='h-4 w-4' />Anzahl Kisten</FormLabel>
+                            <LabelWithTooltip tooltipText="Количество ящиков" className="flex items-center gap-2"><Box className='h-4 w-4' />Anzahl Kisten</LabelWithTooltip>
                             <FormControl><Input type="number" {...field} placeholder="z.B. 200" /></FormControl>
                             <FormMessage />
                         </FormItem>
@@ -393,7 +393,7 @@ export function LoadingProtocolForm() {
               name="cargo_area_temperature"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2"><Thermometer className="h-4 w-4"/>Temperatur des Laderaums</FormLabel>
+                  <LabelWithTooltip tooltipText="Температура в грузовом отсеке" className="flex items-center gap-2"><Thermometer className="h-4 w-4"/>Temperatur des Laderaums</LabelWithTooltip>
                   <div className="relative">
                     <FormControl><Input type="number" {...field} placeholder="z.B. 2" className="pr-8"/></FormControl>
                     <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">°C</span>
@@ -411,10 +411,10 @@ export function LoadingProtocolForm() {
                         <FormControl>
                             <Checkbox checked={field.value} onCheckedChange={field.onChange} id="cargo_area_closed" />
                         </FormControl>
-                        <FormLabel htmlFor="cargo_area_closed" className="font-normal flex items-center gap-2">
+                        <LabelWithTooltip htmlFor="cargo_area_closed" tooltipText="Грузовой отсек заперт" className="font-normal flex items-center gap-2">
                             <Lock className="h-4 w-4"/>
                             Laderaum abgeschlossen
-                        </FormLabel>
+                        </LabelWithTooltip>
                     </FormItem>
                 )}
                 />
@@ -426,10 +426,10 @@ export function LoadingProtocolForm() {
                         <FormControl>
                             <Checkbox checked={field.value} onCheckedChange={field.onChange} id="has_seal" />
                         </FormControl>
-                        <FormLabel htmlFor="has_seal" className="font-normal flex items-center gap-2">
+                        <LabelWithTooltip htmlFor="has_seal" tooltipText="Пломба в наличии" className="font-normal flex items-center gap-2">
                             <Award className="h-4 w-4"/>
                             Siegel vorhanden
-                        </FormLabel>
+                        </LabelWithTooltip>
                     </FormItem>
                 )}
                 />
@@ -447,6 +447,3 @@ export function LoadingProtocolForm() {
     </Form>
   );
 }
-
-
-    

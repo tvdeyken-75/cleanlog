@@ -13,7 +13,7 @@ import { useTour } from '@/context/TourContext';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -21,6 +21,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 
 import { LocationInput } from './LocationInput';
 import { ArrowLeft, Truck, Fuel, Thermometer, MapPin, CircleCheck, Lock, Award, CalendarClock, ChevronsUpDown } from 'lucide-react';
+import { LabelWithTooltip } from '../ui/label-with-tooltip';
 
 const fuelProtocolFormSchema = z.object({
   location: z.string().min(1, "Ort ist ein Pflichtfeld."),
@@ -152,7 +153,7 @@ export function FuelProtocolForm() {
               name="liters"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Getankte Liter</FormLabel>
+                  <LabelWithTooltip tooltipText="Заправленные литры">Getankte Liter</LabelWithTooltip>
                   <div className="relative">
                     <FormControl><Input type="number" {...field} placeholder="z.B. 350" className="pr-10"/></FormControl>
                     <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">Liter</span>
@@ -166,7 +167,7 @@ export function FuelProtocolForm() {
                 name="location"
                 render={({ field }) => (
                 <FormItem>
-                    <FormLabel className="flex items-center gap-2"><MapPin className="h-4 w-4"/>Ort</FormLabel>
+                    <LabelWithTooltip tooltipText="Место" className="flex items-center gap-2"><MapPin className="h-4 w-4"/>Ort</LabelWithTooltip>
                     <FormControl><LocationInput value={field.value} onChange={field.onChange} /></FormControl>
                     <FormMessage />
                 </FormItem>
@@ -185,7 +186,7 @@ export function FuelProtocolForm() {
               name="cargo_area_temperature"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center gap-2"><Thermometer className="h-4 w-4"/>Temperatur des Laderaums</FormLabel>
+                  <LabelWithTooltip tooltipText="Температура в грузовом отсеке" className="flex items-center gap-2"><Thermometer className="h-4 w-4"/>Temperatur des Laderaums</LabelWithTooltip>
                   <div className="relative">
                     <FormControl><Input type="number" {...field} placeholder="z.B. 2" className="pr-8"/></FormControl>
                     <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">°C</span>
@@ -203,10 +204,10 @@ export function FuelProtocolForm() {
                         <FormControl>
                             <Checkbox checked={field.value} onCheckedChange={field.onChange} id="cargo_area_closed" />
                         </FormControl>
-                        <FormLabel htmlFor="cargo_area_closed" className="font-normal flex items-center gap-2">
+                        <LabelWithTooltip htmlFor="cargo_area_closed" tooltipText="Грузовой отсек заперт" className="font-normal flex items-center gap-2">
                             <Lock className="h-4 w-4"/>
                             Laderaum abgeschlossen
-                        </FormLabel>
+                        </LabelWithTooltip>
                     </FormItem>
                 )}
                 />
@@ -218,10 +219,10 @@ export function FuelProtocolForm() {
                         <FormControl>
                             <Checkbox checked={field.value} onCheckedChange={field.onChange} id="has_seal" />
                         </FormControl>
-                        <FormLabel htmlFor="has_seal" className="font-normal flex items-center gap-2">
+                        <LabelWithTooltip htmlFor="has_seal" tooltipText="Пломба в наличии" className="font-normal flex items-center gap-2">
                             <Award className="h-4 w-4"/>
                             Siegel vorhanden
-                        </FormLabel>
+                        </LabelWithTooltip>
                     </FormItem>
                 )}
                 />

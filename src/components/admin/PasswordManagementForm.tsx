@@ -5,10 +5,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/hooks/use-toast';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Save } from 'lucide-react';
+import { LabelWithTooltip } from '../ui/label-with-tooltip';
 
 const passwordSchema = z.object({
   newPassword: z.string().min(6, "Das neue Passwort muss mindestens 6 Zeichen lang sein."),
@@ -49,7 +50,7 @@ export function PasswordManagementForm() {
           name="newPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Neues Admin-Passwort</FormLabel>
+              <LabelWithTooltip tooltipText="Новый пароль администратора">Neues Admin-Passwort</LabelWithTooltip>
               <FormControl>
                 <Input type="password" {...field} />
               </FormControl>
@@ -62,7 +63,7 @@ export function PasswordManagementForm() {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Neues Passwort bestätigen</FormLabel>
+              <LabelWithTooltip tooltipText="Подтвердите новый пароль">Neues Passwort bestätigen</LabelWithTooltip>
               <FormControl>
                 <Input type="password" {...field} />
               </FormControl>

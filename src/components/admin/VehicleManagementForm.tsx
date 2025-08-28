@@ -5,11 +5,12 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useProtocols } from '@/hooks/useProtocols';
 import { useToast } from '@/hooks/use-toast';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { PlusCircle } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { LabelWithTooltip } from '../ui/label-with-tooltip';
 
 const vehicleSchema = z.object({
   type: z.enum(['truck', 'trailer']),
@@ -47,7 +48,7 @@ export function VehicleManagementForm() {
           name="type"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Fahrzeugtyp</FormLabel>
+              <LabelWithTooltip tooltipText="Тип транспортного средства">Fahrzeugtyp</LabelWithTooltip>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger className="w-[180px]"><SelectValue /></SelectTrigger>
@@ -66,7 +67,7 @@ export function VehicleManagementForm() {
           name="license_plate"
           render={({ field }) => (
             <FormItem className="flex-1">
-              <FormLabel>Neues Kennzeichen</FormLabel>
+              <LabelWithTooltip tooltipText="Новый номерной знак">Neues Kennzeichen</LabelWithTooltip>
               <FormControl>
                 <Input placeholder="z.B. B-XY-123" {...field} />
               </FormControl>
