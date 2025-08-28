@@ -23,7 +23,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '../ui/textarea';
 
 import { LocationInput } from './LocationInput';
-import { ArrowLeft, Truck, Thermometer, MapPin, CircleCheck, Lock, Award, PackagePlus, Gauge, Timer, CalendarClock, ChevronsUpDown, Pallet, Box } from 'lucide-react';
+import { ArrowLeft, Truck, Thermometer, MapPin, CircleCheck, Lock, Award, PackagePlus, Gauge, Timer, CalendarClock, ChevronsUpDown, Layers, Box } from 'lucide-react';
 
 const loadingProtocolFormSchema = z.object({
   location: z.string().min(1, "Ort ist ein Pflichtfeld."),
@@ -308,7 +308,7 @@ export function LoadingProtocolForm() {
                         name="pallets"
                         render={({ field }) => (
                         <FormItem>
-                            <FormLabel className="flex items-center gap-2"><Pallet className='h-4 w-4' />Anzahl Paletten</FormLabel>
+                            <FormLabel className="flex items-center gap-2"><Layers className='h-4 w-4' />Anzahl Paletten</FormLabel>
                             <FormControl><Input type="number" {...field} placeholder="z.B. 10" /></FormControl>
                             <FormMessage />
                         </FormItem>
