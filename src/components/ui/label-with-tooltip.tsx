@@ -13,16 +13,14 @@ export function LabelWithTooltip({ children, tooltipText, ...props }: LabelWithT
   return (
     <div className="flex items-center gap-1.5">
       <Label {...props}>{children}</Label>
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>{tooltipText}</p>
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <HelpCircle className="h-4 w-4 text-muted-foreground cursor-help" />
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>{tooltipText}</p>
+        </TooltipContent>
+      </Tooltip>
     </div>
   )
 }

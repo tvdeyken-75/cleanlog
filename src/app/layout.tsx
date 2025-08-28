@@ -4,6 +4,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import { TourProvider } from '@/context/TourContext';
 import { Toaster } from "@/components/ui/toaster";
 import './globals.css';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 export const metadata: Metadata = {
   title: 'FahrerLogbuch',
@@ -26,8 +27,10 @@ export default function RootLayout({
       <body className={cn("font-body antialiased bg-background")}>
         <AuthProvider>
           <TourProvider>
-            {children}
-            <Toaster />
+            <TooltipProvider>
+              {children}
+              <Toaster />
+            </TooltipProvider>
           </TourProvider>
         </AuthProvider>
       </body>
