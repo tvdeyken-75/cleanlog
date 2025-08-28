@@ -6,7 +6,7 @@ export interface ContaminationDetails {
   corrective_actions: string;
 }
 
-export type ProtocolType = 'cleaning' | 'fuel' | 'pause' | 'loading' | 'delivery';
+export type ProtocolType = 'cleaning' | 'fuel' | 'pause' | 'loading' | 'delivery' | 'emergency';
 
 export interface Tour {
   truck_license_plate: string;
@@ -82,8 +82,23 @@ export interface DeliveryProtocol extends BaseProtocol {
     cargo_area_temperature: number;
 }
 
+export type EmergencyType = 'vehicle-damage' | 'goods-blocked' | 'personal-injury' | 'delay' | 'break-in' | 'health-incident' | 'breakdown' | 'other';
 
-export type Protocol = CleaningProtocol | FuelProtocol | PauseProtocol | LoadingProtocol | DeliveryProtocol;
+export interface EmergencyProtocol extends BaseProtocol {
+    type: 'emergency';
+    emergency_type: EmergencyType;
+    description: string;
+    photos: string[]; // data URIs
+    // Conditional fields
+    reference_number?: string; // For vehicle damage, goods blocked
+    incident_type_description?: string; // For personal injury, health incident
+    help_called?: boolean; // For personal injury, health incident
+    estimated_duration?: number; // For delay, breakdown
+    vehicle_immobile?: boolean; // For delay, breakdown
+}
+
+
+export type Protocol = CleaningProtocol | FuelProtocol | PauseProtocol | LoadingProtocol | DeliveryProtocol | EmergencyProtocol;
 
 
     

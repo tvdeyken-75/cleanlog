@@ -1,7 +1,7 @@
 
 "use client";
 
-import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol, LoadingProtocol, DeliveryProtocol } from "@/lib/types";
+import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol, LoadingProtocol, DeliveryProtocol, EmergencyProtocol } from "@/lib/types";
 import {
   Table,
   TableBody,
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Truck, AlertTriangle, CheckCircle2, Droplets, Fuel, Coffee, PackagePlus, PackageCheck } from "lucide-react";
+import { Truck, AlertTriangle, CheckCircle2, Droplets, Fuel, Coffee, PackagePlus, PackageCheck, Siren, Camera } from "lucide-react";
 
 interface ProtocolsTableProps {
   protocols: Protocol[];
@@ -107,6 +107,24 @@ const renderDeliveryDetails = (protocol: DeliveryProtocol) => (
     </>
   );
 
+const renderEmergencyDetails = (protocol: EmergencyProtocol) => (
+    <>
+      <TableCell>
+        <div className="font-medium capitalize">{protocol.emergency_type.replace('-', ' ')}</div>
+        <div className="text-sm text-muted-foreground truncate max-w-xs">{protocol.description}</div>
+      </TableCell>
+      <TableCell className="text-center">
+        {protocol.photos && protocol.photos.length > 0 && (
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                <Camera className="h-4 w-4" />
+                <span>{protocol.photos.length}</span>
+            </div>
+        )}
+      </TableCell>
+    </>
+);
+
+
 const renderProtocolDetails = (protocol: Protocol) => {
     switch (protocol.type) {
         case 'cleaning':
@@ -119,6 +137,8 @@ const renderProtocolDetails = (protocol: Protocol) => {
             return renderLoadingDetails(protocol as LoadingProtocol);
         case 'delivery':
             return renderDeliveryDetails(protocol as DeliveryProtocol);
+        case 'emergency':
+            return renderEmergencyDetails(protocol as EmergencyProtocol);
         default:
             return <><TableCell></TableCell><TableCell></TableCell></>;
     }
@@ -167,6 +187,8 @@ export function ProtocolsTable({ protocols, isLoading }: ProtocolsTableProps) {
             return <PackagePlus className="h-5 w-5 text-green-500" />;
         case 'delivery':
             return <PackageCheck className="h-5 w-5 text-indigo-500" />;
+        case 'emergency':
+            return <Siren className="h-5 w-5 text-red-500" />;
         default:
             return <Truck className="h-5 w-5 text-gray-400" />;
     }

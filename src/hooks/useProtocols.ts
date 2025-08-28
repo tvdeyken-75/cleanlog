@@ -2,9 +2,9 @@
 
 "use client";
 import { useState, useEffect, useCallback } from 'react';
-import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol, LoadingProtocol, DeliveryProtocol } from '@/lib/types';
+import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol, LoadingProtocol, DeliveryProtocol, EmergencyProtocol } from '@/lib/types';
 
-type NewProtocol = Omit<CleaningProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | Omit<FuelProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | Omit<PauseProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | Omit<LoadingProtocol, 'id' | 'driverId' | 'end_time' | 'type' | 'loading_protocol_number'> | Omit<DeliveryProtocol, 'id' | 'driverId' | 'end_time' | 'type'>;
+type NewProtocol = Omit<CleaningProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | Omit<FuelProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | Omit<PauseProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | Omit<LoadingProtocol, 'id' | 'driverId' | 'end_time' | 'type' | 'loading_protocol_number'> | Omit<DeliveryProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | Omit<EmergencyProtocol, 'id' | 'driverId' | 'end_time' | 'type'>;
 
 export function useProtocols(userId: string | null) {
   const [protocols, setProtocols] = useState<Protocol[]>([]);
@@ -47,7 +47,7 @@ export function useProtocols(userId: string | null) {
     }
   }, [userId, getProtocolsStorageKey]);
 
-  const addProtocol = (newProtocol: NewProtocol, type: 'cleaning' | 'fuel' | 'pause' | 'loading' | 'delivery') => {
+  const addProtocol = (newProtocol: NewProtocol, type: 'cleaning' | 'fuel' | 'pause' | 'loading' | 'delivery' | 'emergency') => {
     if (!userId) return;
     
     let protocolWithMetadata: Protocol;
