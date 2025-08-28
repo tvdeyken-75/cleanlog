@@ -19,7 +19,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 import { AutocompleteInput } from './AutocompleteInput';
 import { LocationInput } from './LocationInput';
-import { ArrowLeft, Truck, Fuel, Thermometer, MapPin, CircleCheck, Lock, Seal } from 'lucide-react';
+import { ArrowLeft, Truck, Fuel, Thermometer, MapPin, CircleCheck, Lock, Award } from 'lucide-react';
 
 const fuelProtocolFormSchema = z.object({
   truck_license_plate: z.string().min(1, "LKW-Kennzeichen ist ein Pflichtfeld."),
@@ -204,7 +204,7 @@ export function FuelProtocolForm() {
                             <Checkbox checked={field.value} onCheckedChange={field.onChange} id="has_seal" />
                         </FormControl>
                         <FormLabel htmlFor="has_seal" className="font-normal flex items-center gap-2">
-                            <Seal className="h-4 w-4"/>
+                            <Award className="h-4 w-4"/>
                             Siegel vorhanden
                         </FormLabel>
                     </FormItem>
