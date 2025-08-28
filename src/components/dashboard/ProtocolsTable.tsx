@@ -1,6 +1,6 @@
 "use client";
 
-import type { Protocol, CleaningProtocol, FuelProtocol } from "@/lib/types";
+import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol } from "@/lib/types";
 import {
   Table,
   TableBody,
@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Truck, AlertTriangle, CheckCircle2, Droplets, Fuel } from "lucide-react";
+import { Truck, AlertTriangle, CheckCircle2, Droplets, Fuel, Coffee } from "lucide-react";
 
 interface ProtocolsTableProps {
   protocols: Protocol[];
@@ -51,7 +51,39 @@ const renderFuelDetails = (protocol: FuelProtocol) => (
         </div>
       </TableCell>
     </>
-  );
+);
+
+const renderPauseDetails = (protocol: PauseProtocol) => (
+    <>
+      <TableCell>
+        <div className="font-medium">{protocol.duration} Minuten</div>
+        <div className="text-sm text-muted-foreground">{protocol.location}</div>
+      </TableCell>
+      <TableCell className="text-center">
+        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+            <CheckCircle2 className={`h-4 w-4 ${protocol.cargo_area_closed ? 'text-green-500' : 'text-gray-300'}`} />
+            <span>Laderaum</span>
+            <CheckCircle2 className={`h-4 w-4 ${protocol.has_seal ? 'text-green-500' : 'text-gray-300'}`} />
+            <span>Siegel</span>
+        </div>
+      </TableCell>
+    </>
+);
+
+
+const renderProtocolDetails = (protocol: Protocol) => {
+    switch (protocol.type) {
+        case 'cleaning':
+            return renderCleaningDetails(protocol as CleaningProtocol);
+        case 'fuel':
+            return renderFuelDetails(protocol as FuelProtocol);
+        case 'pause':
+            return renderPauseDetails(protocol as PauseProtocol);
+        default:
+            return <><TableCell></TableCell><TableCell></TableCell></>;
+    }
+}
+
 
 export function ProtocolsTable({ protocols, isLoading }: ProtocolsTableProps) {
   if (isLoading) {
@@ -89,6 +121,8 @@ export function ProtocolsTable({ protocols, isLoading }: ProtocolsTableProps) {
             return <Droplets className="h-5 w-5 text-blue-500" />;
         case 'fuel':
             return <Fuel className="h-5 w-5 text-orange-500" />;
+        case 'pause':
+            return <Coffee className="h-5 w-5 text-purple-500" />;
         default:
             return <Truck className="h-5 w-5 text-gray-400" />;
     }
@@ -117,7 +151,7 @@ export function ProtocolsTable({ protocols, isLoading }: ProtocolsTableProps) {
                 <div className="font-medium">{protocol.truck_license_plate}</div>
                 <div className="text-sm text-muted-foreground">{protocol.trailer_license_plate}</div>
               </TableCell>
-              {protocol.type === 'cleaning' ? renderCleaningDetails(protocol as CleaningProtocol) : renderFuelDetails(protocol as FuelProtocol)}
+              {renderProtocolDetails(protocol)}
               <TableCell className="text-right">
                 {new Date(protocol.end_time).toLocaleDateString('de-DE', {
                   day: '2-digit',

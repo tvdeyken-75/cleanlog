@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Fuel, Droplets } from 'lucide-react';
+import { Droplets, Fuel, Coffee } from 'lucide-react';
 import { ProtocolsTable } from './ProtocolsTable';
 import { useProtocols } from '@/hooks/useProtocols';
 import Link from 'next/link';
@@ -22,6 +22,12 @@ export function DashboardClient() {
           {activeTour && <p className="text-muted-foreground">Aktuelle Tour: {activeTour.transport_order}</p>}
         </div>
         <div className="flex gap-2">
+          <Link href="/protocols/pause" passHref>
+            <Button variant="outline">
+              <Coffee className="mr-2 h-4 w-4" />
+              Pause
+            </Button>
+          </Link>
           <Link href="/protocols/fuel" passHref>
             <Button variant="outline">
               <Fuel className="mr-2 h-4 w-4" />

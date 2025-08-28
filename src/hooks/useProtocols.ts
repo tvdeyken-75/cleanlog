@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect, useCallback } from 'react';
-import type { Protocol, CleaningProtocol, FuelProtocol } from '@/lib/types';
+import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol } from '@/lib/types';
 
-type NewProtocol = Omit<CleaningProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | Omit<FuelProtocol, 'id' | 'driverId' | 'end_time' | 'type'>;
+type NewProtocol = Omit<CleaningProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | Omit<FuelProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | Omit<PauseProtocol, 'id' | 'driverId' | 'end_time' | 'type'>;
 
 export function useProtocols(userId: string | null) {
   const [protocols, setProtocols] = useState<Protocol[]>([]);
@@ -45,7 +45,7 @@ export function useProtocols(userId: string | null) {
     }
   }, [userId, getProtocolsStorageKey]);
 
-  const addProtocol = (newProtocol: NewProtocol, type: 'cleaning' | 'fuel') => {
+  const addProtocol = (newProtocol: NewProtocol, type: 'cleaning' | 'fuel' | 'pause') => {
     if (!userId) return;
     
     const protocolWithMetadata: Protocol = {
