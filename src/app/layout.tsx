@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { cn } from "@/lib/utils";
 import { AuthProvider } from '@/context/AuthContext';
+import { TourProvider } from '@/context/TourContext';
 import { Toaster } from "@/components/ui/toaster";
 import './globals.css';
 
@@ -24,8 +25,10 @@ export default function RootLayout({
       </head>
       <body className={cn("font-body antialiased bg-background")}>
         <AuthProvider>
-          {children}
-          <Toaster />
+          <TourProvider>
+            {children}
+            <Toaster />
+          </TourProvider>
         </AuthProvider>
       </body>
     </html>

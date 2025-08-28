@@ -24,7 +24,7 @@ export function LoginForm() {
         title: "Anmeldung erfolgreich",
         description: `Willkommen zurück, ${username}!`,
       });
-      router.push('/');
+      router.push('/tour-selection');
     } else {
       toast({
         variant: "destructive",

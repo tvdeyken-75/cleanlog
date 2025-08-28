@@ -1,9 +1,10 @@
 "use client";
 
 import { useAuth } from '@/context/AuthContext';
+import { useTour } from '@/context/TourContext';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Truck, LogOut } from 'lucide-react';
+import { Truck, LogOut, Map } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,12 +18,19 @@ import Link from 'next/link';
 
 export function Header() {
   const { user, logout, isAuthenticated } = useAuth();
+  const { endTour, activeTour } = useTour();
   const router = useRouter();
 
   const handleLogout = () => {
     logout();
+    endTour();
     router.push('/login');
   };
+
+  const handleEndTour = () => {
+    endTour();
+    router.push('/tour-selection');
+  }
   
   const getInitials = (name: string | null) => {
     if (!name) return '?';
@@ -58,7 +66,23 @@ export function Header() {
                     </p>
                   </div>
                 </DropdownMenuLabel>
+                {activeTour && (
+                   <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">Aktuelle Tour</p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {activeTour.transport_order}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                )}
                 <DropdownMenuSeparator />
+                {activeTour && (
+                  <DropdownMenuItem onClick={handleEndTour}>
+                    <Map className="mr-2 h-4 w-4" />
+                    <span>Tour beenden</span>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={handleLogout}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Abmelden</span>

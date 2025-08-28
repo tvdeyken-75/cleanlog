@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { useAuth } from '@/context/AuthContext';
 import { useProtocols } from '@/hooks/useProtocols';
 import { useToast } from '@/hooks/use-toast';
+import { useTour } from '@/context/TourContext';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -36,6 +37,7 @@ type FuelProtocolFormValues = z.infer<typeof fuelProtocolFormSchema>;
 export function FuelProtocolForm() {
   const router = useRouter();
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
+  const { activeTour } = useTour();
   const { addProtocol, getUniqueLicensePlates } = useProtocols(user);
   const { toast } = useToast();
   const [startTime] = useState(new Date().toISOString());
@@ -48,6 +50,13 @@ export function FuelProtocolForm() {
       has_seal: false,
     }
   });
+  
+  useEffect(() => {
+    if (activeTour) {
+      form.setValue('truck_license_plate', activeTour.truck_license_plate);
+      form.setValue('trailer_license_plate', activeTour.trailer_license_plate);
+    }
+  }, [activeTour, form]);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -56,7 +65,7 @@ export function FuelProtocolForm() {
   }, [authLoading, isAuthenticated, router]);
 
   const onSubmit = (data: FuelProtocolFormValues) => {
-    addProtocol(data, 'fuel');
+    addProtocol({ ...data, transport_order: activeTour?.transport_order || '' }, 'fuel');
     toast({
       title: "Protokoll gespeichert",
       description: "Ihr Tankprotokoll wurde erfolgreich hinzugefügt.",

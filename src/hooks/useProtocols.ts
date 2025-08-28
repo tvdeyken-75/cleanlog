@@ -8,7 +8,7 @@ export function useProtocols(userId: string | null) {
   const [protocols, setProtocols] = useState<Protocol[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  const getStorageKey = useCallback(() => `fahrerLogbuchProtocols_v2_${userId}`, [userId]);
+  const getStorageKey = useCallback(() => `fahrerLogbuchProtocols_v3_${userId}`, [userId]);
 
   useEffect(() => {
     if (userId) {
@@ -57,15 +57,7 @@ export function useProtocols(userId: string | null) {
   const getUniqueLicensePlates = (type: 'truck' | 'trailer'): string[] => {
     const key = type === 'truck' ? 'truck_license_plate' : 'trailer_license_plate';
     const allPlates = protocols.map(p => p[key]);
-    const truckPlates = protocols
-        .filter(p => p.type === 'cleaning' || p.type === 'fuel')
-        .map(p => p.truck_license_plate);
-    const trailerPlates = protocols
-        .filter(p => p.type === 'cleaning' || p.type === 'fuel')
-        .map(p => p.trailer_license_plate);
-    
-    const plates = type === 'truck' ? truckPlates : trailerPlates;
-    return [...new Set(plates)];
+    return [...new Set(allPlates)];
   };
 
   return { protocols, addProtocol, isLoading, getUniqueLicensePlates };

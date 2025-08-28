@@ -6,12 +6,16 @@ export interface ContaminationDetails {
 
 export type ProtocolType = 'cleaning' | 'fuel';
 
-interface BaseProtocol {
+export interface Tour {
+  truck_license_plate: string;
+  trailer_license_plate: string;
+  transport_order: string;
+}
+
+interface BaseProtocol extends Tour {
     id: string;
     driverId: string;
     type: ProtocolType;
-    truck_license_plate: string;
-    trailer_license_plate: string;
     location: string;
     start_time: string;
     end_time: string;

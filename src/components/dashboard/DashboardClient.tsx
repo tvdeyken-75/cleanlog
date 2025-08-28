@@ -1,47 +1,26 @@
 "use client";
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { PlusCircle, Fuel } from 'lucide-react';
 import { ProtocolsTable } from './ProtocolsTable';
 import { useProtocols } from '@/hooks/useProtocols';
 import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { Card, CardContent } from '../ui/card';
+import { useTour } from '@/context/TourContext';
 
 export function DashboardClient() {
-  const router = useRouter();
-  const { user, isLoading: authLoading, isAuthenticated } = useAuth();
+  const { user } = useAuth();
   const { protocols, isLoading: protocolsLoading } = useProtocols(user);
-
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.replace('/login');
-    }
-  }, [authLoading, isAuthenticated, router]);
-
-  if (authLoading || !isAuthenticated) {
-    return (
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-10 w-1/4" />
-          <Skeleton className="h-10 w-36" />
-        </div>
-        <Card>
-          <CardContent className="p-6">
-            <Skeleton className="h-40 w-full" />
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+  const { activeTour } = useTour();
 
   return (
     <>
       <div className="flex items-center justify-between gap-4">
-        <h1 className="font-headline text-2xl font-semibold md:text-3xl">Meine Protokolle</h1>
+        <div>
+          <h1 className="font-headline text-2xl font-semibold md:text-3xl">Meine Protokolle</h1>
+          {activeTour && <p className="text-muted-foreground">Aktuelle Tour: {activeTour.transport_order}</p>}
+        </div>
         <div className="flex gap-2">
           <Link href="/protocols/fuel" passHref>
             <Button variant="outline">

@@ -9,20 +9,20 @@ import { z } from 'zod';
 import { useAuth } from '@/context/AuthContext';
 import { useProtocols } from '@/hooks/useProtocols';
 import { useToast } from '@/hooks/use-toast';
+import { useTour } from '@/context/TourContext';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Separator } from '@/components/ui/separator';
 
 import { AutocompleteInput } from './AutocompleteInput';
 import { LocationInput } from './LocationInput';
-import { ArrowLeft, Check, Sparkles, Truck, ClipboardList, Thermometer, Droplets, MapPin, AlertTriangle, ChevronsRight, CircleCheck } from 'lucide-react';
+import { ArrowLeft, Sparkles, Truck, ClipboardList, Thermometer, Droplets, MapPin, AlertTriangle, CircleCheck } from 'lucide-react';
 
 const contaminationTypes = [
   { id: 'chemical', label: 'Chemisch (Reinigungsmittelrückstand)' },
@@ -65,6 +65,7 @@ type ProtocolFormValues = z.infer<typeof protocolFormSchema>;
 export function ProtocolForm() {
   const router = useRouter();
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
+  const { activeTour } = useTour();
   const { addProtocol, getUniqueLicensePlates } = useProtocols(user);
   const { toast } = useToast();
   const [startTime] = useState(new Date().toISOString());
@@ -76,6 +77,13 @@ export function ProtocolForm() {
       location: '',
     }
   });
+  
+  useEffect(() => {
+    if (activeTour) {
+      form.setValue('truck_license_plate', activeTour.truck_license_plate);
+      form.setValue('trailer_license_plate', activeTour.trailer_license_plate);
+    }
+  }, [activeTour, form]);
 
   const watchControlResult = form.watch('control_result');
 
@@ -89,6 +97,7 @@ export function ProtocolForm() {
     const protocolData = {
       truck_license_plate: data.truck_license_plate,
       trailer_license_plate: data.trailer_license_plate,
+      transport_order: activeTour?.transport_order || '',
       cleaning_type: data.cleaning_type,
       cleaning_products: data.cleaning_products,
       control_type: data.control_type,
@@ -327,7 +336,7 @@ export function ProtocolForm() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2"><ChevronsRight className="text-primary"/>Umgebungsdaten</CardTitle>
+            <CardTitle className="flex items-center gap-2"><Truck className="text-primary"/>Umgebungsdaten</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
