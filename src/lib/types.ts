@@ -4,7 +4,7 @@ export interface ContaminationDetails {
   corrective_actions: string;
 }
 
-export type ProtocolType = 'cleaning' | 'fuel' | 'pause';
+export type ProtocolType = 'cleaning' | 'fuel' | 'pause' | 'loading';
 
 export interface Tour {
   truck_license_plate: string;
@@ -17,7 +17,7 @@ interface BaseProtocol extends Tour {
     driverId: string;
     type: ProtocolType;
     location: string;
-    start_time: string;
+    start_time: string; // Should be part of all protocols for consistency
     end_time: string;
 }
 
@@ -49,5 +49,24 @@ export interface PauseProtocol extends BaseProtocol {
     cargo_area_temperature: number;
 }
 
+export type GoodsType = 'food' | 'non-food' | 'empties';
 
-export type Protocol = CleaningProtocol | FuelProtocol | PauseProtocol;
+export interface LoadingProtocol extends BaseProtocol {
+  type: 'loading';
+  goods_type: GoodsType;
+  articles?: string;
+  quantity?: number;
+  packaging?: string;
+  weight?: number;
+  pallets?: number;
+  crates?: number;
+  required_temperature: number;
+  odometer_reading: number;
+  duration: number;
+  cargo_area_closed: boolean;
+  has_seal: boolean;
+  cargo_area_temperature: number;
+}
+
+
+export type Protocol = CleaningProtocol | FuelProtocol | PauseProtocol | LoadingProtocol;

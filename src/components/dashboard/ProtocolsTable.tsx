@@ -1,6 +1,6 @@
 "use client";
 
-import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol } from "@/lib/types";
+import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol, LoadingProtocol } from "@/lib/types";
 import {
   Table,
   TableBody,
@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Truck, AlertTriangle, CheckCircle2, Droplets, Fuel, Coffee } from "lucide-react";
+import { Truck, AlertTriangle, CheckCircle2, Droplets, Fuel, Coffee, PackagePlus } from "lucide-react";
 
 interface ProtocolsTableProps {
   protocols: Protocol[];
@@ -70,6 +70,23 @@ const renderPauseDetails = (protocol: PauseProtocol) => (
     </>
 );
 
+const renderLoadingDetails = (protocol: LoadingProtocol) => (
+  <>
+    <TableCell>
+      <div className="font-medium capitalize">{protocol.goods_type.replace('-', ' ')}</div>
+      <div className="text-sm text-muted-foreground">{protocol.location}</div>
+    </TableCell>
+    <TableCell className="text-center">
+        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+            <CheckCircle2 className={`h-4 w-4 ${protocol.cargo_area_closed ? 'text-green-500' : 'text-gray-300'}`} />
+            <span>Laderaum</span>
+            <CheckCircle2 className={`h-4 w-4 ${protocol.has_seal ? 'text-green-500' : 'text-gray-300'}`} />
+            <span>Siegel</span>
+        </div>
+      </TableCell>
+  </>
+);
+
 
 const renderProtocolDetails = (protocol: Protocol) => {
     switch (protocol.type) {
@@ -79,6 +96,8 @@ const renderProtocolDetails = (protocol: Protocol) => {
             return renderFuelDetails(protocol as FuelProtocol);
         case 'pause':
             return renderPauseDetails(protocol as PauseProtocol);
+        case 'loading':
+            return renderLoadingDetails(protocol as LoadingProtocol);
         default:
             return <><TableCell></TableCell><TableCell></TableCell></>;
     }
@@ -123,6 +142,8 @@ export function ProtocolsTable({ protocols, isLoading }: ProtocolsTableProps) {
             return <Fuel className="h-5 w-5 text-orange-500" />;
         case 'pause':
             return <Coffee className="h-5 w-5 text-purple-500" />;
+        case 'loading':
+            return <PackagePlus className="h-5 w-5 text-green-500" />;
         default:
             return <Truck className="h-5 w-5 text-gray-400" />;
     }
