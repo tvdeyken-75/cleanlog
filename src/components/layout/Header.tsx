@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useAuth } from '@/context/AuthContext';
@@ -28,8 +29,7 @@ export function Header() {
   };
 
   const handleEndTour = () => {
-    endTour();
-    router.push('/tour-selection');
+    router.push('/tour-summary');
   }
   
   const getInitials = (name: string | null) => {
