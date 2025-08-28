@@ -2,7 +2,7 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Fuel } from 'lucide-react';
+import { PlusCircle, Fuel, Droplets } from 'lucide-react';
 import { ProtocolsTable } from './ProtocolsTable';
 import { useProtocols } from '@/hooks/useProtocols';
 import Link from 'next/link';
@@ -29,9 +29,9 @@ export function DashboardClient() {
             </Button>
           </Link>
           <Link href="/protocols/new" passHref>
-            <Button>
-              <PlusCircle className="mr-2 h-4 w-4" />
-              Neues Protokoll
+            <Button variant="outline">
+              <Droplets className="mr-2 h-4 w-4" />
+              Reinigung
             </Button>
           </Link>
         </div>
