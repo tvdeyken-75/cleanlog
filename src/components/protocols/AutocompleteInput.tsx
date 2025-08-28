@@ -9,7 +9,6 @@ import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
 } from "@/components/ui/command"
@@ -18,9 +17,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { licensePlateAutocomplete } from "@/ai/flows/license-plate-autocomplete"
-import { useDebounce } from "@/hooks/use-debounce"
 import { Input } from "../ui/input"
+import { useDebounce } from "@/hooks/use-debounce"
 
 interface AutocompleteInputProps {
   value: string;
@@ -32,28 +30,10 @@ interface AutocompleteInputProps {
 export function AutocompleteInput({ value, onChange, existingPlates, placeholder }: AutocompleteInputProps) {
   const [open, setOpen] = React.useState(false);
   const [inputValue, setInputValue] = React.useState(value || "");
-  const debouncedInputValue = useDebounce(inputValue, 300);
-  const [suggestions, setSuggestions] = React.useState<string[]>([]);
-  const [isLoading, setIsLoading] = React.useState(false);
 
   React.useEffect(() => {
     setInputValue(value || "");
   }, [value]);
-  
-  React.useEffect(() => {
-    if (debouncedInputValue) {
-      setIsLoading(true);
-      licensePlateAutocomplete({
-        partialLicensePlate: debouncedInputValue,
-        existingLicensePlates: existingPlates,
-      }).then((result) => {
-        setSuggestions(result.suggestions);
-        setIsLoading(false);
-      });
-    } else {
-      setSuggestions([]);
-    }
-  }, [debouncedInputValue, existingPlates]);
 
   const handleSelect = (currentValue: string) => {
     const newValue = currentValue === value ? "" : currentValue;
@@ -62,10 +42,14 @@ export function AutocompleteInput({ value, onChange, existingPlates, placeholder
     setOpen(false);
   };
   
-  const allOptions = React.useMemo(() => {
-    const combined = [...suggestions, ...existingPlates.filter(p => !suggestions.includes(p))];
-    return [...new Set(combined)].sort();
-  }, [suggestions, existingPlates]);
+  const filteredPlates = React.useMemo(() => {
+    if (!inputValue) {
+      return existingPlates;
+    }
+    return existingPlates.filter(plate =>
+      plate.toLowerCase().includes(inputValue.toLowerCase())
+    );
+  }, [inputValue, existingPlates]);
 
 
   return (
@@ -98,10 +82,9 @@ export function AutocompleteInput({ value, onChange, existingPlates, placeholder
       <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
         <Command>
           <CommandList>
-            {isLoading && <CommandEmpty>Wird geladen...</CommandEmpty>}
-            {!isLoading && allOptions.length === 0 && <CommandEmpty>Keine Kennzeichen gefunden.</CommandEmpty>}
+            {filteredPlates.length === 0 && <CommandEmpty>Keine Kennzeichen gefunden.</CommandEmpty>}
             <CommandGroup>
-              {allOptions.filter(p => p.toLowerCase().includes(inputValue.toLowerCase())).map((plate) => (
+              {filteredPlates.map((plate) => (
                 <CommandItem
                   key={plate}
                   value={plate}
