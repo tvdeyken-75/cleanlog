@@ -19,9 +19,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 import { LocationInput } from './LocationInput';
-import { ArrowLeft, Sparkles, Truck, ClipboardList, Thermometer, Droplets, MapPin, AlertTriangle, CircleCheck, CalendarClock } from 'lucide-react';
+import { ArrowLeft, Sparkles, Truck, ClipboardList, Thermometer, Droplets, MapPin, AlertTriangle, CircleCheck, CalendarClock, ChevronsUpDown } from 'lucide-react';
 
 const contaminationTypes = [
   { id: 'chemical', label: 'Chemisch (Reinigungsmittelrückstand)' },
@@ -67,6 +68,7 @@ export function ProtocolForm() {
   const { toast } = useToast();
   const [startTime, setStartTime] = useState(new Date().toISOString());
   const [currentTime, setCurrentTime] = useState("");
+  const [isTourInfoOpen, setIsTourInfoOpen] = useState(false);
 
   const form = useForm<ProtocolFormValues>({
     resolver: zodResolver(protocolFormSchema),
@@ -147,31 +149,41 @@ export function ProtocolForm() {
           <h1 className="text-2xl font-bold font-headline">Neues Reinigungsprotokoll</h1>
         </div>
         
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Truck className="text-primary"/>Tour-Informationen</CardTitle>
-            </CardHeader>
-            <CardContent>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div>
-                        <p className="text-muted-foreground">LKW</p>
-                        <p className="font-medium">{activeTour.truck_license_plate}</p>
+        <Collapsible open={isTourInfoOpen} onOpenChange={setIsTourInfoOpen}>
+          <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                  <CardTitle className="flex items-center gap-2"><Truck className="text-primary"/>Tour-Informationen</CardTitle>
+                  <CollapsibleTrigger asChild>
+                      <Button variant="ghost" size="sm">
+                          <ChevronsUpDown className="h-4 w-4" />
+                          <span className="sr-only">Toggle</span>
+                      </Button>
+                  </CollapsibleTrigger>
+              </CardHeader>
+              <CollapsibleContent>
+                <CardContent className="pt-0">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div>
+                            <p className="text-muted-foreground">LKW</p>
+                            <p className="font-medium">{activeTour.truck_license_plate}</p>
+                        </div>
+                        <div>
+                            <p className="text-muted-foreground">Anhänger</p>
+                            <p className="font-medium">{activeTour.trailer_license_plate}</p>
+                        </div>
+                        <div>
+                            <p className="text-muted-foreground">Transportauftrag</p>
+                            <p className="font-medium">{activeTour.transport_order}</p>
+                        </div>
+                        <div>
+                            <p className="text-muted-foreground flex items-center gap-1.5"><CalendarClock className="h-4 w-4"/>Datum & Zeit</p>
+                            <p className="font-medium">{currentTime || "..."}</p>
+                        </div>
                     </div>
-                    <div>
-                        <p className="text-muted-foreground">Anhänger</p>
-                        <p className="font-medium">{activeTour.trailer_license_plate}</p>
-                    </div>
-                    <div>
-                        <p className="text-muted-foreground">Transportauftrag</p>
-                        <p className="font-medium">{activeTour.transport_order}</p>
-                    </div>
-                     <div>
-                        <p className="text-muted-foreground flex items-center gap-1.5"><CalendarClock className="h-4 w-4"/>Datum & Zeit</p>
-                        <p className="font-medium">{currentTime || "..."}</p>
-                    </div>
-                </div>
-            </CardContent>
-        </Card>
+                </CardContent>
+              </CollapsibleContent>
+          </Card>
+        </Collapsible>
 
         <Card>
           <CardHeader>
