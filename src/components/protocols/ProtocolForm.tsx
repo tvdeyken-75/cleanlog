@@ -20,7 +20,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
 
-import { AutocompleteInput } from './AutocompleteInput';
 import { LocationInput } from './LocationInput';
 import { ArrowLeft, Sparkles, Truck, ClipboardList, Thermometer, Droplets, MapPin, AlertTriangle, CircleCheck } from 'lucide-react';
 
@@ -34,8 +33,6 @@ const contaminationTypes = [
 ];
 
 const protocolFormSchema = z.object({
-  truck_license_plate: z.string().min(1, "LKW-Kennzeichen ist ein Pflichtfeld."),
-  trailer_license_plate: z.string().min(1, "Anhänger-Kennzeichen ist ein Pflichtfeld."),
   cleaning_type: z.string({ required_error: "Art der Reinigung ist ein Pflichtfeld." }),
   cleaning_products: z.string().min(1, "Reinigungsmittel ist ein Pflichtfeld."),
   control_type: z.string({ required_error: "Art der Kontrolle ist ein Pflichtfeld." }),
@@ -66,7 +63,7 @@ export function ProtocolForm() {
   const router = useRouter();
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
   const { activeTour } = useTour();
-  const { addProtocol, getUniqueLicensePlates } = useProtocols(user);
+  const { addProtocol } = useProtocols(user);
   const { toast } = useToast();
   const [startTime] = useState(new Date().toISOString());
 
@@ -77,13 +74,6 @@ export function ProtocolForm() {
       location: '',
     }
   });
-  
-  useEffect(() => {
-    if (activeTour) {
-      form.setValue('truck_license_plate', activeTour.truck_license_plate);
-      form.setValue('trailer_license_plate', activeTour.trailer_license_plate);
-    }
-  }, [activeTour, form]);
 
   const watchControlResult = form.watch('control_result');
 
@@ -94,10 +84,19 @@ export function ProtocolForm() {
   }, [authLoading, isAuthenticated, router]);
 
   const onSubmit = (data: ProtocolFormValues) => {
+    if (!activeTour) {
+      toast({
+        variant: "destructive",
+        title: "Fehler",
+        description: "Keine aktive Tour gefunden. Bitte starten Sie eine neue Tour.",
+      });
+      return;
+    }
+
     const protocolData = {
-      truck_license_plate: data.truck_license_plate,
-      trailer_license_plate: data.trailer_license_plate,
-      transport_order: activeTour?.transport_order || '',
+      truck_license_plate: activeTour.truck_license_plate,
+      trailer_license_plate: activeTour.trailer_license_plate,
+      transport_order: activeTour.transport_order,
       cleaning_type: data.cleaning_type,
       cleaning_products: data.cleaning_products,
       control_type: data.control_type,
@@ -120,7 +119,7 @@ export function ProtocolForm() {
     router.push('/');
   };
   
-  if (authLoading || !isAuthenticated) {
+  if (authLoading || !isAuthenticated || !activeTour) {
     return (
       <div className="container max-w-4xl mx-auto p-4 md:p-8 space-y-8">
         <Skeleton className="h-8 w-48" />
@@ -140,47 +139,25 @@ export function ProtocolForm() {
         </div>
         
         <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2"><Truck className="text-primary"/>Fahrzeugdaten</CardTitle>
-          </CardHeader>
-          <CardContent className="grid md:grid-cols-2 gap-6">
-            <FormField
-              control={form.control}
-              name="truck_license_plate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>LKW-Kennzeichen</FormLabel>
-                  <FormControl>
-                    <AutocompleteInput 
-                      value={field.value}
-                      onChange={field.onChange}
-                      existingPlates={getUniqueLicensePlates('truck')}
-                      placeholder="z.B. B-XY-123"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="trailer_license_plate"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Anhänger-Kennzeichen</FormLabel>
-                  <FormControl>
-                    <AutocompleteInput 
-                      value={field.value}
-                      onChange={field.onChange}
-                      existingPlates={getUniqueLicensePlates('trailer')}
-                      placeholder="z.B. B-AB-456"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </CardContent>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2"><Truck className="text-primary"/>Tour-Informationen</CardTitle>
+            </CardHeader>
+            <CardContent>
+                <div className="grid grid-cols-3 gap-4 text-sm">
+                    <div>
+                        <p className="text-muted-foreground">LKW</p>
+                        <p className="font-medium">{activeTour.truck_license_plate}</p>
+                    </div>
+                    <div>
+                        <p className="text-muted-foreground">Anhänger</p>
+                        <p className="font-medium">{activeTour.trailer_license_plate}</p>
+                    </div>
+                    <div>
+                        <p className="text-muted-foreground">Transportauftrag</p>
+                        <p className="font-medium">{activeTour.transport_order}</p>
+                    </div>
+                </div>
+            </CardContent>
         </Card>
 
         <Card>
