@@ -215,6 +215,7 @@ export function ProtocolsTable({ protocols, isLoading }: ProtocolsTableProps) {
     }
   }
 
+  const sortedProtocols = [...protocols].reverse();
 
   return (
     <div className="relative w-full overflow-auto">
@@ -229,7 +230,7 @@ export function ProtocolsTable({ protocols, isLoading }: ProtocolsTableProps) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {protocols.map((protocol) => (
+          {sortedProtocols.map((protocol) => (
             <TableRow key={protocol.id}>
               <TableCell className="w-12 text-center">
                   {getProtocolTypeIcon(protocol.type)}

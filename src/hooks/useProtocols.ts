@@ -89,7 +89,7 @@ export function useProtocols(userId: string | null) {
 
 
     setProtocols(prevProtocols => {
-      const updatedProtocols = [protocolWithMetadata, ...prevProtocols];
+      const updatedProtocols = [...prevProtocols, protocolWithMetadata];
       try {
         localStorage.setItem(getProtocolsStorageKey(), JSON.stringify(updatedProtocols));
       } catch (error) {
