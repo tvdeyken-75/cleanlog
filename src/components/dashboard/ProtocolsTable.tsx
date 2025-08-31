@@ -111,11 +111,19 @@ const renderDeliveryDetails = (protocol: DeliveryProtocol) => (
         <div className="text-xs text-muted-foreground mt-1 font-mono">Von: {protocol.loading_protocol_number}</div>
       </TableCell>
       <TableCell className="text-center">
-          <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-              <CheckCircle2 className={`h-4 w-4 ${protocol.cargo_area_closed ? 'text-green-500' : 'text-gray-300'}`} />
-              <span>Laderaum</span>
-              <CheckCircle2 className={`h-4 w-4 ${protocol.has_seal ? 'text-green-500' : 'text-gray-300'}`} />
-              <span>Siegel</span>
+          <div className="flex flex-col items-center justify-center gap-2">
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                <CheckCircle2 className={`h-4 w-4 ${protocol.cargo_area_closed ? 'text-green-500' : 'text-gray-300'}`} />
+                <span>Laderaum</span>
+                <CheckCircle2 className={`h-4 w-4 ${protocol.has_seal ? 'text-green-500' : 'text-gray-300'}`} />
+                <span>Siegel</span>
+            </div>
+            {protocol.photos && protocol.photos.length > 0 && (
+                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                    <Camera className="h-4 w-4" />
+                    <span>{protocol.photos.length}</span>
+                </div>
+            )}
           </div>
         </TableCell>
     </>
@@ -229,7 +237,7 @@ export function ProtocolsTable({ protocols, isLoading }: ProtocolsTableProps) {
     }
   }
 
-  const sortedProtocols = [...protocols].sort((a, b) => new Date(a.end_time).getTime() - new Date(b.end_time).getTime());
+  const sortedProtocols = [...protocols].sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
 
   return (
     <div className="relative w-full overflow-auto">

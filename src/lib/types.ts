@@ -90,6 +90,7 @@ export interface DeliveryProtocol extends BaseProtocol {
     cargo_area_closed: boolean;
     has_seal: boolean;
     cargo_area_temperature: number;
+    photos?: Photo[];
 }
 
 export type EmergencyType = 'vehicle-damage' | 'goods-blocked' | 'personal-injury' | 'delay' | 'break-in' | 'health-incident' | 'breakdown' | 'other';
