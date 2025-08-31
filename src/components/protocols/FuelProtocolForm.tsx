@@ -21,12 +21,13 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 import { LocationInput } from './LocationInput';
-import { ArrowLeft, Truck, Fuel, Thermometer, MapPin, CircleCheck, Lock, Award, CalendarClock, ChevronsUpDown } from 'lucide-react';
+import { ArrowLeft, Truck, Fuel, Thermometer, MapPin, CircleCheck, Lock, Award, CalendarClock, ChevronsUpDown, Gauge } from 'lucide-react';
 import { LabelWithTooltip } from '../ui/label-with-tooltip';
 
 const fuelProtocolFormSchema = z.object({
   location: z.string().min(1, "Ort ist ein Pflichtfeld."),
   liters: z.coerce.number({ invalid_type_error: "Liter muss eine Zahl sein." }).positive("Liter muss eine positive Zahl sein."),
+  odometer_reading: z.coerce.number().positive("Kilometerstand muss eine positive Zahl sein."),
   cargo_area_temperature: z.coerce.number({ invalid_type_error: "Temperatur muss eine Zahl sein." }).min(-50, "Temperatur zu niedrig").max(50, "Temperatur zu hoch"),
   cargo_area_closed: z.boolean().default(false),
   has_seal: z.boolean().default(false),
@@ -48,6 +49,7 @@ export function FuelProtocolForm() {
     defaultValues: {
       location: '',
       liters: 0,
+      odometer_reading: undefined,
       cargo_area_temperature: 0,
       cargo_area_closed: false,
       has_seal: false,
@@ -165,11 +167,25 @@ export function FuelProtocolForm() {
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="odometer_reading"
+              render={({ field }) => (
+                <FormItem>
+                  <LabelWithTooltip tooltipText="Показания одометра" className="flex items-center gap-2"><Gauge className="h-4 w-4"/>Kilometerstand</LabelWithTooltip>
+                  <div className="relative">
+                    <FormControl><Input type="number" {...field} placeholder="z.B. 123456" className="pr-8"/></FormControl>
+                    <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">km</span>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
              <FormField
                 control={form.control}
                 name="location"
                 render={({ field }) => (
-                <FormItem>
+                <FormItem className="md:col-span-2">
                     <LabelWithTooltip tooltipText="Место" className="flex items-center gap-2"><MapPin className="h-4 w-4"/>Ort</LabelWithTooltip>
                     <FormControl><LocationInput value={field.value} onChange={field.onChange} /></FormControl>
                     <FormMessage />
@@ -243,5 +259,7 @@ export function FuelProtocolForm() {
     </Form>
   );
 }
+
+    
 
     

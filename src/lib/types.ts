@@ -54,6 +54,7 @@ export interface CleaningProtocol extends BaseProtocol {
 export interface FuelProtocol extends BaseProtocol {
     type: 'fuel';
     liters: number;
+    odometer_reading: number;
     cargo_area_closed: boolean;
     has_seal: boolean;
     cargo_area_temperature: number;
@@ -129,5 +130,7 @@ export interface MaintenanceProtocol extends BaseProtocol {
 
 export type Protocol = CleaningProtocol | FuelProtocol | PauseProtocol | LoadingProtocol | DeliveryProtocol | EmergencyProtocol | MaintenanceProtocol;
 
+
+    
 
     

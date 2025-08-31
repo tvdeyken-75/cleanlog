@@ -242,6 +242,7 @@ export function Header() {
         case 'fuel':
             body = [
                 ['Getankte Liter', `${protocol.liters} L`],
+                ['KM-Stand', protocol.odometer_reading],
                 ['Laderaum-Temperatur', `${protocol.cargo_area_temperature}°C`],
                 ['Laderaum geschlossen', protocol.cargo_area_closed ? 'Ja' : 'Nein'],
                 ['Siegel vorhanden', protocol.has_seal ? 'Ja' : 'Nein'],
@@ -377,3 +378,5 @@ export function Header() {
     </header>
   );
 }
+
+    
