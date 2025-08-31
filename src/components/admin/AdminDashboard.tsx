@@ -1,20 +1,22 @@
 
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { KeyRound, Truck, Database } from 'lucide-react';
+import { KeyRound, Truck, Database, Image as ImageIcon } from 'lucide-react';
 import { VehicleManagementForm } from './VehicleManagementForm';
 import { PasswordManagementForm } from './PasswordManagementForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DatabaseSettingsForm } from './DatabaseSettingsForm';
+import { LogoUploadForm } from './LogoUploadForm';
 
 export function AdminDashboard() {
   const router = useRouter();
   const { userRole, isLoading, isAuthenticated } = useAuth();
+  const [activeTab, setActiveTab] = useState("vehicles");
 
   useEffect(() => {
     if (!isLoading && (!isAuthenticated || userRole !== 'admin')) {
@@ -35,11 +37,12 @@ export function AdminDashboard() {
   return (
     <div className="container max-w-4xl mx-auto space-y-8">
         <h1 className="text-2xl font-bold font-headline">Admin Panel</h1>
-        <Tabs defaultValue="vehicles">
-            <TabsList className="grid w-full grid-cols-3">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="vehicles"><Truck className="mr-2 h-4 w-4"/>Fahrzeugverwaltung</TabsTrigger>
                 <TabsTrigger value="password"><KeyRound className="mr-2 h-4 w-4"/>Passwortverwaltung</TabsTrigger>
                 <TabsTrigger value="database"><Database className="mr-2 h-4 w-4"/>Datenbank</TabsTrigger>
+                <TabsTrigger value="logo"><ImageIcon className="mr-2 h-4 w-4"/>Logo</TabsTrigger>
             </TabsList>
             <TabsContent value="vehicles">
                 <Card>
@@ -68,6 +71,16 @@ export function AdminDashboard() {
                     </CardHeader>
                     <CardContent>
                         <DatabaseSettingsForm />
+                    </CardContent>
+                </Card>
+            </TabsContent>
+            <TabsContent value="logo">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2"><ImageIcon className="text-primary"/>Firmenlogo verwalten</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <LogoUploadForm />
                     </CardContent>
                 </Card>
             </TabsContent>
