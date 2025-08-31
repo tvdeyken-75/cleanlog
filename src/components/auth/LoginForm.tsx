@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState, FormEvent, useEffect } from 'react';
@@ -12,33 +13,21 @@ import { LabelWithTooltip } from '../ui/label-with-tooltip';
 export function LoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const { login, isLoading, getAdminPassword } = useAuth();
-  const [adminPassword, setAdminPassword] = useState('admin123');
+  const { login, isLoading, userRole } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
-
-  useEffect(() => {
-    setAdminPassword(getAdminPassword());
-  }, [getAdminPassword]);
-
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    if (username === 'demo' && password === 'demo123') {
-      login(username, 'driver');
+    const loginSuccess = login(username, password);
+    
+    if (loginSuccess) {
       toast({
         title: "Anmeldung erfolgreich",
         description: `Willkommen zurück, ${username}!`,
       });
-      router.push('/tour-selection');
-    } else if (username === 'admin' && password === adminPassword) {
-      login(username, 'admin');
-      toast({
-        title: "Anmeldung erfolgreich",
-        description: `Willkommen, Administrator!`,
-      });
-      router.push('/admin');
+      // The redirection will be based on the role fetched from the context
     } else {
       toast({
         variant: "destructive",
@@ -47,6 +36,16 @@ export function LoginForm() {
       });
     }
   };
+
+  useEffect(() => {
+    if (userRole) {
+      if (userRole === 'admin') {
+        router.push('/admin');
+      } else {
+        router.push('/tour-selection');
+      }
+    }
+  }, [userRole, router]);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">

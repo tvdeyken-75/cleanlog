@@ -1,31 +1,55 @@
+
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-
-type UserRole = 'driver' | 'admin';
+import type { User, UserRole } from '@/lib/types';
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (user: string, role: UserRole) => void;
+  login: (username: string, password: string) => boolean;
   logout: () => void;
   user: string | null;
   userRole: UserRole | null;
   isLoading: boolean;
-  getAdminPassword: () => string;
-  changeAdminPassword: (newPass: string) => void;
+  addUser: (newUser: User) => boolean;
+  getUsers: () => User[];
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const defaultAdmin: User = { username: 'admin', password: 'admin123', role: 'admin' };
+const defaultDriver: User = { username: 'demo', password: 'demo123', role: 'driver' };
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<string | null>(null);
   const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [users, setUsers] = useState<User[]>([defaultAdmin, defaultDriver]);
   const [isLoading, setIsLoading] = useState(true);
   
+  const getUsersStorageKey = () => 'fahrerLogbuchUsers_v1';
+  const getSessionUserKey = () => 'fahrerLogbuchSessionUser_v1';
+  const getSessionRoleKey = () => 'fahrerLogbuchSessionRole_v1';
+
   useEffect(() => {
     try {
-      const storedUser = localStorage.getItem('fahrerLogbuchUser');
-      const storedRole = localStorage.getItem('fahrerLogbuchUserRole') as UserRole;
+      // Load users
+      const storedUsers = localStorage.getItem(getUsersStorageKey());
+      if (storedUsers) {
+        const parsedUsers = JSON.parse(storedUsers);
+        // Ensure admin always exists
+        if (!parsedUsers.find((u: User) => u.username === 'admin')) {
+          setUsers([defaultAdmin, ...parsedUsers.filter((u:User) => u.username !== 'admin')]);
+        } else {
+          setUsers(parsedUsers);
+        }
+      } else {
+        setUsers([defaultAdmin, defaultDriver]);
+        localStorage.setItem(getUsersStorageKey(), JSON.stringify([defaultAdmin, defaultDriver]));
+      }
+
+      // Load active session
+      const storedUser = localStorage.getItem(getSessionUserKey());
+      const storedRole = localStorage.getItem(getSessionRoleKey()) as UserRole;
       if (storedUser && storedRole) {
         setUser(storedUser);
         setUserRole(storedRole);
@@ -37,21 +61,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const login = (username: string, role: UserRole) => {
+  const saveUsers = (updatedUsers: User[]) => {
+    setUsers(updatedUsers);
     try {
-      localStorage.setItem('fahrerLogbuchUser', username);
-      localStorage.setItem('fahrerLogbuchUserRole', role);
-      setUser(username);
-      setUserRole(role);
+      localStorage.setItem(getUsersStorageKey(), JSON.stringify(updatedUsers));
     } catch (error) {
-      console.error("Could not write to localStorage", error);
+      console.error("Could not write users to localStorage", error);
     }
+  }
+
+  const login = (username: string, password: string): boolean => {
+    const foundUser = users.find(u => u.username === username && u.password === password);
+    if (foundUser) {
+      try {
+        localStorage.setItem(getSessionUserKey(), foundUser.username);
+        localStorage.setItem(getSessionRoleKey(), foundUser.role);
+        setUser(foundUser.username);
+        setUserRole(foundUser.role);
+        return true;
+      } catch (error) {
+        console.error("Could not write to localStorage", error);
+        return false;
+      }
+    }
+    return false;
   };
 
   const logout = () => {
     try {
-      localStorage.removeItem('fahrerLogbuchUser');
-      localStorage.removeItem('fahrerLogbuchUserRole');
+      localStorage.removeItem(getSessionUserKey());
+      localStorage.removeItem(getSessionRoleKey());
       setUser(null);
       setUserRole(null);
     } catch (error) {
@@ -59,26 +98,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const getAdminPassword = useCallback(() => {
-    try {
-        return localStorage.getItem('fahrerLogbuchAdminPassword') || 'admin123';
-    } catch (error) {
-        console.error("Could not access localStorage", error);
-        return 'admin123';
+  const addUser = (newUser: User): boolean => {
+    if (users.some(u => u.username === newUser.username)) {
+      return false; // User already exists
     }
-  }, []);
+    const updatedUsers = [...users, newUser];
+    saveUsers(updatedUsers);
+    return true;
+  }
 
-  const changeAdminPassword = (newPass: string) => {
-    try {
-        localStorage.setItem('fahrerLogbuchAdminPassword', newPass);
-    } catch (error) {
-        console.error("Could not write to localStorage", error);
-    }
-  };
-
+  const getUsers = (): User[] => {
+    return users;
+  }
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated: !!user, login, logout, user, userRole, isLoading, getAdminPassword, changeAdminPassword }}>
+    <AuthContext.Provider value={{ isAuthenticated: !!user, login, logout, user, userRole, isLoading, addUser, getUsers }}>
       {children}
     </AuthContext.Provider>
   );

@@ -1,5 +1,13 @@
 
 
+export type UserRole = 'driver' | 'admin';
+
+export interface User {
+    username: string;
+    password?: string; // Password might not always be present on client
+    role: UserRole;
+}
+
 export interface ContaminationDetails {
   types: string[];
   description: string;
