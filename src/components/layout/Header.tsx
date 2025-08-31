@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useAuth } from '@/context/AuthContext';
@@ -19,12 +18,11 @@ import Link from 'next/link';
 
 export function Header() {
   const { user, logout, isAuthenticated, userRole } = useAuth();
-  const { endTour, activeTour } = useTour();
+  const { activeTour } = useTour();
   const router = useRouter();
 
   const handleLogout = () => {
     logout();
-    endTour();
     router.push('/login');
   };
 
