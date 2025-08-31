@@ -1,6 +1,7 @@
+import { LogoutButton } from '@/components/auth/LogoutButton';
 import { TourSelectionForm } from '@/components/tour/TourSelectionForm';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { Map, Wrench } from 'lucide-react';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
+import { Wrench } from 'lucide-react';
 
 export default function TourSelectionPage() {
   return (
@@ -17,6 +18,9 @@ export default function TourSelectionPage() {
           <CardContent>
             <TourSelectionForm />
           </CardContent>
+          <CardFooter className="flex justify-center">
+            <LogoutButton />
+          </CardFooter>
         </Card>
       </div>
     </main>
