@@ -49,9 +49,9 @@ export function PauseProtocolForm() {
     resolver: zodResolver(pauseProtocolFormSchema),
     defaultValues: {
       location: '',
-      duration: undefined,
+      duration: 0,
       message: '',
-      cargo_area_temperature: undefined,
+      cargo_area_temperature: 0,
       cargo_area_closed: false,
       has_seal: false,
     }
@@ -258,3 +258,5 @@ export function PauseProtocolForm() {
     </Form>
   );
 }
+
+    

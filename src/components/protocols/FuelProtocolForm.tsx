@@ -47,8 +47,8 @@ export function FuelProtocolForm() {
     resolver: zodResolver(fuelProtocolFormSchema),
     defaultValues: {
       location: '',
-      liters: undefined,
-      cargo_area_temperature: undefined,
+      liters: 0,
+      cargo_area_temperature: 0,
       cargo_area_closed: false,
       has_seal: false,
     }
@@ -243,3 +243,5 @@ export function FuelProtocolForm() {
     </Form>
   );
 }
+
+    

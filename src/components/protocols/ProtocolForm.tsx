@@ -96,7 +96,7 @@ export function ProtocolForm() {
       cleaning_products: '',
       control_type: undefined,
       control_result: undefined,
-      water_temperature: undefined,
+      water_temperature: 0,
       water_quality: undefined,
       photos: [],
       contamination_types: [],
@@ -534,5 +534,7 @@ export function ProtocolForm() {
     </Form>
   );
 }
+
+    
 
     
