@@ -17,8 +17,8 @@ const sqliteSchema = z.object({
   filePath: z.string().min(1, "Dateipfad ist ein Pflichtfeld."),
 });
 
-const remoteDbSchema = z.object({
-  dbType: z.union([z.literal('postgresql'), z.literal('mariadb')]),
+const postgresqlSchema = z.object({
+  dbType: z.literal('postgresql'),
   serverAddress: z.string().min(1, "Serveradresse ist ein Pflichtfeld."),
   port: z.coerce.number().positive("Port muss eine positive Zahl sein."),
   username: z.string().min(1, "Benutzername ist ein Pflichtfeld."),
@@ -26,9 +26,20 @@ const remoteDbSchema = z.object({
   databaseName: z.string().min(1, "Datenbankname ist ein Pflichtfeld."),
 });
 
+const mariadbSchema = z.object({
+    dbType: z.literal('mariadb'),
+    serverAddress: z.string().min(1, "Serveradresse ist ein Pflichtfeld."),
+    port: z.coerce.number().positive("Port muss eine positive Zahl sein."),
+    username: z.string().min(1, "Benutzername ist ein Pflichtfeld."),
+    password: z.string().optional(),
+    databaseName: z.string().min(1, "Datenbankname ist ein Pflichtfeld."),
+});
+
+
 const dbSettingsSchema = z.discriminatedUnion("dbType", [
   sqliteSchema,
-  remoteDbSchema,
+  postgresqlSchema,
+  mariadbSchema,
 ]);
 
 type DbSettingsFormValues = z.infer<typeof dbSettingsSchema>;
