@@ -79,6 +79,7 @@ export interface LoadingProtocol extends BaseProtocol {
   cargo_area_closed: boolean;
   has_seal: boolean;
   cargo_area_temperature: number;
+  photos?: Photo[];
 }
 
 export interface DeliveryProtocol extends BaseProtocol {

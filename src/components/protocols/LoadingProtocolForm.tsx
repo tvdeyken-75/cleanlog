@@ -1,8 +1,9 @@
 
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -11,7 +12,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useProtocols } from '@/hooks/useProtocols';
 import { useToast } from '@/hooks/use-toast';
 import { useTour } from '@/context/TourContext';
-import type { GoodsType } from '@/lib/types';
+import type { GoodsType, Photo } from '@/lib/types';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,10 +23,18 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '../ui/textarea';
+import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 
 import { LocationInput } from './LocationInput';
-import { ArrowLeft, Truck, Thermometer, MapPin, CircleCheck, Lock, Award, PackagePlus, Gauge, Timer, CalendarClock, ChevronsUpDown, Layers, Box } from 'lucide-react';
+import { ArrowLeft, Truck, Thermometer, MapPin, CircleCheck, Lock, Award, PackagePlus, Gauge, Timer, CalendarClock, ChevronsUpDown, Layers, Box, Camera, Upload, Trash2, File } from 'lucide-react';
 import { LabelWithTooltip } from '../ui/label-with-tooltip';
+
+
+const photoSchema = z.object({
+  dataUrl: z.string(),
+  mimeType: z.string(),
+});
+
 
 const loadingProtocolFormSchema = z.object({
   location: z.string().min(1, "Ort ist ein Pflichtfeld."),
@@ -43,6 +52,7 @@ const loadingProtocolFormSchema = z.object({
   cargo_area_temperature: z.coerce.number(),
   cargo_area_closed: z.boolean().default(false),
   has_seal: z.boolean().default(false),
+  photos: z.array(photoSchema).optional(),
 }).superRefine((data, ctx) => {
     if (data.goods_type === 'food' || data.goods_type === 'non-food') {
         if (!data.articles) {
@@ -85,6 +95,12 @@ export function LoadingProtocolForm() {
   const [currentTime, setCurrentTime] = useState("");
   const [isTourInfoOpen, setIsTourInfoOpen] = useState(false);
   
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+  const [photos, setPhotos] = useState<Photo[]>([]);
+
   const form = useForm<LoadingProtocolFormValues>({
     resolver: zodResolver(loadingProtocolFormSchema),
     defaultValues: {
@@ -103,6 +119,7 @@ export function LoadingProtocolForm() {
       cargo_area_temperature: undefined,
       cargo_area_closed: false,
       has_seal: false,
+      photos: [],
     }
   });
 
@@ -125,6 +142,67 @@ export function LoadingProtocolForm() {
       router.replace('/login');
     }
   }, [authLoading, isAuthenticated, router]);
+  
+  useEffect(() => {
+    async function getCameraPermission() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setHasCameraPermission(false);
+        return;
+      }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        if (videoRef.current) {
+            videoRef.current.srcObject = stream;
+        }
+        setHasCameraPermission(true);
+      } catch (err) {
+        setHasCameraPermission(false);
+      }
+    }
+    getCameraPermission();
+  }, []);
+
+  const takePhoto = () => {
+    if (videoRef.current && canvasRef.current) {
+        const video = videoRef.current;
+        const canvas = canvasRef.current;
+        const context = canvas.getContext('2d');
+        if (context) {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+            const dataUrl = canvas.toDataURL('image/jpeg');
+            const newPhotos: Photo[] = [...photos, { dataUrl, mimeType: 'image/jpeg' }];
+            setPhotos(newPhotos);
+            form.setValue('photos', newPhotos, { shouldValidate: true });
+        }
+    }
+  };
+
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files) return;
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target?.result as string;
+        if (dataUrl) {
+            const newPhotos: Photo[] = [...photos, { dataUrl, mimeType: file.type }];
+            setPhotos(newPhotos);
+            form.setValue('photos', newPhotos, { shouldValidate: true });
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removePhoto = (index: number) => {
+    const newPhotos = photos.filter((_, i) => i !== index);
+    setPhotos(newPhotos);
+    form.setValue('photos', newPhotos, { shouldValidate: true });
+  }
 
   const onSubmit = (data: LoadingProtocolFormValues) => {
     if (!activeTour) {
@@ -447,6 +525,62 @@ export function LoadingProtocolForm() {
                 )}
                 />
             </div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader><CardTitle className="flex items-center gap-2"><Camera className="text-primary"/>Fotodokumentation</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+             {hasCameraPermission === false && (
+                <Alert variant="destructive">
+                    <AlertTitle>Kamerazugriff erforderlich</AlertTitle>
+                    <AlertDescription>Bitte erlauben Sie den Zugriff auf die Kamera, um Fotos aufzunehmen.</AlertDescription>
+                </Alert>
+             )}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+              <div className="w-full aspect-video bg-muted rounded-md overflow-hidden relative md:col-span-2">
+                <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
+                <canvas ref={canvasRef} className="hidden" />
+              </div>
+              <div className="flex flex-col gap-2">
+                <Button type="button" onClick={takePhoto} disabled={!hasCameraPermission} size="lg">
+                    <Camera className="mr-2 h-5 w-5"/> Foto aufnehmen
+                </Button>
+                <Button type="button" onClick={() => fileInputRef.current?.click()} variant="outline" size="lg">
+                    <Upload className="mr-2 h-5 w-5"/> Dokument hochladen
+                </Button>
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileSelect}
+                    className="hidden"
+                    accept="image/*,application/pdf"
+                    multiple
+                />
+              </div>
+            </div>
+            <FormField control={form.control} name="photos" render={({ field }) => (
+                <FormItem>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                        {photos.map((photo, index) => (
+                            <div key={index} className="relative group">
+                                {photo.mimeType.startsWith('image/') ? (
+                                    <Image src={photo.dataUrl} alt={`Dokument ${index + 1}`} width={200} height={150} className="rounded-md object-cover aspect-video"/>
+                                ) : (
+                                    <div className="w-full aspect-video bg-muted rounded-md flex flex-col items-center justify-center p-2">
+                                        <File className="h-10 w-10 text-muted-foreground"/>
+                                        <p className="text-xs text-center text-muted-foreground mt-1 truncate">Dokument</p>
+                                    </div>
+                                )}
+                                <Button type="button" variant="destructive" size="icon" className="absolute top-1 right-1 h-7 w-7 opacity-0 group-hover:opacity-100" onClick={() => removePhoto(index)}>
+                                    <Trash2 className="h-4 w-4"/>
+                                </Button>
+                            </div>
+                        ))}
+                    </div>
+                    <FormMessage />
+                </FormItem>
+            )} />
           </CardContent>
         </Card>
 

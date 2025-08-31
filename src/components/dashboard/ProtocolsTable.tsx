@@ -93,6 +93,12 @@ const renderLoadingDetails = (protocol: LoadingProtocol) => (
             <CheckCircle2 className={`h-4 w-4 ${protocol.has_seal ? 'text-green-500' : 'text-gray-300'}`} />
             <span>Siegel</span>
         </div>
+        {protocol.photos && protocol.photos.length > 0 && (
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                <Camera className="h-4 w-4" />
+                <span>{protocol.photos.length}</span>
+            </div>
+        )}
       </TableCell>
   </>
 );
