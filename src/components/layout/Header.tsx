@@ -251,6 +251,7 @@ export function Header() {
         case 'pause':
             body = [
                 ['Dauer', `${protocol.duration} min`],
+                ['KM-Stand', protocol.odometer_reading],
                 ['Laderaum-Temperatur', `${protocol.cargo_area_temperature}°C`],
                 ['Laderaum geschlossen', protocol.cargo_area_closed ? 'Ja' : 'Nein'],
                 ['Siegel vorhanden', protocol.has_seal ? 'Ja' : 'Nein'],

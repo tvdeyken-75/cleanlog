@@ -64,6 +64,7 @@ export interface PauseProtocol extends BaseProtocol {
     type: 'pause';
     duration: number; // in minutes
     message: string;
+    odometer_reading: number;
     cargo_area_closed: boolean;
     has_seal: boolean;
     cargo_area_temperature: number;
