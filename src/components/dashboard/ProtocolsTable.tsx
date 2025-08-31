@@ -26,13 +26,21 @@ const renderCleaningDetails = (protocol: CleaningProtocol) => (
       <div className="text-sm text-muted-foreground">{protocol.location}</div>
     </TableCell>
     <TableCell className="text-center">
-      <Badge variant={protocol.control_result === 'n.i.O.' ? "destructive" : "secondary"} className="text-xs">
-        {protocol.control_result === 'n.i.O.' ? 
-          <AlertTriangle className="mr-1 h-3 w-3" /> : 
-          <CheckCircle2 className="mr-1 h-3 w-3" />
-        }
-        {protocol.control_result}
-      </Badge>
+        <div className="flex items-center justify-center gap-4">
+            <Badge variant={protocol.control_result === 'n.i.O.' ? "destructive" : "secondary"} className="text-xs">
+                {protocol.control_result === 'n.i.O.' ? 
+                <AlertTriangle className="mr-1 h-3 w-3" /> : 
+                <CheckCircle2 className="mr-1 h-3 w-3" />
+                }
+                {protocol.control_result}
+            </Badge>
+            {protocol.photos && protocol.photos.length > 0 && (
+                <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                    <Camera className="h-4 w-4" />
+                    <span>{protocol.photos.length}</span>
+                </div>
+            )}
+        </div>
     </TableCell>
   </>
 );
@@ -215,7 +223,7 @@ export function ProtocolsTable({ protocols, isLoading }: ProtocolsTableProps) {
     }
   }
 
-  const sortedProtocols = [...protocols].reverse();
+  const sortedProtocols = [...protocols].sort((a, b) => new Date(a.end_time).getTime() - new Date(b.end_time).getTime());
 
   return (
     <div className="relative w-full overflow-auto">

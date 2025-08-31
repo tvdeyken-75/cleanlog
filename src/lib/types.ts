@@ -14,6 +14,11 @@ export interface Tour {
   transport_order: string;
 }
 
+export interface Photo {
+    dataUrl: string; // data URI
+    mimeType: string;
+}
+
 interface BaseProtocol {
     id: string;
     driverId: string;
@@ -35,6 +40,7 @@ export interface CleaningProtocol extends BaseProtocol {
   contamination_details?: ContaminationDetails;
   water_temperature: number;
   water_quality: string;
+  photos?: Photo[];
 }
 
 export interface FuelProtocol extends BaseProtocol {
@@ -86,11 +92,6 @@ export interface DeliveryProtocol extends BaseProtocol {
 }
 
 export type EmergencyType = 'vehicle-damage' | 'goods-blocked' | 'personal-injury' | 'delay' | 'break-in' | 'health-incident' | 'breakdown' | 'other';
-
-export interface Photo {
-    dataUrl: string; // data URI
-    mimeType: string;
-}
 
 export interface EmergencyProtocol extends BaseProtocol {
     type: 'emergency';
