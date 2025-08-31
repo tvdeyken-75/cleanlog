@@ -18,6 +18,7 @@ import { AutocompleteInput } from '../protocols/AutocompleteInput';
 import { Play, Wrench } from 'lucide-react';
 import { LabelWithTooltip } from '../ui/label-with-tooltip';
 import { Checkbox } from '../ui/checkbox';
+import { Skeleton } from '../ui/skeleton';
 
 const tourSelectionSchema = z.object({
   truck_license_plate: z.string().optional(),
@@ -37,7 +38,7 @@ type TourSelectionFormValues = z.infer<typeof tourSelectionSchema>;
 export function TourSelectionForm() {
   const router = useRouter();
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
-  const { startTour, activeTour } = useTour();
+  const { startTour, activeTour, isLoading: tourLoading } = useTour();
   const { getUniqueLicensePlates } = useProtocols(user);
 
   const form = useForm<TourSelectionFormValues>({
@@ -53,13 +54,14 @@ export function TourSelectionForm() {
   const isMaintenance = form.watch('is_maintenance');
 
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
+    const isLoading = authLoading || tourLoading;
+    if (!isLoading && !isAuthenticated) {
       router.replace('/login');
     }
-    if(!authLoading && activeTour) {
+    if(!isLoading && activeTour) {
       router.replace('/');
     }
-  }, [authLoading, isAuthenticated, activeTour, router]);
+  }, [authLoading, tourLoading, isAuthenticated, activeTour, router]);
 
   const onSubmit = (data: TourSelectionFormValues) => {
     if (data.is_maintenance) {
@@ -77,8 +79,17 @@ export function TourSelectionForm() {
     }
   };
 
-  if (authLoading) {
-    return <p>Wird geladen...</p>
+  const isLoading = authLoading || tourLoading;
+
+  if (isLoading) {
+    return (
+        <div className="space-y-6">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-12 w-full" />
+        </div>
+    );
   }
 
   return (
