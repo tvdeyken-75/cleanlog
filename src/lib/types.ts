@@ -97,6 +97,7 @@ export interface DeliveryProtocol extends BaseProtocol {
     type: 'delivery';
     loading_protocol_number: string;
     unloading_duration: number;
+    odometer_reading: number;
     message: string;
     cargo_area_closed: boolean;
     has_seal: boolean;

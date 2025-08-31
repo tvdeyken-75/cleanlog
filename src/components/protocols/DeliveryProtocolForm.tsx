@@ -26,7 +26,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 
 import { LocationInput } from './LocationInput';
-import { ArrowLeft, Truck, Thermometer, MapPin, CircleCheck, Lock, Award, PackageCheck, MessageSquare, Timer, CalendarClock, ChevronsUpDown, PackageSearch, Camera, Trash2, File, Upload } from 'lucide-react';
+import { ArrowLeft, Truck, Thermometer, MapPin, CircleCheck, Lock, Award, PackageCheck, MessageSquare, Timer, CalendarClock, ChevronsUpDown, PackageSearch, Camera, Trash2, File, Upload, Gauge } from 'lucide-react';
 import { LabelWithTooltip } from '../ui/label-with-tooltip';
 
 
@@ -39,6 +39,7 @@ const deliveryProtocolFormSchema = z.object({
   loading_protocol_number: z.string({ required_error: "Ladeprotokoll ist ein Pflichtfeld." }),
   location: z.string().min(1, "Ort ist ein Pflichtfeld."),
   unloading_duration: z.coerce.number().positive("Dauer muss eine positive Zahl sein."),
+  odometer_reading: z.coerce.number().positive("Kilometerstand muss eine positive Zahl sein."),
   message: z.string().optional(),
   cargo_area_temperature: z.coerce.number(),
   cargo_area_closed: z.boolean().default(false),
@@ -69,6 +70,7 @@ export function DeliveryProtocolForm() {
       location: '',
       loading_protocol_number: undefined,
       unloading_duration: 0,
+      odometer_reading: undefined,
       message: '',
       cargo_area_temperature: 0,
       cargo_area_closed: false,
@@ -283,6 +285,20 @@ export function DeliveryProtocolForm() {
                   <div className="relative">
                     <FormControl><Input type="number" {...field} placeholder="z.B. 30" className="pr-12"/></FormControl>
                     <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">Minuten</span>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+             <FormField
+              control={form.control}
+              name="odometer_reading"
+              render={({ field }) => (
+                <FormItem>
+                  <LabelWithTooltip tooltipText="Показания одометра" className="flex items-center gap-2"><Gauge className="h-4 w-4"/>Kilometerstand</LabelWithTooltip>
+                  <div className="relative">
+                    <FormControl><Input type="number" {...field} placeholder="z.B. 123456" className="pr-8"/></FormControl>
+                    <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">km</span>
                   </div>
                   <FormMessage />
                 </FormItem>
