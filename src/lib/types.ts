@@ -48,6 +48,7 @@ export interface CleaningProtocol extends BaseProtocol {
   contamination_details?: ContaminationDetails;
   water_temperature: number;
   water_quality: string;
+  odometer_reading: number;
   photos?: Photo[];
 }
 

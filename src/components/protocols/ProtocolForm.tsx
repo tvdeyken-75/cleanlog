@@ -27,7 +27,7 @@ import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 
 
 import { LocationInput } from './LocationInput';
-import { ArrowLeft, Sparkles, Truck, ClipboardList, Thermometer, Droplets, MapPin, AlertTriangle, CircleCheck, CalendarClock, ChevronsUpDown, Camera, Upload, Trash2, File } from 'lucide-react';
+import { ArrowLeft, Sparkles, Truck, ClipboardList, Thermometer, Droplets, MapPin, AlertTriangle, CircleCheck, CalendarClock, ChevronsUpDown, Camera, Upload, Trash2, File, Gauge } from 'lucide-react';
 import { LabelWithTooltip } from '../ui/label-with-tooltip';
 
 const contaminationTypes = [
@@ -52,6 +52,7 @@ const protocolFormSchema = z.object({
   location: z.string().min(1, "Ort ist ein Pflichtfeld."),
   water_temperature: z.coerce.number({ invalid_type_error: "Temperatur muss eine Zahl sein." }).min(-50, "Temperatur zu niedrig").max(120, "Temperatur zu hoch"),
   water_quality: z.string({ required_error: "Wasserqualität ist ein Pflichtfeld." }),
+  odometer_reading: z.coerce.number().positive("Kilometerstand muss eine positive Zahl sein."),
   photos: z.array(photoSchema).optional(),
   contamination_types: z.array(z.string()).optional(),
   contamination_description: z.string().optional(),
@@ -98,6 +99,7 @@ export function ProtocolForm() {
       control_result: undefined,
       water_temperature: 0,
       water_quality: undefined,
+      odometer_reading: undefined,
       photos: [],
       contamination_types: [],
       contamination_description: '',
@@ -497,6 +499,20 @@ export function ProtocolForm() {
                       <div className="relative">
                         <FormControl><Input type="number" {...field} placeholder="z.B. 45" className="pr-8"/></FormControl>
                         <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">°C</span>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 <FormField
+                  control={form.control}
+                  name="odometer_reading"
+                  render={({ field }) => (
+                    <FormItem>
+                      <LabelWithTooltip tooltipText="Показания одометра" className="flex items-center gap-2"><Gauge className="h-4 w-4"/>Kilometerstand</LabelWithTooltip>
+                      <div className="relative">
+                        <FormControl><Input type="number" {...field} placeholder="z.B. 123456" className="pr-8"/></FormControl>
+                        <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">km</span>
                       </div>
                       <FormMessage />
                     </FormItem>

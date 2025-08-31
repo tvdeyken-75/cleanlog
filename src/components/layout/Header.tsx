@@ -232,6 +232,7 @@ export function Header() {
                 ['Ergebnis', protocol.control_result],
                 ['Wassertemperatur', `${protocol.water_temperature}°C`],
                 ['Wasserqualität', protocol.water_quality],
+                ['KM-Stand', protocol.odometer_reading],
             ];
             if (protocol.control_result === 'n.i.O.' && protocol.contamination_details) {
                 body.push(['Kontamination', protocol.contamination_details.types.join(', ')]);
