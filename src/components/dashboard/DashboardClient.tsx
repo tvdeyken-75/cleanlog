@@ -15,6 +15,15 @@ export function DashboardClient() {
   const { protocols, isLoading: protocolsLoading } = useProtocols(user);
   const { activeTour, isMaintenanceMode } = useTour();
 
+  const activeTourProtocols = protocols.filter(p => {
+    if (isMaintenanceMode) {
+      // In maintenance mode, show protocols with no transport order
+      return !p.transport_order;
+    }
+    // In tour mode, show protocols for the active tour
+    return p.transport_order === activeTour?.transport_order;
+  });
+
   return (
     <>
       <div className="flex items-center justify-between gap-4">
@@ -70,7 +79,7 @@ export function DashboardClient() {
       </div>
       <Card>
         <CardContent className="p-0">
-          <ProtocolsTable protocols={protocols} isLoading={protocolsLoading} />
+          <ProtocolsTable protocols={activeTourProtocols} isLoading={protocolsLoading} />
         </CardContent>
       </Card>
     </>
