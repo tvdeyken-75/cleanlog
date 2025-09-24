@@ -6,12 +6,12 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { KeyRound, Truck, Database, Image as ImageIcon, Mail } from 'lucide-react';
+import { KeyRound, Truck, Database, Image as ImageIcon, Mail, FileText } from 'lucide-react';
 import { VehicleManagementForm } from './VehicleManagementForm';
 import { PasswordManagementForm } from './PasswordManagementForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DatabaseSettingsForm } from './DatabaseSettingsForm';
-import { LogoUploadForm } from './LogoUploadForm';
+import { CompanySettingsForm } from './CompanySettingsForm';
 import { NotificationSettingsForm } from './NotificationSettingsForm';
 
 export function AdminDashboard() {
@@ -43,7 +43,7 @@ export function AdminDashboard() {
                 <TabsTrigger value="vehicles"><Truck className="mr-2 h-4 w-4"/>Fahrzeugverwaltung</TabsTrigger>
                 <TabsTrigger value="password"><KeyRound className="mr-2 h-4 w-4"/>Passwortverwaltung</TabsTrigger>
                 <TabsTrigger value="database"><Database className="mr-2 h-4 w-4"/>Datenbank</TabsTrigger>
-                <TabsTrigger value="logo"><ImageIcon className="mr-2 h-4 w-4"/>Logo</TabsTrigger>
+                <TabsTrigger value="masterdata"><FileText className="mr-2 h-4 w-4"/>Stammdaten</TabsTrigger>
                 <TabsTrigger value="notifications"><Mail className="mr-2 h-4 w-4"/>Benachrichtigungen</TabsTrigger>
             </TabsList>
             <TabsContent value="vehicles">
@@ -76,13 +76,13 @@ export function AdminDashboard() {
                     </CardContent>
                 </Card>
             </TabsContent>
-            <TabsContent value="logo">
+            <TabsContent value="masterdata">
                 <Card>
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2"><ImageIcon className="text-primary"/>Firmenlogo verwalten</CardTitle>
+                        <CardTitle className="flex items-center gap-2"><FileText className="text-primary"/>Stammdaten verwalten</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <LogoUploadForm />
+                        <CompanySettingsForm />
                     </CardContent>
                 </Card>
             </TabsContent>

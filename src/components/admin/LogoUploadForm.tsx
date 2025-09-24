@@ -10,39 +10,47 @@ import { useToast } from '@/hooks/use-toast';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Save, Upload, Trash2 } from 'lucide-react';
+import { Save, Upload, Trash2, Building, Key } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card';
 import { LabelWithTooltip } from '../ui/label-with-tooltip';
+import { Separator } from '../ui/separator';
 
-const LOGO_STORAGE_KEY = 'fahrerLogbuchLogo_v1';
+const SETTINGS_STORAGE_KEY = 'fahrerLogbuchCompanySettings_v1';
 
-const logoSchema = z.object({
+const settingsSchema = z.object({
   logo: z.string().optional(),
+  companyName: z.string().optional(),
+  apiKey: z.string().optional(),
 });
 
-type LogoFormValues = z.infer<typeof logoSchema>;
+type SettingsFormValues = z.infer<typeof settingsSchema>;
 
-export function LogoUploadForm() {
+export function CompanySettingsForm() {
   const { toast } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
-  const form = useForm<LogoFormValues>({
-    resolver: zodResolver(logoSchema),
+  const form = useForm<SettingsFormValues>({
+    resolver: zodResolver(settingsSchema),
     defaultValues: {
       logo: '',
+      companyName: '',
+      apiKey: '',
     },
   });
 
   useEffect(() => {
     try {
-      const storedLogo = localStorage.getItem(LOGO_STORAGE_KEY);
-      if (storedLogo) {
-        setLogoPreview(storedLogo);
-        form.setValue('logo', storedLogo);
+      const storedSettings = localStorage.getItem(SETTINGS_STORAGE_KEY);
+      if (storedSettings) {
+        const parsedSettings = JSON.parse(storedSettings);
+        form.reset(parsedSettings);
+        if (parsedSettings.logo) {
+          setLogoPreview(parsedSettings.logo);
+        }
       }
     } catch (error) {
-      console.error("Could not access localStorage for logo", error);
+      console.error("Could not access localStorage for settings", error);
     }
   }, [form]);
 
@@ -72,26 +80,22 @@ export function LogoUploadForm() {
   
   const removeLogo = () => {
     setLogoPreview(null);
-    form.setValue('logo', '');
+    form.setValue('logo', undefined, { shouldDirty: true });
   }
 
-  const onSubmit = (data: LogoFormValues) => {
+  const onSubmit = (data: SettingsFormValues) => {
     try {
-      if (data.logo) {
-        localStorage.setItem(LOGO_STORAGE_KEY, data.logo);
-      } else {
-        localStorage.removeItem(LOGO_STORAGE_KEY);
-      }
+      localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(data));
       toast({
         title: "Einstellungen gespeichert",
-        description: "Das Firmenlogo wurde erfolgreich aktualisiert.",
+        description: "Die Stammdaten wurden erfolgreich aktualisiert.",
       });
     } catch (error) {
-      console.error("Could not write logo to localStorage", error);
+      console.error("Could not write settings to localStorage", error);
        toast({
         variant: "destructive",
         title: "Fehler beim Speichern",
-        description: "Das Logo konnte nicht gespeichert werden.",
+        description: "Die Stammdaten konnten nicht gespeichert werden.",
       });
     }
   };
@@ -101,7 +105,43 @@ export function LogoUploadForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
         <Card>
             <CardHeader>
-                <CardTitle>Logo hochladen</CardTitle>
+                <CardTitle className="flex items-center gap-2"><Building />Firmendaten</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <FormField
+                control={form.control}
+                name="companyName"
+                render={({ field }) => (
+                    <FormItem>
+                        <LabelWithTooltip tooltipText="Der Name Ihres Unternehmens">Firmenname</LabelWithTooltip>
+                        <FormControl>
+                            <Input placeholder="z.B. Mustermann GmbH" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+                />
+                <FormField
+                control={form.control}
+                name="apiKey"
+                render={({ field }) => (
+                    <FormItem>
+                        <LabelWithTooltip tooltipText="API-Schlüssel für externe Integrationen" className="flex items-center gap-2"><Key className="w-4 h-4" />API Key</LabelWithTooltip>
+                        <FormControl>
+                            <Input placeholder="Ihr API-Schlüssel" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                )}
+                />
+            </CardContent>
+        </Card>
+        
+        <Separator />
+        
+        <Card>
+            <CardHeader>
+                <CardTitle>Firmenlogo</CardTitle>
                 <CardDescription>Laden Sie Ihr Firmenlogo als PNG-Datei hoch. Es wird auf den PDF-Berichten angezeigt.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -147,7 +187,7 @@ export function LogoUploadForm() {
         
         <Button type="submit">
           <Save className="mr-2 h-4 w-4" />
-          Logo speichern
+          Stammdaten speichern
         </Button>
       </form>
     </Form>
