@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Save, Mail, MessageSquare } from 'lucide-react';
+import { Save, Mail, MessageSquare, Globe } from 'lucide-react';
 import { LabelWithTooltip } from '../ui/label-with-tooltip';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../ui/card';
 import { Textarea } from '../ui/textarea';
@@ -16,6 +16,7 @@ import { Textarea } from '../ui/textarea';
 const notificationSettingsSchema = z.object({
   emails: z.string().optional(),
   whatsapp: z.string().optional(),
+  apiUri: z.string().url("Bitte geben Sie eine gültige URL ein.").optional().or(z.literal('')),
 });
 
 type NotificationSettingsFormValues = z.infer<typeof notificationSettingsSchema>;
@@ -28,6 +29,7 @@ export function NotificationSettingsForm() {
     defaultValues: {
       emails: '',
       whatsapp: '',
+      apiUri: '',
     },
   });
 
@@ -75,6 +77,21 @@ export function NotificationSettingsForm() {
                         </LabelWithTooltip>
                         <FormControl>
                             <Input {...field} placeholder="z.B. +49123456789" />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                    <FormField
+                    control={form.control}
+                    name="apiUri"
+                    render={({ field }) => (
+                        <FormItem>
+                        <LabelWithTooltip tooltipText="Die URL, an die die JSON-Zusammenfassung gesendet werden soll">
+                             <div className='flex items-center gap-2'><Globe className="h-4 w-4" /> REST API URI</div>
+                        </LabelWithTooltip>
+                        <FormControl>
+                            <Input {...field} placeholder="https://ihre-api.de/endpoint" />
                         </FormControl>
                         <FormMessage />
                         </FormItem>
