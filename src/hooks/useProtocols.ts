@@ -56,6 +56,15 @@ export function useProtocols(userId: string | null) {
     }
   }, [userId, getProtocolsStorageKey]);
 
+  const saveVehicles = (newVehiclesState: {truck: Vehicle[], trailer: Vehicle[]}) => {
+    setVehicles(newVehiclesState);
+    try {
+        localStorage.setItem(getVehiclesStorageKey(), JSON.stringify(newVehiclesState));
+    } catch (error) {
+        console.error("Could not write vehicles to localStorage", error);
+    }
+  }
+
   const addProtocol = (newProtocol: NewProtocolPayload, type: ProtocolType) => {
     if (!userId) return;
     
@@ -99,21 +108,36 @@ export function useProtocols(userId: string | null) {
     });
   };
 
-  const addVehicle = (type: 'truck' | 'trailer', newVehicle: Vehicle) => {
-    setVehicles(prevVehicles => {
-        const newVehiclesState = { ...prevVehicles };
-        // Check if a vehicle with the same license plate already exists
-        if (!newVehiclesState[type].some(v => v.license_plate === newVehicle.license_plate)) {
-            newVehiclesState[type] = [...newVehiclesState[type], newVehicle];
-            try {
-                localStorage.setItem(getVehiclesStorageKey(), JSON.stringify(newVehiclesState));
-            } catch (error) {
-                console.error("Could not write vehicles to localStorage", error);
-            }
-        }
-        return newVehiclesState;
-    });
+  const addVehicle = (type: 'truck' | 'trailer', newVehicle: Vehicle): boolean => {
+    const currentVehicles = vehicles[type];
+    if (currentVehicles.some(v => v.license_plate === newVehicle.license_plate)) {
+        return false; // Already exists
+    }
+    const newVehiclesState = { 
+        ...vehicles, 
+        [type]: [...currentVehicles, newVehicle]
+    };
+    saveVehicles(newVehiclesState);
+    return true;
   };
+
+  const updateVehicle = (type: 'truck' | 'trailer', originalLicensePlate: string, updatedVehicle: Vehicle) => {
+     const newVehiclesState = { ...vehicles };
+     const index = newVehiclesState[type].findIndex(v => v.license_plate === originalLicensePlate);
+     
+     if (index !== -1) {
+         newVehiclesState[type][index] = updatedVehicle;
+         saveVehicles(newVehiclesState);
+     }
+  };
+
+  const deleteVehicle = (type: 'truck' | 'trailer', licensePlateToDelete: string) => {
+    const newVehiclesState = { 
+        ...vehicles,
+        [type]: vehicles[type].filter(v => v.license_plate !== licensePlateToDelete)
+    };
+    saveVehicles(newVehiclesState);
+  }
 
   const getUniqueLicensePlates = (type: 'truck' | 'trailer'): string[] => {
     const key = type === 'truck' ? 'truck_license_plate' : 'trailer_license_plate';
@@ -122,5 +146,7 @@ export function useProtocols(userId: string | null) {
     return [...new Set([...protocolPlates, ...adminPlates])];
   };
 
-  return { protocols, addProtocol, isLoading, getUniqueLicensePlates, addVehicle, vehicles };
+  return { protocols, addProtocol, isLoading, getUniqueLicensePlates, addVehicle, vehicles, updateVehicle, deleteVehicle };
 }
+
+    
