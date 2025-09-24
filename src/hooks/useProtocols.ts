@@ -108,45 +108,57 @@ export function useProtocols(userId: string | null) {
     });
   };
 
-  const addVehicle = (type: 'truck' | 'trailer', newVehicle: Vehicle): boolean => {
+  const addVehicle = (type: 'truck' | 'trailer', newVehicle: Omit<Vehicle, 'active'>): boolean => {
     const currentVehicles = vehicles[type];
     if (currentVehicles.some(v => v.license_plate === newVehicle.license_plate)) {
         return false; // Already exists
     }
+    const vehicleWithStatus: Vehicle = { ...newVehicle, active: true };
     const newVehiclesState = { 
         ...vehicles, 
-        [type]: [...currentVehicles, newVehicle]
+        [type]: [...currentVehicles, vehicleWithStatus]
     };
     saveVehicles(newVehiclesState);
     return true;
   };
 
-  const updateVehicle = (type: 'truck' | 'trailer', originalLicensePlate: string, updatedVehicle: Vehicle) => {
+  const updateVehicle = (type: 'truck' | 'trailer', originalLicensePlate: string, updatedVehicleData: Omit<Vehicle, 'active'>) => {
      const newVehiclesState = { ...vehicles };
      const index = newVehiclesState[type].findIndex(v => v.license_plate === originalLicensePlate);
      
      if (index !== -1) {
-         newVehiclesState[type][index] = updatedVehicle;
+         // Preserve the active status
+         const currentActiveStatus = newVehiclesState[type][index].active;
+         newVehiclesState[type][index] = { ...updatedVehicleData, active: currentActiveStatus };
          saveVehicles(newVehiclesState);
      }
   };
+  
+  const updateVehicleStatus = (type: 'truck' | 'trailer', licensePlate: string, active: boolean) => {
+    const newVehiclesState = { ...vehicles };
+    const index = newVehiclesState[type].findIndex(v => v.license_plate === licensePlate);
 
-  const deleteVehicle = (type: 'truck' | 'trailer', licensePlateToDelete: string) => {
-    const newVehiclesState = { 
-        ...vehicles,
-        [type]: vehicles[type].filter(v => v.license_plate !== licensePlateToDelete)
-    };
-    saveVehicles(newVehiclesState);
-  }
-
-  const getUniqueLicensePlates = (type: 'truck' | 'trailer'): string[] => {
-    const key = type === 'truck' ? 'truck_license_plate' : 'trailer_license_plate';
-    const protocolPlates = protocols.map(p => p[key]).filter((p): p is string => !!p);
-    const adminPlates = vehicles[type].map(v => v.license_plate);
-    return [...new Set([...protocolPlates, ...adminPlates])];
+    if (index !== -1) {
+        newVehiclesState[type][index].active = active;
+        saveVehicles(newVehiclesState);
+    }
   };
 
-  return { protocols, addProtocol, isLoading, getUniqueLicensePlates, addVehicle, vehicles, updateVehicle, deleteVehicle };
+
+  const getUniqueLicensePlates = (type: 'truck' | 'trailer', onlyActive: boolean = false): string[] => {
+    const key = type === 'truck' ? 'truck_license_plate' : 'trailer_license_plate';
+    const protocolPlates = protocols.map(p => p[key]).filter((p): p is string => !!p);
+    
+    let adminPlates = vehicles[type];
+    if (onlyActive) {
+      adminPlates = adminPlates.filter(v => v.active);
+    }
+    
+    const adminPlateStrings = adminPlates.map(v => v.license_plate);
+    return [...new Set([...protocolPlates, ...adminPlateStrings])];
+  };
+
+  return { protocols, addProtocol, isLoading, getUniqueLicensePlates, addVehicle, vehicles, updateVehicle, updateVehicleStatus };
 }
 
     

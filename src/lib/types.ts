@@ -12,6 +12,7 @@ export interface Vehicle {
   license_plate: string;
   maintenance_number: string;
   api_key?: string;
+  active: boolean;
 }
 
 export interface ContaminationDetails {
@@ -143,5 +144,3 @@ export type Protocol = CleaningProtocol | FuelProtocol | PauseProtocol | Loading
     
 
     
-
-

@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState } from 'react';
@@ -10,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { PlusCircle, Truck, Building, Key, Hash, Edit, Trash2 } from 'lucide-react';
+import { PlusCircle, Truck, Building, Key, Hash, Edit } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { LabelWithTooltip } from '../ui/label-with-tooltip';
 import { useAuth } from '@/context/AuthContext';
@@ -28,7 +29,8 @@ import {
   DialogFooter,
   DialogClose,
 } from "@/components/ui/dialog";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '../ui/alert-dialog';
+import { Switch } from '../ui/switch';
+import { cn } from '@/lib/utils';
 
 
 const vehicleSchema = z.object({
@@ -45,7 +47,7 @@ type EditVehicleFormValues = z.infer<typeof editVehicleSchema>;
 
 export function VehicleManagementForm() {
   const { user } = useAuth();
-  const { addVehicle, vehicles, updateVehicle, deleteVehicle } = useProtocols(user);
+  const { addVehicle, vehicles, updateVehicle, updateVehicleStatus } = useProtocols(user);
   const { toast } = useToast();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<{ vehicle: Vehicle; type: 'truck' | 'trailer' } | null>(null);
@@ -114,17 +116,16 @@ export function VehicleManagementForm() {
     setEditingVehicle(null);
   };
   
-  const handleDeleteVehicle = (type: 'truck' | 'trailer', license_plate: string) => {
-    deleteVehicle(type, license_plate);
+  const handleStatusChange = (type: 'truck' | 'trailer', license_plate: string, active: boolean) => {
+    updateVehicleStatus(type, license_plate, active);
     toast({
-        title: "Fahrzeug gelöscht",
-        description: `Das Fahrzeug ${license_plate} wurde gelöscht.`,
-        variant: "destructive"
+        title: "Status aktualisiert",
+        description: `Das Fahrzeug ${license_plate} ist nun ${active ? 'aktiv' : 'inaktiv'}.`,
     })
   }
 
-  const trucks = vehicles.truck;
-  const trailers = vehicles.trailer;
+  const trucks = vehicles.truck.sort((a,b) => a.license_plate.localeCompare(b.license_plate));
+  const trailers = vehicles.trailer.sort((a,b) => a.license_plate.localeCompare(b.license_plate));
 
   return (
     <div className='space-y-6'>
@@ -212,41 +213,33 @@ export function VehicleManagementForm() {
                                 <TableRow>
                                     <TableHead>Kennzeichen</TableHead>
                                     <TableHead>Wartungs-Nr.</TableHead>
-                                    <TableHead>Aktionen</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Aktion</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {trucks.length > 0 ? (
                                     trucks.map(truck => (
-                                        <TableRow key={truck.license_plate}>
+                                        <TableRow key={truck.license_plate} className={cn(!truck.active && "text-muted-foreground bg-muted/20")}>
                                             <TableCell className='font-medium'>{truck.license_plate}</TableCell>
                                             <TableCell>{truck.maintenance_number}</TableCell>
-                                            <TableCell className="flex gap-2">
+                                            <TableCell>
+                                                <Switch
+                                                    checked={truck.active}
+                                                    onCheckedChange={(checked) => handleStatusChange('truck', truck.license_plate, checked)}
+                                                    aria-label="Fahrzeugstatus"
+                                                />
+                                            </TableCell>
+                                            <TableCell>
                                                 <Button variant="ghost" size="icon" onClick={() => handleEditClick(truck, 'truck')}>
                                                     <Edit className="h-4 w-4" />
                                                 </Button>
-                                                <AlertDialog>
-                                                    <AlertDialogTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </AlertDialogTrigger>
-                                                    <AlertDialogContent>
-                                                        <AlertDialogHeader><AlertDialogTitle>Fahrzeug löschen?</AlertDialogTitle><AlertDialogDescription>
-                                                            Diese Aktion kann nicht rückgängig gemacht werden. Das Fahrzeug {truck.license_plate} wird dauerhaft gelöscht.
-                                                        </AlertDialogDescription></AlertDialogHeader>
-                                                        <AlertDialogFooter>
-                                                            <AlertDialogCancel>Abbrechen</AlertDialogCancel>
-                                                            <AlertDialogAction onClick={() => handleDeleteVehicle('truck', truck.license_plate)}>Löschen</AlertDialogAction>
-                                                        </AlertDialogFooter>
-                                                    </AlertDialogContent>
-                                                </AlertDialog>
                                             </TableCell>
                                         </TableRow>
                                     ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={3} className='text-center text-muted-foreground'>Keine LKWs vorhanden.</TableCell>
+                                        <TableCell colSpan={4} className='text-center text-muted-foreground'>Keine LKWs vorhanden.</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
@@ -261,41 +254,33 @@ export function VehicleManagementForm() {
                                 <TableRow>
                                     <TableHead>Kennzeichen</TableHead>
                                     <TableHead>Wartungs-Nr.</TableHead>
-                                    <TableHead>Aktionen</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Aktion</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {trailers.length > 0 ? (
                                     trailers.map(trailer => (
-                                        <TableRow key={trailer.license_plate}>
+                                        <TableRow key={trailer.license_plate} className={cn(!trailer.active && "text-muted-foreground bg-muted/20")}>
                                             <TableCell className='font-medium'>{trailer.license_plate}</TableCell>
                                             <TableCell>{trailer.maintenance_number}</TableCell>
-                                            <TableCell className="flex gap-2">
+                                             <TableCell>
+                                                <Switch
+                                                    checked={trailer.active}
+                                                    onCheckedChange={(checked) => handleStatusChange('trailer', trailer.license_plate, checked)}
+                                                    aria-label="Fahrzeugstatus"
+                                                />
+                                            </TableCell>
+                                            <TableCell>
                                                 <Button variant="ghost" size="icon" onClick={() => handleEditClick(trailer, 'trailer')}>
                                                     <Edit className="h-4 w-4" />
                                                 </Button>
-                                                <AlertDialog>
-                                                    <AlertDialogTrigger asChild>
-                                                        <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
-                                                            <Trash2 className="h-4 w-4" />
-                                                        </Button>
-                                                    </AlertDialogTrigger>
-                                                    <AlertDialogContent>
-                                                        <AlertDialogHeader><AlertDialogTitle>Fahrzeug löschen?</AlertDialogTitle><AlertDialogDescription>
-                                                           Diese Aktion kann nicht rückgängig gemacht werden. Der Anhänger {trailer.license_plate} wird dauerhaft gelöscht.
-                                                        </AlertDialogDescription></AlertDialogHeader>
-                                                        <AlertDialogFooter>
-                                                            <AlertDialogCancel>Abbrechen</AlertDialogCancel>
-                                                            <AlertDialogAction onClick={() => handleDeleteVehicle('trailer', trailer.license_plate)}>Löschen</AlertDialogAction>
-                                                        </AlertDialogFooter>
-                                                    </AlertDialogContent>
-                                                </AlertDialog>
                                             </TableCell>
                                         </TableRow>
                                     ))
-                                ) : (
+                                   ) : (
                                     <TableRow>
-                                        <TableCell colSpan={3} className='text-center text-muted-foreground'>Keine Anhänger vorhanden.</TableCell>
+                                        <TableCell colSpan={4} className='text-center text-muted-foreground'>Keine Anhänger vorhanden.</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>

@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useEffect } from 'react';
@@ -125,7 +126,7 @@ export function TourSelectionForm() {
                 <AutocompleteInput 
                   value={field.value || ''}
                   onChange={field.onChange}
-                  existingPlates={getUniqueLicensePlates('truck')}
+                  existingPlates={getUniqueLicensePlates('truck', true)}
                   placeholder="z.B. B-XY-123"
                 />
               </FormControl>
@@ -143,7 +144,7 @@ export function TourSelectionForm() {
                 <AutocompleteInput 
                   value={field.value || ''}
                   onChange={field.onChange}
-                  existingPlates={getUniqueLicensePlates('trailer')}
+                  existingPlates={getUniqueLicensePlates('trailer', true)}
                   placeholder="z.B. B-AB-456"
                 />
               </FormControl>
