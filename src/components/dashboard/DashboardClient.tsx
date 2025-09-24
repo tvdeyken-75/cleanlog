@@ -54,10 +54,12 @@ export function DashboardClient() {
               Tanken
             </Button>
           </Link>
-          <Button size="lg">
-            <Archive className="mr-2 h-5 w-5" />
-            Archiv
-          </Button>
+          <Link href="/archive" passHref>
+            <Button size="lg">
+              <Archive className="mr-2 h-5 w-5" />
+              Archiv
+            </Button>
+          </Link>
           <Link href="/protocols/emergency" passHref>
             <Button variant="destructive" size="lg">
               <Siren className="mr-2 h-5 w-5" />
