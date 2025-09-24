@@ -34,46 +34,46 @@ export function DashboardClient() {
         </div>
         <div className="flex flex-col gap-2">
             <div className="flex flex-wrap gap-2">
-                <Link href="/protocols/new" passHref>
-                    <Button variant="outline" size="lg">
+                <Link href="/protocols/new" passHref className="flex-1">
+                    <Button variant="outline" size="lg" className="w-full">
                     <Droplets className="mr-2 h-5 w-5" />
                     Reinigung
                     </Button>
                 </Link>
-                <Link href="/protocols/laden" passHref>
-                    <Button variant="outline" size="lg">
+                <Link href="/protocols/laden" passHref className="flex-1">
+                    <Button variant="outline" size="lg" className="w-full">
                     <PackagePlus className="mr-2 h-5 w-5" />
                     Laden
                     </Button>
                 </Link>
-                <Link href="/protocols/delivery" passHref>
-                    <Button variant="outline" size="lg">
+                <Link href="/protocols/delivery" passHref className="flex-1">
+                    <Button variant="outline" size="lg" className="w-full">
                     <PackageCheck className="mr-2 h-5 w-5" />
                     Liefern
                     </Button>
                 </Link>
-                <Link href="/protocols/pause" passHref>
-                    <Button variant="outline" size="lg">
+                <Link href="/protocols/pause" passHref className="flex-1">
+                    <Button variant="outline" size="lg" className="w-full">
                     <Coffee className="mr-2 h-5 w-5" />
                     Pause
                     </Button>
                 </Link>
             </div>
             <div className="flex flex-wrap gap-2">
-                 <Link href="/protocols/fuel" passHref>
-                    <Button variant="outline" size="lg">
+                 <Link href="/protocols/fuel" passHref className="flex-1">
+                    <Button variant="outline" size="lg" className="w-full">
                     <Fuel className="mr-2 h-5 w-5" />
                     Tanken
                     </Button>
                 </Link>
-                <Link href="/archive" passHref>
-                    <Button size="lg">
+                <Link href="/archive" passHref className="flex-1">
+                    <Button size="lg" className="w-full">
                     <Archive className="mr-2 h-5 w-5" />
                     Archiv
                     </Button>
                 </Link>
-                <Link href="/protocols/emergency" passHref>
-                    <Button variant="destructive" size="lg">
+                <Link href="/protocols/emergency" passHref className="flex-1">
+                    <Button variant="destructive" size="lg" className="w-full">
                     <Siren className="mr-2 h-5 w-5" />
                     Notfall
                     </Button>
