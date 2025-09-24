@@ -2,7 +2,7 @@
 
 "use client";
 import { useState, useEffect, useCallback } from 'react';
-import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol, LoadingProtocol, DeliveryProtocol, EmergencyProtocol, MaintenanceProtocol } from '@/lib/types';
+import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol, LoadingProtocol, DeliveryProtocol, EmergencyProtocol, MaintenanceProtocol, Vehicle } from '@/lib/types';
 
 type NewProtocolPayload = 
     Omit<CleaningProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | 
@@ -17,11 +17,11 @@ type ProtocolType = Protocol['type'];
 
 export function useProtocols(userId: string | null) {
   const [protocols, setProtocols] = useState<Protocol[]>([]);
-  const [vehicles, setVehicles] = useState<{truck: string[], trailer: string[]}>({ truck: [], trailer: [] });
+  const [vehicles, setVehicles] = useState<{truck: Vehicle[], trailer: Vehicle[]}>({ truck: [], trailer: [] });
   const [isLoading, setIsLoading] = useState(true);
 
   const getProtocolsStorageKey = useCallback(() => `fahrerLogbuchProtocols_v4_${userId}`, [userId]);
-  const getVehiclesStorageKey = () => `fahrerLogbuchVehicles_v1`;
+  const getVehiclesStorageKey = () => `fahrerLogbuchVehicles_v2`;
 
   useEffect(() => {
     // Load vehicles (global for all users)
@@ -99,27 +99,28 @@ export function useProtocols(userId: string | null) {
     });
   };
 
-  const addVehicle = (type: 'truck' | 'trailer', licensePlate: string) => {
+  const addVehicle = (type: 'truck' | 'trailer', newVehicle: Vehicle) => {
     setVehicles(prevVehicles => {
-        const newVehicles = { ...prevVehicles };
-        if (!newVehicles[type].includes(licensePlate)) {
-            newVehicles[type] = [...newVehicles[type], licensePlate];
+        const newVehiclesState = { ...prevVehicles };
+        // Check if a vehicle with the same license plate already exists
+        if (!newVehiclesState[type].some(v => v.license_plate === newVehicle.license_plate)) {
+            newVehiclesState[type] = [...newVehiclesState[type], newVehicle];
             try {
-                localStorage.setItem(getVehiclesStorageKey(), JSON.stringify(newVehicles));
+                localStorage.setItem(getVehiclesStorageKey(), JSON.stringify(newVehiclesState));
             } catch (error) {
                 console.error("Could not write vehicles to localStorage", error);
             }
         }
-        return newVehicles;
+        return newVehiclesState;
     });
   };
 
   const getUniqueLicensePlates = (type: 'truck' | 'trailer'): string[] => {
     const key = type === 'truck' ? 'truck_license_plate' : 'trailer_license_plate';
     const protocolPlates = protocols.map(p => p[key]).filter((p): p is string => !!p);
-    const adminPlates = vehicles[type];
+    const adminPlates = vehicles[type].map(v => v.license_plate);
     return [...new Set([...protocolPlates, ...adminPlates])];
   };
 
-  return { protocols, addProtocol, isLoading, getUniqueLicensePlates, addVehicle };
+  return { protocols, addProtocol, isLoading, getUniqueLicensePlates, addVehicle, vehicles };
 }
