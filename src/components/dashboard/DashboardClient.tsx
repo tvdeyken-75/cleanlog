@@ -32,49 +32,53 @@ export function DashboardClient() {
           {activeTour && !isMaintenanceMode && <p className="text-muted-foreground">Aktuelle Tour: {activeTour.transport_order}</p>}
           {isMaintenanceMode && <p className="text-muted-foreground">Wartungsmodus für: {activeTour?.truck_license_plate}{activeTour?.truck_license_plate && activeTour?.trailer_license_plate && ', '}{activeTour?.trailer_license_plate}</p>}
         </div>
-        <div className="flex flex-wrap gap-2">
-           <Link href="/protocols/new" passHref>
-            <Button variant="outline" size="lg">
-              <Droplets className="mr-2 h-5 w-5" />
-              Reinigung
-            </Button>
-          </Link>
-          <Link href="/protocols/laden" passHref>
-            <Button variant="outline" size="lg">
-              <PackagePlus className="mr-2 h-5 w-5" />
-              Laden
-            </Button>
-          </Link>
-          <Link href="/protocols/delivery" passHref>
-            <Button variant="outline" size="lg">
-              <PackageCheck className="mr-2 h-5 w-5" />
-              Liefern
-            </Button>
-          </Link>
-          <Link href="/protocols/pause" passHref>
-            <Button variant="outline" size="lg">
-              <Coffee className="mr-2 h-5 w-5" />
-              Pause
-            </Button>
-          </Link>
-          <Link href="/protocols/fuel" passHref>
-            <Button variant="outline" size="lg">
-              <Fuel className="mr-2 h-5 w-5" />
-              Tanken
-            </Button>
-          </Link>
-          <Link href="/archive" passHref>
-            <Button size="lg">
-              <Archive className="mr-2 h-5 w-5" />
-              Archiv
-            </Button>
-          </Link>
-          <Link href="/protocols/emergency" passHref>
-            <Button variant="destructive" size="lg">
-              <Siren className="mr-2 h-5 w-5" />
-              Notfall
-            </Button>
-          </Link>
+        <div className="flex flex-col gap-2">
+            <div className="flex flex-wrap gap-2">
+                <Link href="/protocols/new" passHref>
+                    <Button variant="outline" size="lg">
+                    <Droplets className="mr-2 h-5 w-5" />
+                    Reinigung
+                    </Button>
+                </Link>
+                <Link href="/protocols/laden" passHref>
+                    <Button variant="outline" size="lg">
+                    <PackagePlus className="mr-2 h-5 w-5" />
+                    Laden
+                    </Button>
+                </Link>
+                <Link href="/protocols/delivery" passHref>
+                    <Button variant="outline" size="lg">
+                    <PackageCheck className="mr-2 h-5 w-5" />
+                    Liefern
+                    </Button>
+                </Link>
+                <Link href="/protocols/pause" passHref>
+                    <Button variant="outline" size="lg">
+                    <Coffee className="mr-2 h-5 w-5" />
+                    Pause
+                    </Button>
+                </Link>
+            </div>
+            <div className="flex flex-wrap gap-2">
+                 <Link href="/protocols/fuel" passHref>
+                    <Button variant="outline" size="lg">
+                    <Fuel className="mr-2 h-5 w-5" />
+                    Tanken
+                    </Button>
+                </Link>
+                <Link href="/archive" passHref>
+                    <Button size="lg">
+                    <Archive className="mr-2 h-5 w-5" />
+                    Archiv
+                    </Button>
+                </Link>
+                <Link href="/protocols/emergency" passHref>
+                    <Button variant="destructive" size="lg">
+                    <Siren className="mr-2 h-5 w-5" />
+                    Notfall
+                    </Button>
+                </Link>
+            </div>
         </div>
       </div>
       <Card>
