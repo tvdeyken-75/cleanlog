@@ -1,0 +1,93 @@
+
+"use client";
+
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { useToast } from '@/hooks/use-toast';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Save, Mail, MessageSquare } from 'lucide-react';
+import { LabelWithTooltip } from '../ui/label-with-tooltip';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../ui/card';
+import { Textarea } from '../ui/textarea';
+
+const notificationSettingsSchema = z.object({
+  emails: z.string().optional(),
+  whatsapp: z.string().optional(),
+});
+
+type NotificationSettingsFormValues = z.infer<typeof notificationSettingsSchema>;
+
+export function NotificationSettingsForm() {
+  const { toast } = useToast();
+
+  const form = useForm<NotificationSettingsFormValues>({
+    resolver: zodResolver(notificationSettingsSchema),
+    defaultValues: {
+      emails: '',
+      whatsapp: '',
+    },
+  });
+
+  const onSubmit = (data: NotificationSettingsFormValues) => {
+    console.log("Saving notification settings:", data);
+    // In a real app, you would save these settings to your backend.
+    toast({
+      title: "Einstellungen gespeichert",
+      description: "Die Benachrichtigungseinstellungen wurden erfolgreich aktualisiert.",
+    });
+  };
+
+  return (
+    <div className='space-y-6'>
+        <Card>
+            <CardHeader>
+                <CardTitle className='flex items-center gap-2'>Empfänger konfigurieren</CardTitle>
+                <CardDescription>Geben Sie an, wohin die Tour-Zusammenfassungen gesendet werden sollen.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <FormField
+                    control={form.control}
+                    name="emails"
+                    render={({ field }) => (
+                        <FormItem>
+                        <LabelWithTooltip tooltipText="Eine oder mehrere E-Mail-Adressen, durch Kommas getrennt">
+                            <div className='flex items-center gap-2'><Mail className="h-4 w-4" /> E-Mail-Adressen</div>
+                        </LabelWithTooltip>
+                        <FormControl>
+                            <Textarea {...field} placeholder="z.B. chef@firma.de, buero@firma.de" />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                    <FormField
+                    control={form.control}
+                    name="whatsapp"
+                    render={({ field }) => (
+                        <FormItem>
+                        <LabelWithTooltip tooltipText="WhatsApp-Nummer für Benachrichtigungen">
+                             <div className='flex items-center gap-2'><MessageSquare className="h-4 w-4" /> WhatsApp-Konto</div>
+                        </LabelWithTooltip>
+                        <FormControl>
+                            <Input {...field} placeholder="z.B. +49123456789" />
+                        </FormControl>
+                        <FormMessage />
+                        </FormItem>
+                    )}
+                    />
+                    <Button type="submit">
+                        <Save className="mr-2 h-4 w-4" />
+                        Einstellungen speichern
+                    </Button>
+                </form>
+                </Form>
+            </CardContent>
+        </Card>
+    </div>
+  );
+}

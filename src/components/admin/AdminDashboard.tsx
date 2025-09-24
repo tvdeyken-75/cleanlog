@@ -6,12 +6,13 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { KeyRound, Truck, Database, Image as ImageIcon } from 'lucide-react';
+import { KeyRound, Truck, Database, Image as ImageIcon, Mail } from 'lucide-react';
 import { VehicleManagementForm } from './VehicleManagementForm';
 import { PasswordManagementForm } from './PasswordManagementForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DatabaseSettingsForm } from './DatabaseSettingsForm';
 import { LogoUploadForm } from './LogoUploadForm';
+import { NotificationSettingsForm } from './NotificationSettingsForm';
 
 export function AdminDashboard() {
   const router = useRouter();
@@ -35,14 +36,15 @@ export function AdminDashboard() {
   }
 
   return (
-    <div className="container max-w-4xl mx-auto space-y-8">
+    <div className="container max-w-5xl mx-auto space-y-8">
         <h1 className="text-2xl font-bold font-headline">Admin Panel</h1>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
                 <TabsTrigger value="vehicles"><Truck className="mr-2 h-4 w-4"/>Fahrzeugverwaltung</TabsTrigger>
                 <TabsTrigger value="password"><KeyRound className="mr-2 h-4 w-4"/>Passwortverwaltung</TabsTrigger>
                 <TabsTrigger value="database"><Database className="mr-2 h-4 w-4"/>Datenbank</TabsTrigger>
                 <TabsTrigger value="logo"><ImageIcon className="mr-2 h-4 w-4"/>Logo</TabsTrigger>
+                <TabsTrigger value="notifications"><Mail className="mr-2 h-4 w-4"/>Benachrichtigungen</TabsTrigger>
             </TabsList>
             <TabsContent value="vehicles">
                 <Card>
@@ -81,6 +83,16 @@ export function AdminDashboard() {
                     </CardHeader>
                     <CardContent>
                         <LogoUploadForm />
+                    </CardContent>
+                </Card>
+            </TabsContent>
+            <TabsContent value="notifications">
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2"><Mail className="text-primary"/>Benachrichtigungseinstellungen</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <NotificationSettingsForm />
                     </CardContent>
                 </Card>
             </TabsContent>
