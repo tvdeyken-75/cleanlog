@@ -13,6 +13,8 @@ interface AuthContextType {
   isLoading: boolean;
   addUser: (newUser: User) => boolean;
   getUsers: () => User[];
+  updateUser: (username: string, updatedData: Partial<User>) => void;
+  deleteUser: (username: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -111,8 +113,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return users;
   }
 
+  const updateUser = (username: string, updatedData: Partial<User>) => {
+    const updatedUsers = users.map(u => {
+      if (u.username === username) {
+        const updatedUser = { ...u, ...updatedData };
+        // If the password is not provided in updatedData, keep the old one
+        if (!updatedData.password) {
+            updatedUser.password = u.password;
+        }
+        return updatedUser;
+      }
+      return u;
+    });
+    saveUsers(updatedUsers);
+  };
+
+  const deleteUser = (username: string) => {
+    // Prevent deleting the main admin
+    if (username === 'admin') return;
+
+    const updatedUsers = users.filter(u => u.username !== username);
+    saveUsers(updatedUsers);
+
+    // If the deleted user is the currently logged-in user, log them out
+    if (user === username) {
+        logout();
+    }
+  };
+
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated: !!user, login, logout, user, userRole, isLoading, addUser, getUsers }}>
+    <AuthContext.Provider value={{ isAuthenticated: !!user, login, logout, user, userRole, isLoading, addUser, getUsers, updateUser, deleteUser }}>
       {children}
     </AuthContext.Provider>
   );
