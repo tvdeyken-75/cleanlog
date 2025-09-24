@@ -3,7 +3,7 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Droplets, Fuel, Coffee, PackagePlus, PackageCheck, Siren, Wrench } from 'lucide-react';
+import { Droplets, Fuel, Coffee, PackagePlus, PackageCheck, Siren, Archive } from 'lucide-react';
 import { ProtocolsTable } from './ProtocolsTable';
 import { useProtocols } from '@/hooks/useProtocols';
 import Link from 'next/link';
@@ -54,6 +54,10 @@ export function DashboardClient() {
               Tanken
             </Button>
           </Link>
+          <Button size="lg">
+            <Archive className="mr-2 h-5 w-5" />
+            Archiv
+          </Button>
           <Link href="/protocols/emergency" passHref>
             <Button variant="destructive" size="lg">
               <Siren className="mr-2 h-5 w-5" />
