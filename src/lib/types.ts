@@ -11,7 +11,7 @@ export interface User {
 export interface Vehicle {
   license_plate: string;
   maintenance_number: string;
-  api_key: string;
+  api_key?: string;
 }
 
 export interface ContaminationDetails {
@@ -143,4 +143,5 @@ export type Protocol = CleaningProtocol | FuelProtocol | PauseProtocol | Loading
     
 
     
+
 

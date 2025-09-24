@@ -23,7 +23,7 @@ const vehicleSchema = z.object({
   type: z.enum(['truck', 'trailer']),
   license_plate: z.string().min(1, "Kennzeichen ist ein Pflichtfeld."),
   maintenance_number: z.string().min(1, "Wartungsnummer ist ein Pflichtfeld."),
-  api_key: z.string().min(1, "API Key ist ein Pflichtfeld."),
+  api_key: z.string().optional(),
 });
 
 type VehicleFormValues = z.infer<typeof vehicleSchema>;
@@ -117,7 +117,7 @@ export function VehicleManagementForm() {
                 name="api_key"
                 render={({ field }) => (
                     <FormItem className="flex-1">
-                    <LabelWithTooltip tooltipText="API Key für externe Dienste" className='flex items-center gap-2'><Key className='w-4 h-4' />API Key</LabelWithTooltip>
+                    <LabelWithTooltip tooltipText="API Key für externe Dienste (optional)" className='flex items-center gap-2'><Key className='w-4 h-4' />API Key</LabelWithTooltip>
                     <FormControl>
                         <Input placeholder="API Key" {...field} />
                     </FormControl>
