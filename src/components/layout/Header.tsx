@@ -23,7 +23,8 @@ import autoTable from 'jspdf-autotable';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
-const LOGO_STORAGE_KEY = 'fahrerLogbuchLogo_v1';
+const SETTINGS_STORAGE_KEY = 'fahrerLogbuchCompanySettings_v1';
+
 
 export function Header() {
   const { user, logout, isAuthenticated, userRole } = useAuth();
@@ -63,22 +64,37 @@ export function Header() {
         const pageHeight = doc.internal.pageSize.getHeight();
         const usableWidth = pageWidth - 2 * margin;
         let yPos = margin;
+        
+        let logoDataUrl = null;
+        try {
+            const storedSettings = localStorage.getItem(SETTINGS_STORAGE_KEY);
+            if (storedSettings) {
+                logoDataUrl = JSON.parse(storedSettings).logo;
+            }
+        } catch(e) {
+            console.error("Could not get settings from local storage", e);
+        }
 
         // 1. Add Logo
-        try {
-            const logoDataUrl = localStorage.getItem(LOGO_STORAGE_KEY);
-            if (logoDataUrl) {
-                const img = new Image();
-                img.src = logoDataUrl;
-                await new Promise(resolve => img.onload = resolve);
+        if (logoDataUrl) {
+          try {
+              const img = new Image();
+              img.src = logoDataUrl;
+              await new Promise(resolve => {
+                img.onload = resolve;
+                img.onerror = resolve; // Continue even if image fails to load
+              });
+              if(img.complete && img.naturalWidth > 0) {
                 const aspectRatio = img.width / img.height;
                 const logoWidth = 30;
                 const logoHeight = logoWidth / aspectRatio;
                 doc.addImage(logoDataUrl, 'PNG', pageWidth - margin - logoWidth, margin, logoWidth, logoHeight);
-            }
-        } catch (e) {
-            console.error("Could not load or add logo", e);
+              }
+          } catch (e) {
+              console.error("Could not load or add logo", e);
+          }
         }
+
 
         // 2. Add Title
         doc.setFontSize(22);
@@ -313,7 +329,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-card">
-      <div className="container flex h-16 items-center">
+      <div className="mx-auto flex h-16 items-center px-4 sm:px-6 lg:px-8">
         <div className="flex">
           <Link href="/" className="mr-4 flex items-center space-x-2">
             <Truck className="h-6 w-6 text-primary" />
@@ -381,7 +397,3 @@ export function Header() {
     </header>
   );
 }
-
-    
-
-    
