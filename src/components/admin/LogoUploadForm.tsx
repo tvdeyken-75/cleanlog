@@ -112,7 +112,7 @@ export function LogoUploadForm() {
                     <FormItem>
                         <LabelWithTooltip tooltipText="Wählen Sie eine PNG-Datei">Logo-Datei</LabelWithTooltip>
                         <FormControl>
-                            <>
+                            <div>
                                 <Input 
                                     type="file" 
                                     className="hidden"
@@ -124,7 +124,7 @@ export function LogoUploadForm() {
                                     <Upload className="mr-2 h-4 w-4" />
                                     Logo auswählen
                                 </Button>
-                            </>
+                            </div>
                         </FormControl>
                         <FormMessage />
                     </FormItem>
