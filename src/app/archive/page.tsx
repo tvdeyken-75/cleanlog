@@ -9,9 +9,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ProtocolsTable } from '@/components/dashboard/ProtocolsTable';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Archive, History } from 'lucide-react';
+import { Archive, History, ArrowLeft } from 'lucide-react';
 import type { Protocol } from '@/lib/types';
 import { useMemo } from 'react';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 interface GroupedProtocols {
   [transportOrder: string]: {
@@ -22,6 +24,7 @@ interface GroupedProtocols {
 }
 
 export default function ArchivePage() {
+  const router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
   const { protocols, isLoading: protocolsLoading } = useProtocols(user);
   const { activeTour } = useTour();
@@ -59,7 +62,14 @@ export default function ArchivePage() {
   return (
     <div className="flex min-h-screen w-full flex-col">
       <Header />
-      <main className="flex-1 p-4 md:p-8">
+      <main className="flex-1 p-4 md:p-8 space-y-6">
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="icon" onClick={() => router.back()}>
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h1 className="text-2xl font-bold font-headline">Archiv</h1>
+        </div>
+
         <Card>
             <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-2xl font-headline">
