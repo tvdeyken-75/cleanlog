@@ -32,6 +32,8 @@ const expenseTypes: { value: ExpenseType, label: string }[] = [
     { value: 'parking', label: 'Parkgebühren' },
     { value: 'toll', label: 'Mautgebühren' },
     { value: 'ferry', label: 'Fährkosten' },
+    { value: 'overnight', label: 'Übernachtung' },
+    { value: 'food', label: 'Verpflegung' },
     { value: 'other', label: 'Sonstiges' },
 ];
 
@@ -41,7 +43,7 @@ const photoSchema = z.object({
 });
 
 const expenseProtocolSchema = z.object({
-  expense_type: z.enum(['parking', 'toll', 'ferry', 'other'], { required_error: "Spesentyp ist ein Pflichtfeld." }),
+  expense_type: z.enum(['parking', 'toll', 'ferry', 'overnight', 'food', 'other'], { required_error: "Spesentyp ist ein Pflichtfeld." }),
   amount: z.coerce.number().positive("Betrag muss eine positive Zahl sein."),
   location: z.string().min(1, "Ort ist ein Pflichtfeld."),
   description: z.string().optional(),

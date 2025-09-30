@@ -137,7 +137,7 @@ export interface MaintenanceProtocol extends BaseProtocol {
     documents?: Photo[];
 }
 
-export type ExpenseType = 'parking' | 'toll' | 'ferry' | 'other';
+export type ExpenseType = 'parking' | 'toll' | 'ferry' | 'overnight' | 'food' | 'other';
 
 export interface ExpenseProtocol extends BaseProtocol {
     type: 'expense';
@@ -154,5 +154,6 @@ export type Protocol = CleaningProtocol | FuelProtocol | PauseProtocol | Loading
     
 
     
+
 
 
