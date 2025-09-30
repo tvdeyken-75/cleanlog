@@ -69,7 +69,7 @@ export function DashboardClient() {
                  <Link href="/protocols/expense" passHref className="flex-1">
                     <Button variant="outline" size="lg" className="w-full">
                     <Euro className="mr-2 h-5 w-5" />
-                    Auslagen
+                    Spesen
                     </Button>
                 </Link>
                 <Link href="/archive" passHref className="flex-1">

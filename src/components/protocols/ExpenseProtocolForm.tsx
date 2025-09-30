@@ -41,7 +41,7 @@ const photoSchema = z.object({
 });
 
 const expenseProtocolSchema = z.object({
-  expense_type: z.enum(['parking', 'toll', 'ferry', 'other'], { required_error: "Auslagentyp ist ein Pflichtfeld." }),
+  expense_type: z.enum(['parking', 'toll', 'ferry', 'other'], { required_error: "Spesentyp ist ein Pflichtfeld." }),
   amount: z.coerce.number().positive("Betrag muss eine positive Zahl sein."),
   location: z.string().min(1, "Ort ist ein Pflichtfeld."),
   description: z.string().optional(),
@@ -180,7 +180,7 @@ export function ExpenseProtocolForm() {
 
     toast({
       title: "Protokoll gespeichert",
-      description: "Ihr Auslagenprotokoll wurde erfolgreich hinzugefügt.",
+      description: "Ihr Spesenprotokoll wurde erfolgreich hinzugefügt.",
     });
     router.push('/');
   };
@@ -201,7 +201,7 @@ export function ExpenseProtocolForm() {
           <Button type="button" variant="outline" size="icon" onClick={() => router.back()}>
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-2xl font-bold font-headline">Neues Auslagenprotokoll</h1>
+          <h1 className="text-2xl font-bold font-headline">Neues Spesenprotokoll</h1>
         </div>
         
         <Collapsible open={isTourInfoOpen} onOpenChange={setIsTourInfoOpen}>
@@ -229,12 +229,12 @@ export function ExpenseProtocolForm() {
         </Collapsible>
 
         <Card>
-          <CardHeader><CardTitle className="flex items-center gap-2"><Euro className="text-primary"/>Auslagen-Details</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="flex items-center gap-2"><Euro className="text-primary"/>Spesen-Details</CardTitle></CardHeader>
           <CardContent className="grid md:grid-cols-2 gap-6">
             <FormField control={form.control} name="expense_type" render={({ field }) => (
-                <FormItem><LabelWithTooltip tooltipText="Тип расходов">Auslagentyp</LabelWithTooltip>
+                <FormItem><LabelWithTooltip tooltipText="Тип расходов">Spesentyp</LabelWithTooltip>
                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl><SelectTrigger><SelectValue placeholder="Wählen Sie den Auslagentyp" /></SelectTrigger></FormControl>
+                    <FormControl><SelectTrigger><SelectValue placeholder="Wählen Sie den Spesentyp" /></SelectTrigger></FormControl>
                     <SelectContent>{expenseTypes.map(e => <SelectItem key={e.value} value={e.value}>{e.label}</SelectItem>)}</SelectContent>
                   </Select><FormMessage />
                 </FormItem>
@@ -323,7 +323,7 @@ export function ExpenseProtocolForm() {
 
         <div className="flex justify-end pt-4">
           <Button type="submit" size="lg" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? "Wird gespeichert..." : "Auslagenprotokoll senden"}
+            {form.formState.isSubmitting ? "Wird gespeichert..." : "Spesenprotokoll senden"}
             <CircleCheck className="ml-2 h-5 w-5"/>
           </Button>
         </div>

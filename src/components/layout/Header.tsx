@@ -232,7 +232,7 @@ export function Header() {
         case 'delivery': return 'Lieferprotokoll';
         case 'emergency': return 'Notfallprotokoll';
         case 'maintenance': return 'Wartungsprotokoll';
-        case 'expense': return 'Auslagenprotokoll';
+        case 'expense': return 'Spesenprotokoll';
         default: return 'Protokoll';
     }
   }
@@ -325,7 +325,7 @@ export function Header() {
             break;
         case 'expense':
             body = [
-                ['Auslagentyp', protocol.expense_type],
+                ['Spesentyp', protocol.expense_type],
                 ['Betrag', protocol.amount.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })],
                 ['Beschreibung', protocol.description || 'Keine'],
             ];
