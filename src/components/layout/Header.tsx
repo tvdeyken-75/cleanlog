@@ -17,7 +17,7 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Link from 'next/link';
 import { useProtocols } from '@/hooks/useProtocols';
-import { CleaningProtocol, DeliveryProtocol, EmergencyProtocol, FuelProtocol, LoadingProtocol, MaintenanceProtocol, PauseProtocol, Protocol } from '@/lib/types';
+import { CleaningProtocol, DeliveryProtocol, EmergencyProtocol, ExpenseProtocol, FuelProtocol, LoadingProtocol, MaintenanceProtocol, PauseProtocol, Protocol } from '@/lib/types';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useState } from 'react';
@@ -232,6 +232,7 @@ export function Header() {
         case 'delivery': return 'Lieferprotokoll';
         case 'emergency': return 'Notfallprotokoll';
         case 'maintenance': return 'Wartungsprotokoll';
+        case 'expense': return 'Auslagenprotokoll';
         default: return 'Protokoll';
     }
   }
@@ -322,6 +323,13 @@ export function Header() {
                 ['KM-Stand', protocol.odometer_reading || 'N/A'],
             ];
             break;
+        case 'expense':
+            body = [
+                ['Auslagentyp', protocol.expense_type],
+                ['Betrag', protocol.amount.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })],
+                ['Beschreibung', protocol.description || 'Keine'],
+            ];
+            break;
      }
      return { head, body };
   }
@@ -330,12 +338,10 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-card">
       <div className="mx-auto flex h-16 items-center px-4 sm:px-6 lg:px-8">
-        <div className="flex">
-          <Link href="/" className="mr-4 flex items-center space-x-2">
+        <Link href="/" className="mr-6 flex items-center space-x-2">
             <Truck className="h-6 w-6 text-primary" />
             <span className="inline-block font-bold font-headline text-xl">FahrerLogbuch</span>
-          </Link>
-        </div>
+        </Link>
         
         {isAuthenticated && (
           <div className="flex flex-1 items-center justify-end space-x-4">

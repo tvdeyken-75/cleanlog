@@ -21,7 +21,7 @@ export interface ContaminationDetails {
   corrective_actions: string;
 }
 
-export type ProtocolType = 'cleaning' | 'fuel' | 'pause' | 'loading' | 'delivery' | 'emergency' | 'maintenance';
+export type ProtocolType = 'cleaning' | 'fuel' | 'pause' | 'loading' | 'delivery' | 'emergency' | 'maintenance' | 'expense';
 
 export interface Tour {
   truck_license_plate: string;
@@ -137,10 +137,21 @@ export interface MaintenanceProtocol extends BaseProtocol {
     documents?: Photo[];
 }
 
+export type ExpenseType = 'parking' | 'toll' | 'ferry' | 'other';
 
-export type Protocol = CleaningProtocol | FuelProtocol | PauseProtocol | LoadingProtocol | DeliveryProtocol | EmergencyProtocol | MaintenanceProtocol;
+export interface ExpenseProtocol extends BaseProtocol {
+    type: 'expense';
+    expense_type: ExpenseType;
+    amount: number;
+    description?: string;
+    photos?: Photo[];
+}
+
+
+export type Protocol = CleaningProtocol | FuelProtocol | PauseProtocol | LoadingProtocol | DeliveryProtocol | EmergencyProtocol | MaintenanceProtocol | ExpenseProtocol;
 
 
     
 
     
+

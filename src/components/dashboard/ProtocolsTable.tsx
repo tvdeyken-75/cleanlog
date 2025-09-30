@@ -1,7 +1,7 @@
 
 "use client";
 
-import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol, LoadingProtocol, DeliveryProtocol, EmergencyProtocol, MaintenanceProtocol } from "@/lib/types";
+import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol, LoadingProtocol, DeliveryProtocol, EmergencyProtocol, MaintenanceProtocol, ExpenseProtocol } from "@/lib/types";
 import {
   Table,
   TableBody,
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Truck, AlertTriangle, CheckCircle2, Droplets, Fuel, Coffee, PackagePlus, PackageCheck, Siren, Camera, Wrench } from "lucide-react";
+import { Truck, AlertTriangle, CheckCircle2, Droplets, Fuel, Coffee, PackagePlus, PackageCheck, Siren, Camera, Wrench, Euro } from "lucide-react";
 
 interface ProtocolsTableProps {
   protocols: Protocol[];
@@ -163,6 +163,23 @@ const renderMaintenanceDetails = (protocol: MaintenanceProtocol) => (
     </>
 );
 
+const renderExpenseDetails = (protocol: ExpenseProtocol) => (
+    <>
+      <TableCell>
+        <div className="font-medium capitalize">{protocol.amount.toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}</div>
+        <div className="text-sm text-muted-foreground">{protocol.expense_type}</div>
+      </TableCell>
+      <TableCell className="text-center">
+        {protocol.photos && protocol.photos.length > 0 && (
+            <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+                <Camera className="h-4 w-4" />
+                <span>{protocol.photos.length}</span>
+            </div>
+        )}
+      </TableCell>
+    </>
+);
+
 
 const renderProtocolDetails = (protocol: Protocol) => {
     switch (protocol.type) {
@@ -180,6 +197,8 @@ const renderProtocolDetails = (protocol: Protocol) => {
             return renderEmergencyDetails(protocol as EmergencyProtocol);
         case 'maintenance':
             return renderMaintenanceDetails(protocol as MaintenanceProtocol);
+        case 'expense':
+            return renderExpenseDetails(protocol as ExpenseProtocol);
         default:
             return <><TableCell></TableCell><TableCell></TableCell></>;
     }
@@ -232,6 +251,8 @@ export function ProtocolsTable({ protocols, isLoading }: ProtocolsTableProps) {
             return <Siren className="h-5 w-5 text-red-500" />;
         case 'maintenance':
             return <Wrench className="h-5 w-5 text-gray-500" />;
+        case 'expense':
+            return <Euro className="h-5 w-5 text-yellow-600" />;
         default:
             return <Truck className="h-5 w-5 text-gray-400" />;
     }

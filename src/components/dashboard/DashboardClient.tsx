@@ -3,7 +3,7 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
-import { Droplets, Fuel, Coffee, PackagePlus, PackageCheck, Siren, Archive } from 'lucide-react';
+import { Droplets, Fuel, Coffee, PackagePlus, PackageCheck, Siren, Archive, Euro } from 'lucide-react';
 import { ProtocolsTable } from './ProtocolsTable';
 import { useProtocols } from '@/hooks/useProtocols';
 import Link from 'next/link';
@@ -52,18 +52,24 @@ export function DashboardClient() {
                     Liefern
                     </Button>
                 </Link>
-                <Link href="/protocols/pause" passHref className="flex-1">
+                 <Link href="/protocols/fuel" passHref className="flex-1">
+                    <Button variant="outline" size="lg" className="w-full">
+                    <Fuel className="mr-2 h-5 w-5" />
+                    Tanken
+                    </Button>
+                </Link>
+            </div>
+            <div className="flex flex-wrap gap-2">
+                 <Link href="/protocols/pause" passHref className="flex-1">
                     <Button variant="outline" size="lg" className="w-full">
                     <Coffee className="mr-2 h-5 w-5" />
                     Pause
                     </Button>
                 </Link>
-            </div>
-            <div className="flex flex-wrap gap-2">
-                 <Link href="/protocols/fuel" passHref className="flex-1">
+                 <Link href="/protocols/expense" passHref className="flex-1">
                     <Button variant="outline" size="lg" className="w-full">
-                    <Fuel className="mr-2 h-5 w-5" />
-                    Tanken
+                    <Euro className="mr-2 h-5 w-5" />
+                    Auslagen
                     </Button>
                 </Link>
                 <Link href="/archive" passHref className="flex-1">

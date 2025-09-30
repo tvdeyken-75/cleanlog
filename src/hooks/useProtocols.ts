@@ -2,7 +2,7 @@
 
 "use client";
 import { useState, useEffect, useCallback } from 'react';
-import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol, LoadingProtocol, DeliveryProtocol, EmergencyProtocol, MaintenanceProtocol, Vehicle } from '@/lib/types';
+import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol, LoadingProtocol, DeliveryProtocol, EmergencyProtocol, MaintenanceProtocol, ExpenseProtocol, Vehicle } from '@/lib/types';
 
 type NewProtocolPayload = 
     Omit<CleaningProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | 
@@ -11,7 +11,8 @@ type NewProtocolPayload =
     Omit<LoadingProtocol, 'id' | 'driverId' | 'end_time' | 'type' | 'loading_protocol_number'> | 
     Omit<DeliveryProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | 
     Omit<EmergencyProtocol, 'id' | 'driverId' | 'end_time' | 'type'> |
-    Omit<MaintenanceProtocol, 'id' | 'driverId' | 'end_time' | 'type'>;
+    Omit<MaintenanceProtocol, 'id' | 'driverId' | 'end_time' | 'type'> |
+    Omit<ExpenseProtocol, 'id' | 'driverId' | 'end_time' | 'type'>;
     
 type ProtocolType = Protocol['type'];
 
