@@ -9,7 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Save, Mail, MessageSquare, Globe } from 'lucide-react';
+import { Save, Mail, MessageSquare, Globe, Send } from 'lucide-react';
 import { LabelWithTooltip } from '../ui/label-with-tooltip';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../ui/card';
 import { Textarea } from '../ui/textarea';
@@ -48,6 +48,30 @@ export function NotificationSettingsForm() {
     }
   }, [form]);
 
+  const handleTestEmails = () => {
+    const emails = form.getValues("emails");
+    if (!emails || !emails.trim()) {
+      toast({
+        variant: "destructive",
+        title: "Keine E-Mail-Adressen",
+        description: "Bitte geben Sie mindestens eine E-Mail-Adresse ein, um den Versand zu testen.",
+      });
+      return;
+    }
+
+    const emailList = emails.split(',').map(email => email.trim()).filter(email => email);
+
+    emailList.forEach(email => {
+      // In a real application, this would trigger a backend call to send an email.
+      // Here, we just simulate it with a toast.
+      toast({
+        title: "Test-E-Mail gesendet",
+        description: `Eine Test-E-Mail wurde an ${email} gesendet.`,
+      });
+      console.log(`Simulating test email to: ${email}`);
+    });
+  };
+
   const onSubmit = (data: NotificationSettingsFormValues) => {
     try {
       localStorage.setItem(NOTIFICATION_SETTINGS_STORAGE_KEY, JSON.stringify(data));
@@ -80,13 +104,18 @@ export function NotificationSettingsForm() {
                     name="emails"
                     render={({ field }) => (
                         <FormItem>
-                        <LabelWithTooltip tooltipText="Eine oder mehrere E-Mail-Adressen, durch Kommas getrennt">
-                            <div className='flex items-center gap-2'><Mail className="h-4 w-4" /> E-Mail-Adressen</div>
-                        </LabelWithTooltip>
-                        <FormControl>
-                            <Textarea {...field} placeholder="z.B. chef@firma.de, buero@firma.de" />
-                        </FormControl>
-                        <FormMessage />
+                          <LabelWithTooltip tooltipText="Eine oder mehrere E-Mail-Adressen, durch Kommas getrennt">
+                              <div className='flex items-center gap-2'><Mail className="h-4 w-4" /> E-Mail-Adressen</div>
+                          </LabelWithTooltip>
+                          <div className="flex gap-2">
+                            <FormControl>
+                                <Textarea {...field} placeholder="z.B. chef@firma.de, buero@firma.de" className="flex-1"/>
+                            </FormControl>
+                            <Button type="button" variant="outline" size="icon" onClick={handleTestEmails} aria-label="Test-E-Mail senden">
+                                <Send className="h-4 w-4"/>
+                            </Button>
+                          </div>
+                          <FormMessage />
                         </FormItem>
                     )}
                     />
