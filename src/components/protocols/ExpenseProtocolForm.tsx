@@ -16,7 +16,7 @@ import type { ExpenseType, Photo } from '@/lib/types';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormMessage, FormDescription } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -36,6 +36,15 @@ const expenseTypes: { value: ExpenseType, label: string }[] = [
     { value: 'food', label: 'Verpflegung' },
     { value: 'other', label: 'Sonstiges' },
 ];
+
+const expenseTypeTranslations: { [key: string]: string } = {
+    parking: 'Парковочные сборы',
+    toll: 'Дорожные сборы',
+    ferry: 'Паромные расходы',
+    overnight: 'Ночлег',
+    food: 'Питание',
+    other: 'Прочее',
+};
 
 const photoSchema = z.object({
   dataUrl: z.string(),
@@ -88,6 +97,8 @@ export function ExpenseProtocolForm() {
       description: '',
     }
   });
+
+  const watchExpenseType = form.watch('expense_type');
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -239,7 +250,13 @@ export function ExpenseProtocolForm() {
                    <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl><SelectTrigger><SelectValue placeholder="Wählen Sie den Spesentyp" /></SelectTrigger></FormControl>
                     <SelectContent>{expenseTypes.map(e => <SelectItem key={e.value} value={e.value}>{e.label}</SelectItem>)}</SelectContent>
-                  </Select><FormMessage />
+                  </Select>
+                  {watchExpenseType && (
+                    <FormDescription className="text-xs text-muted-foreground">
+                      {expenseTypeTranslations[watchExpenseType]}
+                    </FormDescription>
+                  )}
+                  <FormMessage />
                 </FormItem>
               )}
             />
