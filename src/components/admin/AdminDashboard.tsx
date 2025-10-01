@@ -16,16 +16,16 @@ import { NotificationSettingsForm } from './NotificationSettingsForm';
 
 export function AdminDashboard() {
   const router = useRouter();
-  const { userRole, isLoading, isAuthenticated } = useAuth();
+  const { userRoles, isLoading, isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState("vehicles");
 
   useEffect(() => {
-    if (!isLoading && (!isAuthenticated || userRole !== 'admin')) {
+    if (!isLoading && (!isAuthenticated || !userRoles?.includes('admin'))) {
       router.replace('/login');
     }
-  }, [isLoading, isAuthenticated, userRole, router]);
+  }, [isLoading, isAuthenticated, userRoles, router]);
 
-  if (isLoading || userRole !== 'admin') {
+  if (isLoading || !userRoles?.includes('admin')) {
     return (
         <div className="container max-w-4xl mx-auto p-4 md:p-8 space-y-8">
             <Skeleton className="h-8 w-48" />
