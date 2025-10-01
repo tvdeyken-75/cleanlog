@@ -11,17 +11,17 @@ import { getWeek, getYear, eachWeekOfInterval, format, eachDayOfInterval, startO
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogTrigger } from '@/components/ui/dialog';
-import { CreateTourModal } from '@/components/disponent/CreateTourModal';
-import { Tour } from '@/lib/types';
+import { Tour, UserRole } from '@/lib/types';
+import { useAuth } from '@/context/AuthContext';
+import { Combobox } from '@/components/ui/combobox';
 
 
 export default function PlanungPage() {
   const currentYear = getYear(new Date());
   const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [tours, setTours] = useState<Partial<Tour>[]>([]);
+  const { getUsers } = useAuth();
 
   const getWeeksForYear = (year: number) => {
     const firstDayOfYear = new Date(year, 0, 1);
@@ -67,6 +67,11 @@ export default function PlanungPage() {
       updatedTours[index] = { ...updatedTours[index], [field]: value };
       setTours(updatedTours);
   }
+  
+  const drivers = getUsers()
+    .filter(u => u.role.includes('driver' as UserRole))
+    .map(u => ({ value: u.username, label: u.username }));
+
 
   return (
     <div className="space-y-6">
@@ -178,7 +183,15 @@ export default function PlanungPage() {
                         <TableCell><Input value={tour.tourNr || ''} readOnly className="border-none bg-transparent p-1 h-8 min-w-[100px]" /></TableCell>
                         <TableCell><Input type="date" value={tour.start_time ? format(new Date(tour.start_time), 'yyyy-MM-dd') : ''} onChange={e => handleInputChange(index, 'start_time', new Date(e.target.value))} className="p-1 h-8 min-w-[100px]" /></TableCell>
                         <TableCell><Input type="time" value={tour.start_time ? format(new Date(tour.start_time), 'HH:mm') : ''} onChange={e => handleInputChange(index, 'start_time', new Date(`1970-01-01T${e.target.value}`))} className="p-1 h-8 min-w-[100px]" /></TableCell>
-                        <TableCell><Input value={tour.driver || ''} onChange={e => handleInputChange(index, 'driver', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
+                        <TableCell>
+                           <Combobox
+                                options={drivers}
+                                value={tour.driver || ''}
+                                onChange={(value) => handleInputChange(index, 'driver', value)}
+                                placeholder="Fahrer auswählen"
+                                notFoundMessage="Kein Fahrer gefunden."
+                            />
+                        </TableCell>
                         <TableCell><Input value={tour.truck || ''} onChange={e => handleInputChange(index, 'truck', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
                         <TableCell><Input value={tour.trailer || ''} onChange={e => handleInputChange(index, 'trailer', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
                         <TableCell><Input value={tour.customer || ''} onChange={e => handleInputChange(index, 'customer', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
