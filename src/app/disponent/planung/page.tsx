@@ -125,17 +125,19 @@ export default function PlanungPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Tour</TableHead>
-                <TableHead>Fahrer</TableHead>
-                <TableHead>Fahrzeug</TableHead>
-                <TableHead>Start</TableHead>
-                <TableHead>Ende</TableHead>
-                <TableHead>Status</TableHead>
+                <TableHead>TourNr.</TableHead>
+                <TableHead>Fahrername</TableHead>
+                <TableHead>LKW</TableHead>
+                <TableHead>Auflieger</TableHead>
+                <TableHead>Kunde</TableHead>
+                <TableHead>Beschreibung</TableHead>
+                <TableHead>Bemerkungen</TableHead>
+                <TableHead>Kundenref.</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               <TableRow>
-                <TableCell colSpan={6} className="text-center text-muted-foreground">
+                <TableCell colSpan={8} className="text-center text-muted-foreground">
                   Keine Touren für den ausgewählten Zeitraum.
                 </TableCell>
               </TableRow>
