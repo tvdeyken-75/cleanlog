@@ -69,6 +69,7 @@ export function EmergencyProtocolForm() {
   
   const [currentTime, setCurrentTime] = useState("");
   const [isTourInfoOpen, setIsTourInfoOpen] = useState(false);
+  const [isPhotoDocOpen, setIsPhotoDocOpen] = useState(false);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -314,61 +315,73 @@ export function EmergencyProtocolForm() {
             </CardContent></Card>
         )}
 
-        <Card>
-          <CardHeader><CardTitle className="flex items-center gap-2"><Camera className="text-primary"/>Foto- & Dokumentendokumentation</CardTitle></CardHeader>
-          <CardContent className="space-y-4">
-             {hasCameraPermission === false && (
-                <Alert variant="destructive">
-                    <AlertTitle>Kamerazugriff erforderlich</AlertTitle>
-                    <AlertDescription>Bitte erlauben Sie den Zugriff auf die Kamera, um Fotos aufzunehmen. Möglicherweise müssen Sie die Seite neu laden.</AlertDescription>
-                </Alert>
-             )}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-              <div className="w-full aspect-video bg-muted rounded-md overflow-hidden relative md:col-span-2">
-                <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
-                <canvas ref={canvasRef} className="hidden" />
-              </div>
-              <div className="flex flex-col gap-2">
-                <Button type="button" onClick={takePhoto} disabled={!hasCameraPermission} size="lg">
-                    <Camera className="mr-2 h-5 w-5"/> Foto aufnehmen
-                </Button>
-                <Button type="button" onClick={() => fileInputRef.current?.click()} variant="outline" size="lg">
-                    <Upload className="mr-2 h-5 w-5"/> Dokument hochladen
-                </Button>
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileSelect}
-                    className="hidden"
-                    accept="image/*,application/pdf"
-                    multiple
-                />
-              </div>
-            </div>
-            <FormField control={form.control} name="photos" render={({ field }) => (
-                <FormItem>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                        {photos.map((photo, index) => (
-                            <div key={index} className="relative group">
-                                {photo.mimeType.startsWith('image/') ? (
-                                    <Image src={photo.dataUrl} alt={`Dokument ${index + 1}`} width={200} height={150} className="rounded-md object-cover aspect-video"/>
-                                ) : (
-                                    <div className="w-full aspect-video bg-muted rounded-md flex flex-col items-center justify-center p-2">
-                                        <File className="h-10 w-10 text-muted-foreground"/>
-                                        <p className="text-xs text-center text-muted-foreground mt-1 truncate">Dokument</p>
-                                    </div>
-                                )}
-                                <Button type="button" variant="destructive" size="icon" className="absolute top-1 right-1 h-7 w-7 opacity-0 group-hover:opacity-100" onClick={() => removePhoto(index)}>
-                                    <Trash2 className="h-4 w-4"/>
-                                </Button>
-                            </div>
-                        ))}
-                    </div>
-                    <FormMessage />
-                </FormItem>
-            )} />
-          </CardContent>
-        </Card>
+        <Collapsible open={isPhotoDocOpen} onOpenChange={setIsPhotoDocOpen}>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between cursor-pointer">
+              <CardTitle className="flex items-center gap-2"><Camera className="text-primary"/>Foto- & Dokumenten Upload</CardTitle>
+              <CollapsibleTrigger asChild>
+                  <Button variant="ghost" size="sm">
+                      <ChevronsUpDown className="h-4 w-4" />
+                      <span className="sr-only">Toggle</span>
+                  </Button>
+              </CollapsibleTrigger>
+            </CardHeader>
+            <CollapsibleContent>
+              <CardContent className="space-y-4 pt-4">
+                {hasCameraPermission === false && (
+                    <Alert variant="destructive">
+                        <AlertTitle>Kamerazugriff erforderlich</AlertTitle>
+                        <AlertDescription>Bitte erlauben Sie den Zugriff auf die Kamera, um Fotos aufzunehmen. Möglicherweise müssen Sie die Seite neu laden.</AlertDescription>
+                    </Alert>
+                )}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                  <div className="w-full aspect-video bg-muted rounded-md overflow-hidden relative md:col-span-2">
+                    <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
+                    <canvas ref={canvasRef} className="hidden" />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Button type="button" onClick={takePhoto} disabled={!hasCameraPermission} size="lg">
+                        <Camera className="mr-2 h-5 w-5"/> Foto aufnehmen
+                    </Button>
+                    <Button type="button" onClick={() => fileInputRef.current?.click()} variant="outline" size="lg">
+                        <Upload className="mr-2 h-5 w-5"/> Dokument hochladen
+                    </Button>
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileSelect}
+                        className="hidden"
+                        accept="image/*,application/pdf"
+                        multiple
+                    />
+                  </div>
+                </div>
+                <FormField control={form.control} name="photos" render={({ field }) => (
+                    <FormItem>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                            {photos.map((photo, index) => (
+                                <div key={index} className="relative group">
+                                    {photo.mimeType.startsWith('image/') ? (
+                                        <Image src={photo.dataUrl} alt={`Dokument ${index + 1}`} width={200} height={150} className="rounded-md object-cover aspect-video"/>
+                                    ) : (
+                                        <div className="w-full aspect-video bg-muted rounded-md flex flex-col items-center justify-center p-2">
+                                            <File className="h-10 w-10 text-muted-foreground"/>
+                                            <p className="text-xs text-center text-muted-foreground mt-1 truncate">Dokument</p>
+                                        </div>
+                                    )}
+                                    <Button type="button" variant="destructive" size="icon" className="absolute top-1 right-1 h-7 w-7 opacity-0 group-hover:opacity-100" onClick={() => removePhoto(index)}>
+                                        <Trash2 className="h-4 w-4"/>
+                                    </Button>
+                                </div>
+                            ))}
+                        </div>
+                        <FormMessage />
+                    </FormItem>
+                )} />
+              </CardContent>
+            </CollapsibleContent>
+          </Card>
+        </Collapsible>
 
         <div className="flex justify-end pt-4">
           <Button type="submit" size="lg" disabled={form.formState.isSubmitting} className="bg-destructive hover:bg-destructive/90">
