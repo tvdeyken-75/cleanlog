@@ -328,20 +328,6 @@ export function LoadingProtocolForm() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="required_temperature"
-              render={({ field }) => (
-                <FormItem>
-                  <LabelWithTooltip tooltipText="Требования к температуре" className="flex items-center gap-2"><Thermometer className="h-4 w-4"/>Temperaturanforderungen</LabelWithTooltip>
-                  <div className="relative">
-                    <FormControl><Input type="number" {...field} placeholder="z.B. 5" className="pr-8"/></FormControl>
-                    <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">°C</span>
-                  </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </CardContent>
         </Card>
         
@@ -350,26 +336,42 @@ export function LoadingProtocolForm() {
             <CardTitle>Wareninformationen</CardTitle>
           </CardHeader>
           <CardContent className='space-y-6'>
-            <FormField
+            <div className="grid md:grid-cols-2 gap-6">
+              <FormField
+                  control={form.control}
+                  name="goods_type"
+                  render={({ field }) => (
+                  <FormItem>
+                      <LabelWithTooltip tooltipText="Тип товаров">Art der Ware</LabelWithTooltip>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger><SelectValue placeholder="Wählen Sie eine Art" /></SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="food">Lebensmittel</SelectItem>
+                            <SelectItem value="non-food">Non-Food</SelectItem>
+                            <SelectItem value="empties">Leergut</SelectItem>
+                          </SelectContent>
+                      </Select>
+                      <FormMessage />
+                  </FormItem>
+                  )}
+              />
+              <FormField
                 control={form.control}
-                name="goods_type"
+                name="required_temperature"
                 render={({ field }) => (
-                <FormItem>
-                    <LabelWithTooltip tooltipText="Тип товаров">Art der Ware</LabelWithTooltip>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger><SelectValue placeholder="Wählen Sie eine Art" /></SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="food">Lebensmittel</SelectItem>
-                          <SelectItem value="non-food">Non-Food</SelectItem>
-                          <SelectItem value="empties">Leergut</SelectItem>
-                        </SelectContent>
-                    </Select>
+                  <FormItem>
+                    <LabelWithTooltip tooltipText="Требования к температуре" className="flex items-center gap-2"><Thermometer className="h-4 w-4"/>Temperaturanforderungen</LabelWithTooltip>
+                    <div className="relative">
+                      <FormControl><Input type="number" {...field} placeholder="z.B. 5" className="pr-8"/></FormControl>
+                      <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">°C</span>
+                    </div>
                     <FormMessage />
-                </FormItem>
+                  </FormItem>
                 )}
-            />
+              />
+            </div>
             {(watchGoodsType === 'food' || watchGoodsType === 'non-food') && (
                 <div className='space-y-6 p-4 border rounded-md'>
                     <FormField
@@ -594,6 +596,8 @@ export function LoadingProtocolForm() {
     </Form>
   );
 }
+
+    
 
     
 
