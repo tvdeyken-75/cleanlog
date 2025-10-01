@@ -184,10 +184,13 @@ const Sidebar = React.forwardRef<
       if (sidebarRef.current && state === "expanded" && !isMobile) {
         const width = sidebarRef.current.offsetWidth
         document.documentElement.style.setProperty("--sidebar-width", `${width}px`)
-      } else {
+      } else if (collapsible === 'icon') {
+        document.documentElement.style.setProperty("--sidebar-width", `calc(${SIDEBAR_WIDTH_ICON} + 1rem)`)
+      }
+       else {
         document.documentElement.style.setProperty("--sidebar-width", "auto")
       }
-    }, [isMobile, state])
+    }, [isMobile, state, collapsible])
 
     if (collapsible === "none") {
       return (
@@ -345,7 +348,8 @@ const SidebarInset = React.forwardRef<
       ref={ref}
       className={cn(
         "relative flex min-h-svh flex-1 flex-col bg-background",
-        "md:peer-data-[variant=inset]:ml-[var(--sidebar-width)]",
+        "md:peer-data-[variant=sidebar]:ml-[var(--sidebar-width)]",
+        "md:peer-data-[variant=floating]:ml-[var(--sidebar-width)]",
         "peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-[calc(var(--sidebar-width-icon)+theme(spacing.4))] md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow",
         className
       )}
@@ -572,22 +576,40 @@ const SidebarMenuButton = React.forwardRef<
       size = "default",
       tooltip,
       className,
+      children,
       ...props
     },
     ref
   ) => {
     const Comp = asChild ? Slot : "button"
     const { isMobile, state } = useSidebar()
+    
+    const childNodes = React.Children.toArray(children)
+    const icon = childNodes.find(
+      (child) => React.isValidElement(child) && child.type !== "span"
+    )
+    const label = childNodes.find(
+      (child) => React.isValidElement(child) && child.type === "span"
+    )
 
     const button = (
-      <Comp
+       <Comp
         ref={ref}
         data-sidebar="menu-button"
         data-size={size}
         data-active={isActive}
         className={cn(sidebarMenuButtonVariants({ variant, size }), className)}
         {...props}
-      />
+      >
+        {icon}
+        {React.isValidElement(label) &&
+          React.cloneElement(label as React.ReactElement<any>, {
+            className: cn(
+              (label.props as { className?: string }).className,
+              "group-data-[collapsible=icon]:hidden"
+            ),
+          })}
+      </Comp>
     )
 
     if (!tooltip) {
