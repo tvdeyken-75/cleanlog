@@ -50,8 +50,8 @@ const protocolFormSchema = z.object({
   cleaning_type: z.string({ required_error: "Art der Reinigung ist ein Pflichtfeld." }),
   cleaning_products: z.string().min(1, "Reinigungsmittel ist ein Pflichtfeld."),
   cleaning_products_other: z.string().optional(),
-  control_type: z.string({ required_error: "Art der Kontrolle ist ein Pflichtfeld." }),
-  control_result: z.enum(["i.O.", "n.i.O."], { required_error: "Ergebnis ist ein Pflichtfeld." }),
+  control_type: z.string().optional(),
+  control_result: z.enum(["i.O.", "n.i.O."]).optional(),
   location: z.string().min(1, "Ort ist ein Pflichtfeld."),
   water_temperature: z.coerce.number({ invalid_type_error: "Temperatur muss eine Zahl sein." }).min(-50, "Temperatur zu niedrig").max(120, "Temperatur zu hoch"),
   water_quality: z.string({ required_error: "Wasserqualität ist ein Pflichtfeld." }),
@@ -100,6 +100,7 @@ export function ProtocolForm() {
   const [startTime, setStartTime] = useState(new Date().toISOString());
   const [currentTime, setCurrentTime] = useState("");
   const [isTourInfoOpen, setIsTourInfoOpen] = useState(false);
+  const [isQualityControlOpen, setIsQualityControlOpen] = useState(false);
   
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -226,6 +227,8 @@ export function ProtocolForm() {
     const protocolData = {
         ...data,
       cleaning_products: finalCleaningProducts!,
+      control_type: data.control_type || '',
+      control_result: data.control_result || 'i.O.',
       truck_license_plate: activeTour.truck_license_plate,
       trailer_license_plate: activeTour.trailer_license_plate,
       transport_order: activeTour.transport_order,
@@ -417,101 +420,111 @@ export function ProtocolForm() {
           </CardContent>
         </Card>
         
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2"><ClipboardList className="text-primary"/>Qualitätskontrolle</CardTitle>
-          </CardHeader>
-          <CardContent className="grid md:grid-cols-2 gap-6">
-            <FormField
-              control={form.control}
-              name="control_type"
-              render={({ field }) => (
-                <FormItem>
-                  <LabelWithTooltip tooltipText="Вид контроля">Art der Kontrolle</LabelWithTooltip>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl><SelectTrigger><SelectValue placeholder="Wählen Sie eine Art" /></SelectTrigger></FormControl>
-                    <SelectContent>
-                      <SelectItem value="Visuell">Visuell</SelectItem>
-                      <SelectItem value="Abklatschprobe">Abklatschprobe</SelectItem>
-                      <SelectItem value="ATP-Messung">ATP-Messung</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="control_result"
-              render={({ field }) => (
-                <FormItem>
-                  <LabelWithTooltip tooltipText="Результат контроля">Ergebnis der Kontrolle</LabelWithTooltip>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl><SelectTrigger><SelectValue placeholder="Wählen Sie ein Ergebnis" /></SelectTrigger></FormControl>
-                    <SelectContent>
-                      <SelectItem value="i.O.">i.O. (in Ordnung)</SelectItem>
-                      <SelectItem value="n.i.O.">n.i.O. (nicht in Ordnung)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="md:col-span-2 space-y-4">
-              <LabelWithTooltip tooltipText="Документация с фотографиями">Fotodokumentation</LabelWithTooltip>
-               {hasCameraPermission === false && (
-                  <Alert variant="destructive">
-                      <AlertTitle>Kamerazugriff erforderlich</AlertTitle>
-                      <AlertDescription>Bitte erlauben Sie den Zugriff auf die Kamera, um Fotos aufzunehmen.</AlertDescription>
-                  </Alert>
-               )}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
-                <div className="w-full aspect-video bg-muted rounded-md overflow-hidden relative md:col-span-2">
-                  <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
-                  <canvas ref={canvasRef} className="hidden" />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Button type="button" onClick={takePhoto} disabled={!hasCameraPermission} size="lg">
-                      <Camera className="mr-2 h-5 w-5"/> Foto aufnehmen
-                  </Button>
-                  <Button type="button" onClick={() => fileInputRef.current?.click()} variant="outline" size="lg">
-                      <Upload className="mr-2 h-5 w-5"/> Datei hochladen
-                  </Button>
-                  <input
-                      type="file"
-                      ref={fileInputRef}
-                      onChange={handleFileSelect}
-                      className="hidden"
-                      accept="image/*,application/pdf"
-                      multiple
-                  />
-                </div>
-              </div>
-              <FormField control={form.control} name="photos" render={({ field }) => (
-                  <FormItem>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                          {photos.map((photo, index) => (
-                              <div key={index} className="relative group">
-                                  {photo.mimeType.startsWith('image/') ? (
-                                      <Image src={photo.dataUrl} alt={`Dokument ${index + 1}`} width={200} height={150} className="rounded-md object-cover aspect-video"/>
-                                  ) : (
-                                      <div className="w-full aspect-video bg-muted rounded-md flex flex-col items-center justify-center p-2">
-                                          <File className="h-10 w-10 text-muted-foreground"/>
-                                          <p className="text-xs text-center text-muted-foreground mt-1 truncate">Dokument</p>
-                                      </div>
-                                  )}
-                                  <Button type="button" variant="destructive" size="icon" className="absolute top-1 right-1 h-7 w-7 opacity-0 group-hover:opacity-100" onClick={() => removePhoto(index)}>
-                                      <Trash2 className="h-4 w-4"/>
-                                  </Button>
-                              </div>
-                          ))}
-                      </div>
-                      <FormMessage />
-                  </FormItem>
-              )} />
-            </div>
-          </CardContent>
-        </Card>
+        <Collapsible open={isQualityControlOpen} onOpenChange={setIsQualityControlOpen}>
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between cursor-pointer">
+                    <CardTitle className="flex items-center gap-2"><ClipboardList className="text-primary"/>Qualitätskontrolle</CardTitle>
+                    <CollapsibleTrigger asChild>
+                        <Button variant="ghost" size="sm">
+                            <ChevronsUpDown className="h-4 w-4" />
+                            <span className="sr-only">Toggle</span>
+                        </Button>
+                    </CollapsibleTrigger>
+                </CardHeader>
+                <CollapsibleContent>
+                    <CardContent className="grid md:grid-cols-2 gap-6">
+                        <FormField
+                        control={form.control}
+                        name="control_type"
+                        render={({ field }) => (
+                            <FormItem>
+                            <LabelWithTooltip tooltipText="Вид контроля">Art der Kontrolle</LabelWithTooltip>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl><SelectTrigger><SelectValue placeholder="Wählen Sie eine Art" /></SelectTrigger></FormControl>
+                                <SelectContent>
+                                <SelectItem value="Visuell">Visuell</SelectItem>
+                                <SelectItem value="Abklatschprobe">Abklatschprobe</SelectItem>
+                                <SelectItem value="ATP-Messung">ATP-Messung</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                        <FormField
+                        control={form.control}
+                        name="control_result"
+                        render={({ field }) => (
+                            <FormItem>
+                            <LabelWithTooltip tooltipText="Результат контроля">Ergebnis der Kontrolle</LabelWithTooltip>
+                            <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                <FormControl><SelectTrigger><SelectValue placeholder="Wählen Sie ein Ergebnis" /></SelectTrigger></FormControl>
+                                <SelectContent>
+                                <SelectItem value="i.O.">i.O. (in Ordnung)</SelectItem>
+                                <SelectItem value="n.i.O.">n.i.O. (nicht in Ordnung)</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
+                        <div className="md:col-span-2 space-y-4">
+                        <LabelWithTooltip tooltipText="Документация с фотографиями">Fotodokumentation</LabelWithTooltip>
+                        {hasCameraPermission === false && (
+                            <Alert variant="destructive">
+                                <AlertTitle>Kamerazugriff erforderlich</AlertTitle>
+                                <AlertDescription>Bitte erlauben Sie den Zugriff auf die Kamera, um Fotos aufzunehmen.</AlertDescription>
+                            </Alert>
+                        )}
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
+                            <div className="w-full aspect-video bg-muted rounded-md overflow-hidden relative md:col-span-2">
+                            <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
+                            <canvas ref={canvasRef} className="hidden" />
+                            </div>
+                            <div className="flex flex-col gap-2">
+                            <Button type="button" onClick={takePhoto} disabled={!hasCameraPermission} size="lg">
+                                <Camera className="mr-2 h-5 w-5"/> Foto aufnehmen
+                            </Button>
+                            <Button type="button" onClick={() => fileInputRef.current?.click()} variant="outline" size="lg">
+                                <Upload className="mr-2 h-5 w-5"/> Datei hochladen
+                            </Button>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleFileSelect}
+                                className="hidden"
+                                accept="image/*,application/pdf"
+                                multiple
+                            />
+                            </div>
+                        </div>
+                        <FormField control={form.control} name="photos" render={({ field }) => (
+                            <FormItem>
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                    {photos.map((photo, index) => (
+                                        <div key={index} className="relative group">
+                                            {photo.mimeType.startsWith('image/') ? (
+                                                <Image src={photo.dataUrl} alt={`Dokument ${index + 1}`} width={200} height={150} className="rounded-md object-cover aspect-video"/>
+                                            ) : (
+                                                <div className="w-full aspect-video bg-muted rounded-md flex flex-col items-center justify-center p-2">
+                                                    <File className="h-10 w-10 text-muted-foreground"/>
+                                                    <p className="text-xs text-center text-muted-foreground mt-1 truncate">Dokument</p>
+                                                </div>
+                                            )}
+                                            <Button type="button" variant="destructive" size="icon" className="absolute top-1 right-1 h-7 w-7 opacity-0 group-hover:opacity-100" onClick={() => removePhoto(index)}>
+                                                <Trash2 className="h-4 w-4"/>
+                                            </Button>
+                                        </div>
+                                    ))}
+                                </div>
+                                <FormMessage />
+                            </FormItem>
+                        )} />
+                        </div>
+                    </CardContent>
+                </CollapsibleContent>
+            </Card>
+        </Collapsible>
 
         {watchControlResult === 'n.i.O.' && (
           <Card className="border-destructive">
@@ -627,11 +640,3 @@ export function ProtocolForm() {
     </Form>
   );
 }
-
-    
-
-    
-
-    
-
-    
