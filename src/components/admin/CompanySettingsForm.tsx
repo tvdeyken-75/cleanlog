@@ -20,6 +20,10 @@ const SETTINGS_STORAGE_KEY = 'fahrerchecklisteCompanySettings_v1';
 const settingsSchema = z.object({
   logo: z.string().optional(),
   companyName: z.string().optional(),
+  street: z.string().optional(),
+  zip: z.string().optional(),
+  city: z.string().optional(),
+  country: z.string().optional(),
   apiKey: z.string().optional(),
 });
 
@@ -35,6 +39,10 @@ export function CompanySettingsForm() {
     defaultValues: {
       logo: '',
       companyName: '',
+      street: '',
+      zip: '',
+      city: '',
+      country: '',
       apiKey: '',
     },
   });
@@ -109,18 +117,73 @@ export function CompanySettingsForm() {
             </CardHeader>
             <CardContent className="space-y-4">
                 <FormField
-                control={form.control}
-                name="companyName"
-                render={({ field }) => (
-                    <FormItem>
-                        <LabelWithTooltip tooltipText="Der Name Ihres Unternehmens">Firmenname</LabelWithTooltip>
-                        <FormControl>
-                            <Input placeholder="z.B. Mustermann GmbH" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                )}
+                  control={form.control}
+                  name="companyName"
+                  render={({ field }) => (
+                      <FormItem>
+                          <LabelWithTooltip tooltipText="Der Name Ihres Unternehmens">Firmenname</LabelWithTooltip>
+                          <FormControl>
+                              <Input placeholder="z.B. Mustermann GmbH" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                      </FormItem>
+                  )}
                 />
+                 <FormField
+                  control={form.control}
+                  name="street"
+                  render={({ field }) => (
+                      <FormItem>
+                          <LabelWithTooltip tooltipText="Straße und Hausnummer">Straße</LabelWithTooltip>
+                          <FormControl>
+                              <Input placeholder="Musterstraße 1" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                      </FormItem>
+                  )}
+                />
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                   <FormField
+                    control={form.control}
+                    name="zip"
+                    render={({ field }) => (
+                        <FormItem>
+                            <LabelWithTooltip tooltipText="Postleitzahl">PLZ</LabelWithTooltip>
+                            <FormControl>
+                                <Input placeholder="12345" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                  />
+                   <FormField
+                    control={form.control}
+                    name="city"
+                    render={({ field }) => (
+                        <FormItem className='md:col-span-2'>
+                            <LabelWithTooltip tooltipText="Ort">Ort</LabelWithTooltip>
+                            <FormControl>
+                                <Input placeholder="Musterstadt" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                  />
+                </div>
+                 <FormField
+                  control={form.control}
+                  name="country"
+                  render={({ field }) => (
+                      <FormItem>
+                          <LabelWithTooltip tooltipText="Land">Land</LabelWithTooltip>
+                          <FormControl>
+                              <Input placeholder="Deutschland" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                      </FormItem>
+                  )}
+                />
+                <Separator />
                 <FormField
                 control={form.control}
                 name="apiKey"

@@ -1,6 +1,7 @@
 
 
 
+
 "use client";
 
 import { useAuth } from '@/context/AuthContext';
@@ -16,6 +17,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import {
+  Dialog,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import Link from 'next/link';
 import { useProtocols } from '@/hooks/useProtocols';
@@ -24,12 +29,13 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { AboutDialog } from './AboutDialog';
 
 const SETTINGS_STORAGE_KEY = 'fahrerchecklisteCompanySettings_v1';
 
 
 export function Header() {
-  const { user, logout, isAuthenticated, userRoles } = useAuth();
+  const { user, logout, isAuthenticated, userRoles, activeRole } = useAuth();
   const { activeTour } = useTour();
   const router = useRouter();
   const { protocols } = useProtocols(user);
@@ -345,76 +351,81 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-card">
-      <div className="mx-auto flex h-16 items-center px-4 sm:px-6 lg:px-8">
-        <Link href="/" className="mr-6 flex items-center space-x-2">
-            <Truck className="h-6 w-6 text-primary" />
-            <span className="inline-block font-bold font-headline text-xl">Fahrercheckliste</span>
-        </Link>
-        
-        {isAuthenticated && (
-          <div className="flex flex-1 items-center justify-end space-x-4">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-9 w-9 rounded-full">
-                  <Avatar className="h-9 w-9">
-                    <AvatarFallback className="bg-primary text-primary-foreground">{getInitials(user)}</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">Angemeldet als</p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {user} ({userRoles?.join(', ')})
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                {activeTour && (
-                   <DropdownMenuLabel className="font-normal">
+      <Dialog>
+        <div className="mx-auto flex h-16 items-center px-4 sm:px-6 lg:px-8">
+            <DialogTrigger asChild>
+              <button className="mr-6 flex items-center space-x-2">
+                  <Truck className="h-6 w-6 text-primary" />
+                  <span className="inline-block font-bold font-headline text-xl">Fahrercheckliste</span>
+              </button>
+            </DialogTrigger>
+          
+          {isAuthenticated && (
+            <div className="flex flex-1 items-center justify-end space-x-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                    <Avatar className="h-9 w-9">
+                      <AvatarFallback className="bg-primary text-primary-foreground">{getInitials(user)}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
-                      <p className="text-sm font-medium leading-none">Aktuelle Tour</p>
+                      <p className="text-sm font-medium leading-none">Angemeldet als</p>
                       <p className="text-xs leading-none text-muted-foreground">
-                        {activeTour.transport_order}
+                        {user} ({activeRole})
                       </p>
                     </div>
                   </DropdownMenuLabel>
-                )}
-                <DropdownMenuSeparator />
-                {userRoles?.includes('admin') && (
-                  <DropdownMenuItem onClick={() => router.push('/admin')}>
-                    <UserCog className="mr-2 h-4 w-4" />
-                    <span>Admin Panel</span>
-                  </DropdownMenuItem>
-                )}
-                 <DropdownMenuItem onClick={() => router.push('/archive')}>
-                    <Archive className="mr-2 h-4 w-4" />
-                    <span>Archiv</span>
-                  </DropdownMenuItem>
-                {activeTour && (
-                  <>
-                    <DropdownMenuItem onClick={handlePrint} disabled={isPrinting}>
-                      {isPrinting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Printer className="mr-2 h-4 w-4" />}
-                      <span>{isPrinting ? 'Druckt...' : 'Drucken & Teilen'}</span>
+                  {activeTour && (
+                     <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">Aktuelle Tour</p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {activeTour.transport_order}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                  )}
+                  <DropdownMenuSeparator />
+                  {userRoles?.includes('admin') && (
+                    <DropdownMenuItem onClick={() => router.push('/admin')}>
+                      <UserCog className="mr-2 h-4 w-4" />
+                      <span>Admin Panel</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onClick={handleEndTour}
-                      className="text-destructive focus:bg-destructive focus:text-destructive-foreground"
-                    >
-                      <Map className="mr-2 h-4 w-4" />
-                      <span>Tour beenden</span>
+                  )}
+                   <DropdownMenuItem onClick={() => router.push('/archive')}>
+                      <Archive className="mr-2 h-4 w-4" />
+                      <span>Archiv</span>
                     </DropdownMenuItem>
-                  </>
-                )}
-                <DropdownMenuItem onClick={handleLogout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Abmelden</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        )}
-      </div>
+                  {activeTour && (
+                    <>
+                      <DropdownMenuItem onClick={handlePrint} disabled={isPrinting}>
+                        {isPrinting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Printer className="mr-2 h-4 w-4" />}
+                        <span>{isPrinting ? 'Druckt...' : 'Drucken & Teilen'}</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={handleEndTour}
+                        className="text-destructive focus:bg-destructive focus:text-destructive-foreground"
+                      >
+                        <Map className="mr-2 h-4 w-4" />
+                        <span>Tour beenden</span>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                  <DropdownMenuItem onClick={handleLogout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Abmelden</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
+        </div>
+        <AboutDialog />
+      </Dialog>
     </header>
   );
 }
