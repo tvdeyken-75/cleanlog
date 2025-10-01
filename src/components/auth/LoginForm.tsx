@@ -17,7 +17,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
 const loginFormSchema = z.object({
-    username: z.string({ required_error: "Benutzername ist ein Pflichtfeld." }),
+    username: z.string().min(1, "Benutzername ist ein Pflichtfeld."),
     password: z.string().min(1, "Passwort ist ein Pflichtfeld."),
 });
 
