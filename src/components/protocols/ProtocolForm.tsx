@@ -131,6 +131,12 @@ export function ProtocolForm() {
   const watchCleaningType = form.watch('cleaning_type');
 
   useEffect(() => {
+    if (watchCleaningProducts === 'Bio Tec BTS 3100 (6%) für Laderaum') {
+      form.setValue('water_temperature', 30);
+    }
+  }, [watchCleaningProducts, form]);
+
+  useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date().toLocaleString('de-DE', { dateStyle: 'medium', timeStyle: 'medium' }));
     }, 1000);
@@ -621,6 +627,8 @@ export function ProtocolForm() {
     </Form>
   );
 }
+
+    
 
     
 
