@@ -15,11 +15,62 @@ interface ProtocolDetailsDialogProps {
   onClose: () => void;
 }
 
+const keyToGerman: { [key: string]: string } = {
+    location: 'Ort',
+    start_time: 'Startzeit',
+    end_time: 'Endzeit',
+    truck_license_plate: 'LKW Kennzeichen',
+    trailer_license_plate: 'Anhänger Kennzeichen',
+    transport_order: 'Transportauftrag',
+    cleaning_type: 'Reinigungsart',
+    cleaning_products: 'Reinigungsmittel',
+    control_type: 'Kontrollart',
+    control_result: 'Kontrollergebnis',
+    water_temperature: 'Wassertemperatur',
+    water_quality: 'Wasserqualität',
+    odometer_reading: 'Kilometerstand',
+    liters: 'Liter',
+    cargo_area_closed: 'Laderaum geschlossen',
+    has_seal: 'Siegel vorhanden',
+    cargo_area_temperature: 'Laderaumtemperatur',
+    duration: 'Dauer (Minuten)',
+    message: 'Nachricht',
+    goods_type: 'Warenart',
+    loading_protocol_number: 'Ladeprotokoll-Nr.',
+    articles: 'Artikel',
+    quantity: 'Menge',
+    packaging: 'Verpackung',
+    weight: 'Gewicht (kg)',
+    pallets: 'Paletten',
+    crates: 'Kisten',
+    required_temperature: 'Solltemperatur',
+    unloading_duration: 'Entlade-Dauer',
+    emergency_type: 'Notfallart',
+    description: 'Beschreibung',
+    reference_number: 'Referenznummer',
+    incident_type_description: 'Art des Vorfalls',
+    help_called: 'Hilfe gerufen',
+    estimated_duration: 'Geschätzte Dauer',
+    vehicle_immobile: 'Fahrzeug fahruntüchtig',
+    maintenance_type: 'Wartungsart',
+    reason: 'Grund',
+    amount: 'Betrag (€)',
+    expense_type: 'Spesenart'
+};
+
+const booleanToGerman = (value: any) => {
+    if (typeof value === 'boolean') {
+        return value ? 'Ja' : 'Nein';
+    }
+    return value;
+};
+
+
 const DetailItem = ({ label, value }: { label: string; value: React.ReactNode }) => {
     if (value === null || value === undefined || value === '') return null;
     return (
         <div className="grid grid-cols-2 gap-4 py-2 border-b">
-            <p className="font-semibold text-sm">{label}</p>
+            <p className="font-semibold text-sm capitalize">{label}</p>
             <p className="text-sm text-muted-foreground break-words">{String(value)}</p>
         </div>
     )
@@ -59,7 +110,15 @@ export function ProtocolDetailsDialog({ protocol, isOpen, onClose }: ProtocolDet
       if (typeof value === 'object' && value !== null) continue;
       if (key === 'id' || key === 'driverId' || key === 'type') continue;
 
-      details.push(<DetailItem key={key} label={key.replace(/_/g, ' ')} value={String(value)} />);
+      const label = keyToGerman[key] || key.replace(/_/g, ' ');
+      let displayValue = value;
+      if (key.endsWith('time')) {
+        displayValue = new Date(value as string).toLocaleString('de-DE');
+      } else {
+        displayValue = booleanToGerman(value);
+      }
+      
+      details.push(<DetailItem key={key} label={label} value={displayValue} />);
     }
     return details;
   }
