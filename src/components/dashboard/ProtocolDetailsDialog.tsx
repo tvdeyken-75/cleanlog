@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import Image from "next/image";
@@ -56,7 +57,8 @@ const keyToGerman: { [key: string]: string } = {
     maintenance_type: 'Wartungsart',
     reason: 'Grund',
     amount: 'Betrag (€)',
-    expense_type: 'Spesenart'
+    expense_type: 'Spesenart',
+    actions_taken: 'Maßnahmen'
 };
 
 const booleanToGerman = (value: any) => {

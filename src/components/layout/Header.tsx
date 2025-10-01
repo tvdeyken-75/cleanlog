@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useAuth } from '@/context/AuthContext';
@@ -313,6 +314,7 @@ export function Header() {
              body = [
                 ['Notfall-Typ', protocol.emergency_type],
                 ['Beschreibung', protocol.description],
+                ['Maßnahmen', protocol.actions_taken || 'Keine'],
                 ['Referenznummer', protocol.reference_number || 'Keine'],
                 ['Hilfe gerufen?', protocol.help_called ? 'Ja' : 'Nein'],
                 ['Dauer (Schätzung)', protocol.estimated_duration ? `${protocol.estimated_duration} min` : 'N/A'],

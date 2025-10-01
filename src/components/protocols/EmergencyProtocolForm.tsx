@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
@@ -51,6 +52,7 @@ const emergencyProtocolSchema = z.object({
   description: z.string().min(10, "Beschreibung muss mindestens 10 Zeichen lang sein."),
   location: z.string().min(1, "Ort ist ein Pflichtfeld."),
   photos: z.array(photoSchema).min(1, "Mindestens ein Foto oder Dokument ist erforderlich."),
+  actions_taken: z.string().optional(),
   reference_number: z.string().optional(),
   incident_type_description: z.string().optional(),
   help_called: z.enum(['yes', 'no']).optional(),
@@ -84,6 +86,7 @@ export function EmergencyProtocolForm() {
       photos: [],
       emergency_type: undefined,
       description: '',
+      actions_taken: '',
       reference_number: '',
       incident_type_description: '',
       help_called: undefined,
@@ -264,6 +267,12 @@ export function EmergencyProtocolForm() {
             <FormField control={form.control} name="description" render={({ field }) => (
                 <FormItem className="md:col-span-2"><LabelWithTooltip tooltipText="Краткое описание происшествия" className="flex items-center gap-2"><FileText className="h-4 w-4"/>Kurzbeschreibung</LabelWithTooltip>
                     <FormControl><Textarea {...field} placeholder="Beschreiben Sie den Vorfall so detailliert wie möglich..." rows={4} /></FormControl><FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField control={form.control} name="actions_taken" render={({ field }) => (
+                <FormItem className="md:col-span-2"><LabelWithTooltip tooltipText="Welche Maßnahmen wurden ergriffen?" className="flex items-center gap-2"><FileText className="h-4 w-4"/>Maßnahmen</LabelWithTooltip>
+                    <FormControl><Textarea {...field} placeholder="Beschreiben Sie die ergriffenen Maßnahmen..." rows={3} /></FormControl><FormMessage />
                 </FormItem>
               )}
             />

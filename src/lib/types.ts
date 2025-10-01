@@ -122,6 +122,7 @@ export interface EmergencyProtocol extends BaseProtocol {
     emergency_type: EmergencyType;
     description: string;
     photos: Photo[];
+    actions_taken?: string;
     // Conditional fields
     reference_number?: string; // For vehicle damage, goods blocked
     incident_type_description?: string; // For personal injury, health incident
