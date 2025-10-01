@@ -49,7 +49,7 @@ export default function DisponentLayout({
      return (
       <div className="flex min-h-screen w-full flex-col">
         <Header />
-        <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+        <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6">
             <Skeleton className="h-10 w-1/2" />
             <Skeleton className="w-full h-96" />
         </main>
@@ -114,7 +114,7 @@ export default function DisponentLayout({
                     </SidebarContent>
                 </Sidebar>
                 <SidebarInset>
-                    <main className="flex-1 p-4 md:p-8">
+                    <main className="flex-1 p-4 md:p-6">
                          <div className="md:hidden mb-4">
                             <SidebarTrigger />
                         </div>
