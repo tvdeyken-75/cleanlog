@@ -85,7 +85,7 @@ export default function PlanungPage() {
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                        {weeks.map(({weekNumber}) => <SelectItem key={weekNumber} value={weekNumber.toString()}>KW {weekNumber}</SelectItem>)}
+                        {weeks.map(({weekNumber, startDate}) => <SelectItem key={startDate.toISOString()} value={weekNumber.toString()}>KW {weekNumber}</SelectItem>)}
                     </SelectContent>
                 </Select>
             </div>
