@@ -91,7 +91,8 @@ export interface LoadingProtocol extends BaseProtocol {
   weight?: number;
   pallets?: number;
   crates?: number;
-  required_temperature: number;
+  required_temperature_min?: number;
+  required_temperature_max?: number;
   odometer_reading: number;
   duration: number;
   cargo_area_closed: boolean;
@@ -154,6 +155,7 @@ export type Protocol = CleaningProtocol | FuelProtocol | PauseProtocol | Loading
     
 
     
+
 
 
 

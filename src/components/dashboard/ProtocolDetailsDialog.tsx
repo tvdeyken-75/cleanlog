@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import type { Protocol, Photo } from "@/lib/types";
+import type { Protocol, Photo, LoadingProtocol } from "@/lib/types";
 import { getProtocolTitle } from "@/lib/utils";
 import { File } from "lucide-react";
 
@@ -43,7 +43,8 @@ const keyToGerman: { [key: string]: string } = {
     weight: 'Gewicht (kg)',
     pallets: 'Paletten',
     crates: 'Kisten',
-    required_temperature: 'Solltemperatur',
+    required_temperature_min: 'Min. Solltemperatur',
+    required_temperature_max: 'Max. Solltemperatur',
     unloading_duration: 'Entlade-Dauer',
     emergency_type: 'Notfallart',
     description: 'Beschreibung',

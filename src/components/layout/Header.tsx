@@ -277,10 +277,13 @@ export function Header() {
             ];
             break;
         case 'loading':
+            const tempRange = (protocol.required_temperature_min !== undefined || protocol.required_temperature_max !== undefined)
+              ? `${protocol.required_temperature_min ?? '?'}°C bis ${protocol.required_temperature_max ?? '?'}°C`
+              : 'N/A';
             body = [
                 ['Ladedauer', `${protocol.duration} min`],
                 ['KM-Stand', protocol.odometer_reading],
-                ['Anforderung Temp.', `${protocol.required_temperature}°C`],
+                ['Anforderung Temp.', tempRange],
                 ['Laderaum-Temperatur', `${protocol.cargo_area_temperature}°C`],
                 ['Warenart', protocol.goods_type],
                 ['Artikel', protocol.articles || 'N/A'],

@@ -41,7 +41,8 @@ const loadingProtocolFormSchema = z.object({
   duration: z.coerce.number().positive("Dauer muss eine positive Zahl sein."),
   odometer_reading: z.coerce.number().positive("Kilometerstand muss eine positive Zahl sein."),
   goods_type: z.enum(['food', 'non-food', 'empties'], { required_error: "Warenart ist ein Pflichtfeld." }),
-  required_temperature: z.coerce.number(),
+  required_temperature_min: z.coerce.number().optional(),
+  required_temperature_max: z.coerce.number().optional(),
   articles: z.string().optional(),
   articles_other: z.string().optional(),
   quantity: z.coerce.number().optional(),
@@ -109,7 +110,8 @@ export function LoadingProtocolForm() {
       duration: undefined,
       odometer_reading: undefined,
       goods_type: undefined,
-      required_temperature: undefined,
+      required_temperature_min: undefined,
+      required_temperature_max: undefined,
       articles: '',
       articles_other: '',
       quantity: undefined,
@@ -337,7 +339,7 @@ export function LoadingProtocolForm() {
             <CardTitle>Wareninformationen</CardTitle>
           </CardHeader>
           <CardContent className='space-y-6'>
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 gap-6 items-start">
               <FormField
                   control={form.control}
                   name="goods_type"
@@ -358,20 +360,37 @@ export function LoadingProtocolForm() {
                   </FormItem>
                   )}
               />
-              <FormField
-                control={form.control}
-                name="required_temperature"
-                render={({ field }) => (
-                  <FormItem>
-                    <LabelWithTooltip tooltipText="Требования к температуре" className="flex items-center gap-2"><Thermometer className="h-4 w-4"/>Temperaturanforderungen</LabelWithTooltip>
-                    <div className="relative">
-                      <FormControl><Input type="number" {...field} placeholder="z.B. 5" className="pr-8"/></FormControl>
-                      <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">°C</span>
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className='space-y-2'>
+                <LabelWithTooltip tooltipText="Требования к температуре" className="flex items-center gap-2"><Thermometer className="h-4 w-4"/>Temperaturanforderungen</LabelWithTooltip>
+                <div className='grid grid-cols-2 gap-2'>
+                    <FormField
+                        control={form.control}
+                        name="required_temperature_min"
+                        render={({ field }) => (
+                        <FormItem>
+                            <div className="relative">
+                            <FormControl><Input type="number" {...field} placeholder="Min" className="pr-8"/></FormControl>
+                            <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">°C</span>
+                            </div>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                     <FormField
+                        control={form.control}
+                        name="required_temperature_max"
+                        render={({ field }) => (
+                        <FormItem>
+                            <div className="relative">
+                            <FormControl><Input type="number" {...field} placeholder="Max" className="pr-8"/></FormControl>
+                            <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">°C</span>
+                            </div>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                </div>
+              </div>
             </div>
             {(watchGoodsType === 'food' || watchGoodsType === 'non-food') && (
                 <div className='space-y-6 p-4 border rounded-md'>
