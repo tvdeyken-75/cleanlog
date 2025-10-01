@@ -6,10 +6,13 @@ import { Header } from '@/components/layout/Header';
 import { SidebarProvider, Sidebar, SidebarTrigger, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset } from '@/components/ui/sidebar';
 import { LayoutGrid, GanttChartSquare } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+
+const SETTINGS_STORAGE_KEY = 'fahrerchecklisteCompanySettings_v1';
 
 export default function DisponentLayout({
   children,
@@ -19,12 +22,27 @@ export default function DisponentLayout({
   const router = useRouter();
   const pathname = usePathname();
   const { isAuthenticated, isLoading, activeRole } = useAuth();
+  const [logo, setLogo] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isLoading && (!isAuthenticated || activeRole !== 'disponent')) {
       router.replace('/login');
     }
   }, [isLoading, isAuthenticated, activeRole, router]);
+
+  useEffect(() => {
+    try {
+      const storedSettings = localStorage.getItem(SETTINGS_STORAGE_KEY);
+      if (storedSettings) {
+        const parsedSettings = JSON.parse(storedSettings);
+        if (parsedSettings.logo) {
+          setLogo(parsedSettings.logo);
+        }
+      }
+    } catch (error) {
+      console.error("Could not access localStorage for settings", error);
+    }
+  }, []);
 
   if (isLoading || !isAuthenticated || activeRole !== 'disponent') {
      return (
@@ -45,6 +63,11 @@ export default function DisponentLayout({
             <div className="flex flex-1">
                 <Sidebar>
                     <SidebarContent>
+                        {logo && (
+                           <div className="p-4 flex justify-center">
+                             <Image src={logo} alt="Firmenlogo" width={128} height={64} style={{ objectFit: 'contain' }}/>
+                           </div>
+                        )}
                         <SidebarMenu>
                         <SidebarMenuItem>
                             <Link href="/disponent" passHref>
