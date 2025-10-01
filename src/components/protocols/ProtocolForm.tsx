@@ -85,6 +85,12 @@ const protocolFormSchema = z.object({
 
 type ProtocolFormValues = z.infer<typeof protocolFormSchema>;
 
+const cleaningTypeTranslations: { [key: string]: string } = {
+  'Tägliche Reinigung': 'Ежедневная уборка',
+  'Reinigung nach None Food Fahrt': 'Уборка после перевозки непродовольственных товаров',
+  'Außenreinigung': 'Внешняя мойка',
+};
+
 export function ProtocolForm() {
   const router = useRouter();
   const { user, isLoading: authLoading, isAuthenticated } = useAuth();
@@ -122,6 +128,7 @@ export function ProtocolForm() {
 
   const watchControlResult = form.watch('control_result');
   const watchCleaningProducts = form.watch('cleaning_products');
+  const watchCleaningType = form.watch('cleaning_type');
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -308,11 +315,11 @@ export function ProtocolForm() {
                         <SelectItem value="Außenreinigung">Außenreinigung</SelectItem>
                       </SelectContent>
                     </Select>
-                    <FormDescription className="text-xs text-muted-foreground">
-                      Tägliche Reinigung: Ежедневная уборка<br/>
-                      Reinigung nach None Food Fahrt: Уборка после перевозки непродовольственных товаров<br/>
-                      Außenreinigung: Внешняя мойка
-                    </FormDescription>
+                    {watchCleaningType && (
+                      <FormDescription className="text-xs text-muted-foreground">
+                        {cleaningTypeTranslations[watchCleaningType]}
+                      </FormDescription>
+                    )}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -614,5 +621,7 @@ export function ProtocolForm() {
     </Form>
   );
 }
+
+    
 
     
