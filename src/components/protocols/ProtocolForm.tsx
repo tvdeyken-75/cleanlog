@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useEffect, useState, useRef } from 'react';
@@ -111,7 +112,7 @@ export function ProtocolForm() {
   const form = useForm<ProtocolFormValues>({
     resolver: zodResolver(protocolFormSchema),
     defaultValues: {
-      location: '',
+      location: 'Manten',
       cleaning_type: 'Tägliche Reinigung',
       cleaning_products: undefined,
       cleaning_products_other: '',

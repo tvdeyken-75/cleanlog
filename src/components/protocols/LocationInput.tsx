@@ -41,20 +41,12 @@ export function LocationInput({ value, onChange }: LocationInputProps) {
     );
   };
   
-  useEffect(() => {
-    // Automatically fetch location on component mount if value is empty
-    if (!value) {
-        fetchLocation();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <div className="relative">
       <Input
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="z.B. 52.52000, 13.40500"
+        placeholder="z.B. Manten oder 52.520, 13.405"
         className="pr-10"
       />
       <Button
