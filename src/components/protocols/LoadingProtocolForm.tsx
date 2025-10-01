@@ -17,7 +17,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -29,6 +28,7 @@ import { RangeSlider } from './RangeSlider';
 import { ArrowLeft, Truck, Thermometer, MapPin, CircleCheck, Lock, Award, PackagePlus, Gauge, Timer, CalendarClock, ChevronsUpDown, Layers, Box, Camera, Upload, Trash2, File } from 'lucide-react';
 import { LabelWithTooltip } from '../ui/label-with-tooltip';
 import { Slider } from '../ui/slider';
+import { Switch } from '../ui/switch';
 
 
 const photoSchema = z.object({
@@ -507,19 +507,19 @@ export function LoadingProtocolForm() {
                 </FormItem>
               )}
             />
-            <div className="flex items-center space-x-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
                 <FormField
                 control={form.control}
                 name="cargo_area_closed"
                 render={({ field }) => (
-                    <FormItem className="flex flex-row items-center space-x-3 space-y-0">
-                        <FormControl>
-                            <Checkbox checked={field.value} onCheckedChange={field.onChange} id="cargo_area_closed" />
-                        </FormControl>
+                    <FormItem className="flex flex-row items-center justify-between sm:justify-start sm:gap-4 rounded-lg border p-3 w-full">
                         <LabelWithTooltip htmlFor="cargo_area_closed" tooltipText="Грузовой отсек заперт" className="font-normal flex items-center gap-2">
                             <Lock className="h-4 w-4"/>
                             Laderaum abgeschlossen
                         </LabelWithTooltip>
+                        <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} id="cargo_area_closed" />
+                        </FormControl>
                     </FormItem>
                 )}
                 />
@@ -527,14 +527,14 @@ export function LoadingProtocolForm() {
                 control={form.control}
                 name="has_seal"
                 render={({ field }) => (
-                    <FormItem className="flex flex-row items-center space-x-3 space-y-0">
-                        <FormControl>
-                            <Checkbox checked={field.value} onCheckedChange={field.onChange} id="has_seal" />
-                        </FormControl>
+                    <FormItem className="flex flex-row items-center justify-between sm:justify-start sm:gap-4 rounded-lg border p-3 w-full">
                         <LabelWithTooltip htmlFor="has_seal" tooltipText="Пломба в наличии" className="font-normal flex items-center gap-2">
                             <Award className="h-4 w-4"/>
                             Siegel vorhanden
                         </LabelWithTooltip>
+                        <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} id="has_seal" />
+                        </FormControl>
                     </FormItem>
                 )}
                 />
