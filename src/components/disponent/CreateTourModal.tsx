@@ -36,7 +36,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Checkbox } from "@/components/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Truck, User as UserIcon, Building, Briefcase, FileText, MessageSquare, Ticket, ChevronsUpDown, DollarSign, CalendarIcon } from 'lucide-react';
+import { Truck, User as UserIcon, Building, Briefcase, FileText, MessageSquare, Ticket, ChevronsUpDown, DollarSign, CalendarIcon, StickyNote } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { Tour } from "@/lib/types";
 import { ScrollArea } from "../ui/scroll-area";
@@ -74,6 +74,8 @@ export function CreateTourModal({ onTourCreated }: CreateTourModalProps) {
   const { getUsers, user } = useAuth();
   const { vehicles, addTour, tours } = useProtocols(user);
   const [isFinancesOpen, setIsFinancesOpen] = useState(false);
+  const [isMainInfoOpen, setIsMainInfoOpen] = useState(true);
+  const [isNotesOpen, setIsNotesOpen] = useState(false);
   
   const getNextTourNumber = () => {
     if (!tours || tours.length === 0) {
@@ -152,151 +154,171 @@ export function CreateTourModal({ onTourCreated }: CreateTourModalProps) {
       </DialogHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <ScrollArea className="max-h-[70vh] p-4">
-                <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <FormField
-                            control={form.control}
-                            name="tourNr"
-                            render={({ field }) => (
-                            <FormItem>
-                                <LabelWithTooltip tooltipText="Eindeutige Nummer der Tour" className="flex items-center gap-2"><Ticket className="w-4 h-4" />Tour-Nr.</LabelWithTooltip>
-                                <FormControl>
-                                    <Input placeholder="z.B. 2024-001" {...field} disabled />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="customer"
-                            render={({ field }) => (
-                            <FormItem>
-                                <LabelWithTooltip tooltipText="Der Kunde für diese Tour" className="flex items-center gap-2"><Briefcase className="w-4 h-4" />Kunde</LabelWithTooltip>
-                                <FormControl>
-                                    <Input placeholder="Kundenname" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                    <FormField
-                        control={form.control}
-                        name="driver"
-                        render={({ field }) => (
-                        <FormItem>
-                            <LabelWithTooltip tooltipText="Wählen Sie einen Fahrer" className="flex items-center gap-2"><UserIcon className="w-4 h-4" />Fahrer</LabelWithTooltip>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                                <SelectTrigger>
-                                <SelectValue placeholder="Fahrer auswählen" />
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                {drivers.map(driver => (
-                                <SelectItem key={driver.username} value={driver.username}>{driver.username}</SelectItem>
-                                ))}
-                            </SelectContent>
-                            </Select>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
-                    <FormField
-                            control={form.control}
-                            name="customerRef"
-                            render={({ field }) => (
-                            <FormItem>
-                                <LabelWithTooltip tooltipText="Referenznummer des Kunden" className="flex items-center gap-2"><FileText className="w-4 h-4" />Kundenreferenz</LabelWithTooltip>
-                                <FormControl>
-                                    <Input placeholder="z.B. PO-12345" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                    <FormField
-                        control={form.control}
-                        name="truck"
-                        render={({ field }) => (
-                        <FormItem>
-                            <LabelWithTooltip tooltipText="Wählen Sie einen LKW" className="flex items-center gap-2"><Truck className="w-4 h-4" />LKW</LabelWithTooltip>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                                <SelectTrigger>
-                                <SelectValue placeholder="LKW auswählen" />
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                {trucks.map(truck => (
-                                    <SelectItem key={truck.license_plate} value={truck.license_plate}>{truck.license_plate}</SelectItem>
-                                ))}
-                            </SelectContent>
-                            </Select>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="trailer"
-                        render={({ field }) => (
-                        <FormItem>
-                            <LabelWithTooltip tooltipText="Wählen Sie einen Auflieger" className="flex items-center gap-2"><Building className="w-4 h-4" />Auflieger</LabelWithTooltip>
-                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                            <FormControl>
-                                <SelectTrigger>
-                                <SelectValue placeholder="Auflieger auswählen" />
-                                </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                                {trailers.map(trailer => (
-                                    <SelectItem key={trailer.license_plate} value={trailer.license_plate}>{trailer.license_plate}</SelectItem>
-                                ))}
-                            </SelectContent>
-                            </Select>
-                            <FormMessage />
-                        </FormItem>
-                        )}
-                    />
-                    <FormField
-                            control={form.control}
-                            name="description"
-                            render={({ field }) => (
-                            <FormItem className="md:col-span-2">
-                                <LabelWithTooltip tooltipText="Kurze Beschreibung der Tour" className="flex items-center gap-2"><FileText className="w-4 h-4" />Beschreibung</LabelWithTooltip>
-                                <FormControl>
-                                    <Textarea placeholder="z.B. Fleischtransport von A nach B" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="remarks"
-                            render={({ field }) => (
-                            <FormItem className="md:col-span-2">
-                                <LabelWithTooltip tooltipText="Interne Bemerkungen zur Tour" className="flex items-center gap-2"><MessageSquare className="w-4 h-4" />Bemerkungen</LabelWithTooltip>
-                                <FormControl>
-                                    <Textarea placeholder="Besonderheiten oder Anweisungen" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                            )}
-                        />
-                    </div>
-                    
-                    <Collapsible open={isFinancesOpen} onOpenChange={setIsFinancesOpen}>
-                        <CollapsibleTrigger asChild>
-                            <Button type="button" variant="outline" className="w-full">
-                                <DollarSign className="mr-2 h-4 w-4" />
-                                Tourfinanzen {isFinancesOpen ? 'ausblenden' : 'anzeigen'}
-                                <ChevronsUpDown className="ml-auto h-4 w-4" />
+            <ScrollArea className="max-h-[70vh] p-1">
+                <div className="space-y-4 p-4">
+                    <Collapsible open={isMainInfoOpen} onOpenChange={setIsMainInfoOpen} className="space-y-2">
+                         <CollapsibleTrigger asChild>
+                            <Button type="button" variant="ghost" className="w-full justify-between px-2">
+                                <span className="font-semibold text-lg flex items-center gap-2"><Truck className="h-5 w-5 text-primary" />Hauptinformationen</span>
+                                <ChevronsUpDown className="h-4 w-4" />
                             </Button>
                         </CollapsibleTrigger>
-                        <CollapsibleContent className="mt-4 space-y-4 border p-4 rounded-md">
+                        <CollapsibleContent className="space-y-4 border p-4 rounded-md">
+                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <FormField
+                                    control={form.control}
+                                    name="tourNr"
+                                    render={({ field }) => (
+                                    <FormItem>
+                                        <LabelWithTooltip tooltipText="Eindeutige Nummer der Tour" className="flex items-center gap-2"><Ticket className="w-4 h-4" />Tour-Nr.</LabelWithTooltip>
+                                        <FormControl>
+                                            <Input placeholder="z.B. 2024-001" {...field} disabled />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="customer"
+                                    render={({ field }) => (
+                                    <FormItem>
+                                        <LabelWithTooltip tooltipText="Der Kunde für diese Tour" className="flex items-center gap-2"><Briefcase className="w-4 h-4" />Kunde</LabelWithTooltip>
+                                        <FormControl>
+                                            <Input placeholder="Kundenname" {...field} />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="driver"
+                                    render={({ field }) => (
+                                    <FormItem>
+                                        <LabelWithTooltip tooltipText="Wählen Sie einen Fahrer" className="flex items-center gap-2"><UserIcon className="w-4 h-4" />Fahrer</LabelWithTooltip>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                            <SelectValue placeholder="Fahrer auswählen" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {drivers.map(driver => (
+                                            <SelectItem key={driver.username} value={driver.username}>{driver.username}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                        control={form.control}
+                                        name="customerRef"
+                                        render={({ field }) => (
+                                        <FormItem>
+                                            <LabelWithTooltip tooltipText="Referenznummer des Kunden" className="flex items-center gap-2"><FileText className="w-4 h-4" />Kundenreferenz</LabelWithTooltip>
+                                            <FormControl>
+                                                <Input placeholder="z.B. PO-12345" {...field} />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                        )}
+                                    />
+                                <FormField
+                                    control={form.control}
+                                    name="truck"
+                                    render={({ field }) => (
+                                    <FormItem>
+                                        <LabelWithTooltip tooltipText="Wählen Sie einen LKW" className="flex items-center gap-2"><Truck className="w-4 h-4" />LKW</LabelWithTooltip>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                            <SelectValue placeholder="LKW auswählen" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {trucks.map(truck => (
+                                                <SelectItem key={truck.license_plate} value={truck.license_plate}>{truck.license_plate}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                    )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="trailer"
+                                    render={({ field }) => (
+                                    <FormItem>
+                                        <LabelWithTooltip tooltipText="Wählen Sie einen Auflieger" className="flex items-center gap-2"><Building className="w-4 h-4" />Auflieger</LabelWithTooltip>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                        <FormControl>
+                                            <SelectTrigger>
+                                            <SelectValue placeholder="Auflieger auswählen" />
+                                            </SelectTrigger>
+                                        </FormControl>
+                                        <SelectContent>
+                                            {trailers.map(trailer => (
+                                                <SelectItem key={trailer.license_plate} value={trailer.license_plate}>{trailer.license_plate}</SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                    )}
+                                />
+                            </div>
+                        </CollapsibleContent>
+                    </Collapsible>
+
+                     <Collapsible open={isNotesOpen} onOpenChange={setIsNotesOpen} className="space-y-2">
+                        <CollapsibleTrigger asChild>
+                            <Button type="button" variant="ghost" className="w-full justify-between px-2">
+                                <span className="font-semibold text-lg flex items-center gap-2"><StickyNote className="h-5 w-5 text-primary" />Notizen</span>
+                                <ChevronsUpDown className="h-4 w-4" />
+                            </Button>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="space-y-4 border p-4 rounded-md">
+                            <FormField
+                                control={form.control}
+                                name="description"
+                                render={({ field }) => (
+                                <FormItem>
+                                    <LabelWithTooltip tooltipText="Kurze Beschreibung der Tour" className="flex items-center gap-2"><FileText className="w-4 h-4" />Beschreibung</LabelWithTooltip>
+                                    <FormControl>
+                                        <Textarea placeholder="z.B. Fleischtransport von A nach B" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                                )}
+                            />
+                            <FormField
+                                control={form.control}
+                                name="remarks"
+                                render={({ field }) => (
+                                <FormItem>
+                                    <LabelWithTooltip tooltipText="Interne Bemerkungen zur Tour" className="flex items-center gap-2"><MessageSquare className="w-4 h-4" />Bemerkungen</LabelWithTooltip>
+                                    <FormControl>
+                                        <Textarea placeholder="Besonderheiten oder Anweisungen" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                </FormItem>
+                                )}
+                            />
+                        </CollapsibleContent>
+                    </Collapsible>
+                    
+                    <Collapsible open={isFinancesOpen} onOpenChange={setIsFinancesOpen} className="space-y-2">
+                        <CollapsibleTrigger asChild>
+                            <Button type="button" variant="ghost" className="w-full justify-between px-2">
+                                <span className="font-semibold text-lg flex items-center gap-2"><DollarSign className="h-5 w-5 text-primary" />Tourfinanzen</span>
+                                <ChevronsUpDown className="h-4 w-4" />
+                            </Button>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="space-y-4 border p-4 rounded-md">
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                 <FormField control={form.control} name="rohertrag" render={({ field }) => (
                                     <FormItem><LabelWithTooltip tooltipText="Rohertrag der Tour">Rohertrag</LabelWithTooltip>
@@ -369,7 +391,7 @@ export function CreateTourModal({ onTourCreated }: CreateTourModalProps) {
                 </div>
           </ScrollArea>
           
-          <DialogFooter className="pt-4">
+          <DialogFooter className="pt-4 pr-4">
             <DialogClose asChild>
                 <Button type="button" variant="outline">Abbrechen</Button>
             </DialogClose>
@@ -380,5 +402,3 @@ export function CreateTourModal({ onTourCreated }: CreateTourModalProps) {
     </DialogContent>
   );
 }
-
-    
