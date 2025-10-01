@@ -72,12 +72,6 @@ export function DashboardClient() {
                     Spesen
                     </Button>
                 </Link>
-                <Link href="/archive" passHref className="flex-1">
-                    <Button size="lg" className="w-full">
-                    <Archive className="mr-2 h-5 w-5" />
-                    Archiv
-                    </Button>
-                </Link>
                 <Link href="/protocols/emergency" passHref className="flex-1">
                     <Button variant="destructive" size="lg" className="w-full">
                     <Siren className="mr-2 h-5 w-5" />

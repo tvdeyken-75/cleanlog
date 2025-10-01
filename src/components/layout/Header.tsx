@@ -6,7 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useTour } from '@/context/TourContext';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Truck, LogOut, Map, UserCog, Printer, Loader2 } from 'lucide-react';
+import { Truck, LogOut, Map, UserCog, Printer, Loader2, Archive } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -386,6 +386,10 @@ export function Header() {
                     <span>Admin Panel</span>
                   </DropdownMenuItem>
                 )}
+                 <DropdownMenuItem onClick={() => router.push('/archive')}>
+                    <Archive className="mr-2 h-4 w-4" />
+                    <span>Archiv</span>
+                  </DropdownMenuItem>
                 {activeTour && (
                   <>
                     <DropdownMenuItem onClick={handlePrint} disabled={isPrinting}>
@@ -410,5 +414,3 @@ export function Header() {
     </header>
   );
 }
-
-    
