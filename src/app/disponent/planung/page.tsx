@@ -55,9 +55,10 @@ export default function PlanungPage() {
   };
 
   const handleAddTour = () => {
+    const weekStartDate = weeks.find(w => w.weekNumber === selectedWeek)?.startDate || new Date();
       setTours(prevTours => [
           ...prevTours,
-          { tourNr: getNextTourNumber() }
+          { tourNr: getNextTourNumber(), start_time: weekStartDate }
       ]);
   }
 
@@ -175,8 +176,8 @@ export default function PlanungPage() {
                   tours.map((tour, index) => (
                     <TableRow key={tour.tourNr}>
                         <TableCell><Input value={tour.tourNr || ''} readOnly className="border-none bg-transparent p-1 h-8 min-w-[100px]" /></TableCell>
-                        <TableCell><Input type="date" value={tour.start_time ? format(tour.start_time, 'yyyy-MM-dd') : ''} onChange={e => handleInputChange(index, 'start_time', new Date(e.target.value))} className="p-1 h-8 min-w-[100px]" /></TableCell>
-                        <TableCell><Input type="time" value={tour.start_time ? format(tour.start_time, 'HH:mm') : ''} onChange={e => handleInputChange(index, 'start_time', new Date(`1970-01-01T${e.target.value}`))} className="p-1 h-8 min-w-[100px]" /></TableCell>
+                        <TableCell><Input type="date" value={tour.start_time ? format(new Date(tour.start_time), 'yyyy-MM-dd') : ''} onChange={e => handleInputChange(index, 'start_time', new Date(e.target.value))} className="p-1 h-8 min-w-[100px]" /></TableCell>
+                        <TableCell><Input type="time" value={tour.start_time ? format(new Date(tour.start_time), 'HH:mm') : ''} onChange={e => handleInputChange(index, 'start_time', new Date(`1970-01-01T${e.target.value}`))} className="p-1 h-8 min-w-[100px]" /></TableCell>
                         <TableCell><Input value={tour.driver || ''} onChange={e => handleInputChange(index, 'driver', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
                         <TableCell><Input value={tour.truck || ''} onChange={e => handleInputChange(index, 'truck', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
                         <TableCell><Input value={tour.trailer || ''} onChange={e => handleInputChange(index, 'trailer', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
