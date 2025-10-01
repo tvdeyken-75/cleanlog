@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useState } from 'react';
@@ -25,7 +26,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 const userSchema = z.object({
   username: z.string().min(3, "Benutzername muss mindestens 3 Zeichen lang sein."),
   password: z.string().min(6, "Das Passwort muss mindestens 6 Zeichen lang sein.").optional(),
-  role: z.enum(['driver', 'admin'], { required_error: "Rolle ist ein Pflichtfeld."}),
+  role: z.enum(['driver', 'admin', 'disponent', 'geschaftsfuhrer', 'buchhaltung', 'qm_manager'], { required_error: "Rolle ist ein Pflichtfeld."}),
 }).superRefine((data, ctx) => {
     // Password is only required when creating a new user, not when editing.
     // This logic is handled during form submission.
@@ -33,6 +34,16 @@ const userSchema = z.object({
 
 
 type UserFormValues = z.infer<typeof userSchema>;
+
+const roleTranslations: { [key in UserRole]: string } = {
+    admin: 'Admin',
+    driver: 'Fahrer',
+    disponent: 'Disponent',
+    geschaftsfuhrer: 'Geschäftsführer',
+    buchhaltung: 'Buchhaltung',
+    qm_manager: 'QM-Manager'
+};
+
 
 export function PasswordManagementForm() {
   const { addUser, getUsers, updateUser, deleteUser } = useAuth();
@@ -187,8 +198,9 @@ export function PasswordManagementForm() {
                          <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                             <SelectContent>
-                                <SelectItem value="driver">Fahrer</SelectItem>
-                                <SelectItem value="admin">Admin</SelectItem>
+                                {Object.entries(roleTranslations).map(([value, label]) => (
+                                    <SelectItem key={value} value={value}>{label}</SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
                         <FormMessage />
@@ -223,7 +235,7 @@ export function PasswordManagementForm() {
                                 users.map(user => (
                                     <TableRow key={user.username}>
                                         <TableCell className='font-medium'>{user.username}</TableCell>
-                                        <TableCell className='capitalize'>{user.role}</TableCell>
+                                        <TableCell className='capitalize'>{roleTranslations[user.role] || user.role}</TableCell>
                                         <TableCell className="text-right">
                                             <Button variant="ghost" size="icon" onClick={() => handleEditClick(user)}>
                                                 <Edit className="h-4 w-4" />
@@ -284,8 +296,9 @@ export function PasswordManagementForm() {
                                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                                         <FormControl><SelectTrigger><SelectValue /></SelectTrigger></FormControl>
                                         <SelectContent>
-                                            <SelectItem value="driver">Fahrer</SelectItem>
-                                            <SelectItem value="admin">Admin</SelectItem>
+                                            {Object.entries(roleTranslations).map(([value, label]) => (
+                                                <SelectItem key={value} value={value}>{label}</SelectItem>
+                                            ))}
                                         </SelectContent>
                                     </Select>
                                     <FormMessage />

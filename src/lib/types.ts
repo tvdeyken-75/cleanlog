@@ -1,6 +1,7 @@
 
 
-export type UserRole = 'driver' | 'admin';
+
+export type UserRole = 'driver' | 'admin' | 'disponent' | 'geschaftsfuhrer' | 'buchhaltung' | 'qm_manager';
 
 export interface User {
     username: string;
@@ -121,8 +122,8 @@ export interface EmergencyProtocol extends BaseProtocol {
     type: 'emergency';
     emergency_type: EmergencyType;
     description: string;
+    actions_taken: string;
     photos: Photo[];
-    actions_taken?: string;
     // Conditional fields
     reference_number?: string; // For vehicle damage, goods blocked
     incident_type_description?: string; // For personal injury, health incident
