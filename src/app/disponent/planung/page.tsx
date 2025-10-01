@@ -1,5 +1,4 @@
 
-
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,7 +15,7 @@ import { CreateTourModal } from '@/components/disponent/CreateTourModal';
 
 export default function PlanungPage() {
   const currentYear = getYear(new Date());
-  const years = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
+  const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
