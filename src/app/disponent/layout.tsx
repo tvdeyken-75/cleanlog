@@ -3,7 +3,7 @@
 
 import { useAuth } from '@/context/AuthContext';
 import { Header } from '@/components/layout/Header';
-import { SidebarProvider, Sidebar, SidebarTrigger, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset } from '@/components/ui/sidebar';
+import { SidebarProvider, Sidebar, SidebarTrigger, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarInset, SidebarRail } from '@/components/ui/sidebar';
 import { LayoutGrid, GanttChartSquare } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -11,6 +11,7 @@ import { usePathname } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 const SETTINGS_STORAGE_KEY = 'fahrerchecklisteCompanySettings_v1';
 
@@ -61,17 +62,34 @@ export default function DisponentLayout({
         <div className="flex min-h-screen w-full flex-col">
             <Header />
             <div className="flex flex-1">
-                <Sidebar>
+                <Sidebar collapsible="icon">
+                    <SidebarRail />
                     <SidebarContent>
-                        {logo && (
-                           <div className="p-4 flex justify-center">
-                             <Image src={logo} alt="Firmenlogo" width={128} height={64} style={{ objectFit: 'contain' }}/>
+                         {logo && (
+                           <div className={cn(
+                               "p-4 flex justify-center transition-all duration-200",
+                               "group-data-[collapsible=icon]:p-2"
+                           )}>
+                             <Image src={logo} alt="Firmenlogo" width={128} height={64} 
+                                className={cn(
+                                    "transition-all duration-200",
+                                    "group-data-[collapsible=icon]:w-10 group-data-[collapsible=icon]:h-10"
+                                )}
+                                style={{ objectFit: 'contain' }}
+                              />
                            </div>
                         )}
                         <SidebarMenu>
                         <SidebarMenuItem>
                             <Link href="/disponent" passHref>
-                                <SidebarMenuButton isActive={pathname === '/disponent'}>
+                                <SidebarMenuButton 
+                                    isActive={pathname === '/disponent'}
+                                    tooltip={{
+                                        children: "Dashboard",
+                                        side: "right",
+                                        align: "center",
+                                    }}
+                                >
                                     <LayoutGrid />
                                     <span>Dashboard</span>
                                 </SidebarMenuButton>
@@ -79,7 +97,14 @@ export default function DisponentLayout({
                         </SidebarMenuItem>
                         <SidebarMenuItem>
                              <Link href="/disponent/planung" passHref>
-                                <SidebarMenuButton isActive={pathname === '/disponent/planung'}>
+                                <SidebarMenuButton 
+                                    isActive={pathname === '/disponent/planung'}
+                                    tooltip={{
+                                        children: "Planung",
+                                        side: "right",
+                                        align: "center",
+                                    }}
+                                >
                                     <GanttChartSquare />
                                     <span>Planung</span>
                                 </SidebarMenuButton>
