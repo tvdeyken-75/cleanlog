@@ -396,7 +396,10 @@ export function Header() {
                       {isPrinting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Printer className="mr-2 h-4 w-4" />}
                       <span>{isPrinting ? 'Druckt...' : 'Drucken & Teilen'}</span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleEndTour}>
+                    <DropdownMenuItem 
+                      onClick={handleEndTour}
+                      className="text-destructive focus:bg-destructive focus:text-destructive-foreground"
+                    >
                       <Map className="mr-2 h-4 w-4" />
                       <span>Tour beenden</span>
                     </DropdownMenuItem>
