@@ -21,8 +21,8 @@ export function useProtocols(userId: string | null) {
   const [vehicles, setVehicles] = useState<{truck: Vehicle[], trailer: Vehicle[]}>({ truck: [], trailer: [] });
   const [isLoading, setIsLoading] = useState(true);
 
-  const getProtocolsStorageKey = useCallback(() => `fahrerLogbuchProtocols_v4_${userId}`, [userId]);
-  const getVehiclesStorageKey = () => `fahrerLogbuchVehicles_v2`;
+  const getProtocolsStorageKey = useCallback(() => `fahrerchecklisteProtocols_v4_${userId}`, [userId]);
+  const getVehiclesStorageKey = () => `fahrerchecklisteVehicles_v2`;
 
   useEffect(() => {
     // Load vehicles (global for all users)

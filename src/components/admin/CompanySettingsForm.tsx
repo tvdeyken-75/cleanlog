@@ -15,7 +15,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui
 import { LabelWithTooltip } from '../ui/label-with-tooltip';
 import { Separator } from '../ui/separator';
 
-const SETTINGS_STORAGE_KEY = 'fahrerLogbuchCompanySettings_v1';
+const SETTINGS_STORAGE_KEY = 'fahrerchecklisteCompanySettings_v1';
 
 const settingsSchema = z.object({
   logo: z.string().optional(),

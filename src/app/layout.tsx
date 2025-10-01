@@ -7,7 +7,7 @@ import './globals.css';
 import { TooltipProvider } from '@/components/ui/tooltip';
 
 export const metadata: Metadata = {
-  title: 'FahrerLogbuch',
+  title: 'Fahrercheckliste',
   description: 'Protokoll-Manager für die Reinigung von Kühlladeräumen',
 };
 

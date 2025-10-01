@@ -28,9 +28,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [users, setUsers] = useState<User[]>([defaultAdmin, defaultDriver]);
   const [isLoading, setIsLoading] = useState(true);
   
-  const getUsersStorageKey = () => 'fahrerLogbuchUsers_v1';
-  const getSessionUserKey = () => 'fahrerLogbuchSessionUser_v1';
-  const getSessionRoleKey = () => 'fahrerLogbuchSessionRole_v1';
+  const getUsersStorageKey = () => 'fahrerchecklisteUsers_v1';
+  const getSessionUserKey = () => 'fahrerchecklisteSessionUser_v1';
+  const getSessionRoleKey = () => 'fahrerchecklisteSessionRole_v1';
 
   useEffect(() => {
     try {

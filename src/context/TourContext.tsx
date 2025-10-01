@@ -26,7 +26,7 @@ export function TourProvider({ children }: { children: ReactNode }) {
   const getStorageKey = useCallback((base: string) => {
     if (!user) return null;
     // Simplified to one key for tour/maintenance session per user
-    return `fahrerLogbuchActiveSession_${user}`;
+    return `fahrerchecklisteActiveSession_${user}`;
   }, [user]);
 
   useEffect(() => {

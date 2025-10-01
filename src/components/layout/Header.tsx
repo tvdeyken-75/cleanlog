@@ -24,7 +24,7 @@ import autoTable from 'jspdf-autotable';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
-const SETTINGS_STORAGE_KEY = 'fahrerLogbuchCompanySettings_v1';
+const SETTINGS_STORAGE_KEY = 'fahrerchecklisteCompanySettings_v1';
 
 
 export function Header() {
@@ -347,7 +347,7 @@ export function Header() {
       <div className="mx-auto flex h-16 items-center px-4 sm:px-6 lg:px-8">
         <Link href="/" className="mr-6 flex items-center space-x-2">
             <Truck className="h-6 w-6 text-primary" />
-            <span className="inline-block font-bold font-headline text-xl">FahrerLogbuch</span>
+            <span className="inline-block font-bold font-headline text-xl">Fahrercheckliste</span>
         </Link>
         
         {isAuthenticated && (
