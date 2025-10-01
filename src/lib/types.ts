@@ -1,12 +1,13 @@
 
 
 
+
 export type UserRole = 'driver' | 'admin' | 'disponent' | 'geschaftsfuhrer' | 'buchhaltung' | 'qm_manager';
 
 export interface User {
     username: string;
     password?: string; // Password might not always be present on client
-    role: UserRole;
+    role: UserRole[];
 }
 
 export interface Vehicle {

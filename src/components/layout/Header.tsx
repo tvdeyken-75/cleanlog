@@ -1,5 +1,6 @@
 
 
+
 "use client";
 
 import { useAuth } from '@/context/AuthContext';
@@ -28,7 +29,7 @@ const SETTINGS_STORAGE_KEY = 'fahrerchecklisteCompanySettings_v1';
 
 
 export function Header() {
-  const { user, logout, isAuthenticated, userRole } = useAuth();
+  const { user, logout, isAuthenticated, userRoles } = useAuth();
   const { activeTour } = useTour();
   const router = useRouter();
   const { protocols } = useProtocols(user);
@@ -365,7 +366,7 @@ export function Header() {
                   <div className="flex flex-col space-y-1">
                     <p className="text-sm font-medium leading-none">Angemeldet als</p>
                     <p className="text-xs leading-none text-muted-foreground">
-                      {user} ({userRole})
+                      {user} ({userRoles?.join(', ')})
                     </p>
                   </div>
                 </DropdownMenuLabel>
@@ -380,7 +381,7 @@ export function Header() {
                   </DropdownMenuLabel>
                 )}
                 <DropdownMenuSeparator />
-                {userRole === 'admin' && (
+                {userRoles?.includes('admin') && (
                   <DropdownMenuItem onClick={() => router.push('/admin')}>
                     <UserCog className="mr-2 h-4 w-4" />
                     <span>Admin Panel</span>

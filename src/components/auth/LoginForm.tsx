@@ -1,5 +1,6 @@
 
 
+
 "use client";
 
 import { useState, FormEvent, useEffect } from 'react';
@@ -14,7 +15,7 @@ import { LabelWithTooltip } from '../ui/label-with-tooltip';
 export function LoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const { login, isLoading, userRole } = useAuth();
+  const { login, isLoading, userRoles } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
 
@@ -39,14 +40,14 @@ export function LoginForm() {
   };
 
   useEffect(() => {
-    if (userRole) {
-      if (userRole === 'admin') {
+    if (userRoles) {
+      if (userRoles.includes('admin')) {
         router.push('/admin');
       } else {
         router.push('/tour-selection');
       }
     }
-  }, [userRole, router]);
+  }, [userRoles, router]);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">

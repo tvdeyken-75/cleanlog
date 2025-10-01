@@ -1,5 +1,6 @@
 
 
+
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
@@ -10,7 +11,7 @@ interface AuthContextType {
   login: (username: string, password: string) => boolean;
   logout: () => void;
   user: string | null;
-  userRole: UserRole | null;
+  userRoles: UserRole[] | null;
   isLoading: boolean;
   addUser: (newUser: User) => boolean;
   getUsers: () => User[];
@@ -20,12 +21,12 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const defaultAdmin: User = { username: 'admin', password: 'admin123', role: 'admin' };
-const defaultDriver: User = { username: 'demo', password: 'demo123', role: 'driver' };
+const defaultAdmin: User = { username: 'admin', password: 'admin123', role: ['admin'] };
+const defaultDriver: User = { username: 'demo', password: 'demo123', role: ['driver'] };
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<string | null>(null);
-  const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [userRoles, setUserRoles] = useState<UserRole[] | null>(null);
   const [users, setUsers] = useState<User[]>([defaultAdmin, defaultDriver]);
   const [isLoading, setIsLoading] = useState(true);
   
@@ -43,7 +44,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (!parsedUsers.find((u: User) => u.username === 'admin')) {
           setUsers([defaultAdmin, ...parsedUsers.filter((u:User) => u.username !== 'admin')]);
         } else {
-          setUsers(parsedUsers);
+          setUsers(parsedUsers.map((u:User) => ({...u, role: Array.isArray(u.role) ? u.role : [u.role]})));
         }
       } else {
         setUsers([defaultAdmin, defaultDriver]);
@@ -52,10 +53,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Load active session
       const storedUser = localStorage.getItem(getSessionUserKey());
-      const storedRole = localStorage.getItem(getSessionRoleKey()) as UserRole;
-      if (storedUser && storedRole) {
+      const storedRolesJSON = localStorage.getItem(getSessionRoleKey());
+      if (storedUser && storedRolesJSON) {
         setUser(storedUser);
-        setUserRole(storedRole);
+        const storedRoles = JSON.parse(storedRolesJSON);
+        setUserRoles(Array.isArray(storedRoles) ? storedRoles : [storedRoles]);
       }
     } catch (error) {
       console.error("Could not access localStorage", error);
@@ -78,9 +80,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (foundUser) {
       try {
         localStorage.setItem(getSessionUserKey(), foundUser.username);
-        localStorage.setItem(getSessionRoleKey(), foundUser.role);
+        localStorage.setItem(getSessionRoleKey(), JSON.stringify(foundUser.role));
         setUser(foundUser.username);
-        setUserRole(foundUser.role);
+        setUserRoles(foundUser.role);
         return true;
       } catch (error) {
         console.error("Could not write to localStorage", error);
@@ -95,7 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem(getSessionUserKey());
       localStorage.removeItem(getSessionRoleKey());
       setUser(null);
-      setUserRole(null);
+      setUserRoles(null);
     } catch (error) {
       console.error("Could not remove from localStorage", error);
     }
@@ -144,7 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated: !!user, login, logout, user, userRole, isLoading, addUser, getUsers, updateUser, deleteUser }}>
+    <AuthContext.Provider value={{ isAuthenticated: !!user, login, logout, user, userRoles, isLoading, addUser, getUsers, updateUser, deleteUser }}>
       {children}
     </AuthContext.Provider>
   );
