@@ -361,6 +361,38 @@ export function ProtocolForm() {
                     </Dialog>
                   )}
               </div>
+              <FormField
+                  control={form.control}
+                  name="water_temperature"
+                  render={({ field }) => (
+                    <FormItem>
+                      <LabelWithTooltip tooltipText="Температура воды" className="flex items-center gap-2"><Thermometer className="h-4 w-4"/>Wassertemperatur</LabelWithTooltip>
+                      <div className="relative">
+                        <FormControl><Input type="number" {...field} placeholder="z.B. 45" className="pr-8"/></FormControl>
+                        <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">°C</span>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="water_quality"
+                  render={({ field }) => (
+                    <FormItem>
+                      <LabelWithTooltip tooltipText="Качество воды" className="flex items-center gap-2"><Droplets className="h-4 w-4"/>Wasserqualität</LabelWithTooltip>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl><SelectTrigger><SelectValue placeholder="Wählen Sie eine Qualität" /></SelectTrigger></FormControl>
+                        <SelectContent>
+                          <SelectItem value="Trinkwasserqualität">Trinkwasserqualität</SelectItem>
+                          <SelectItem value="Betriebseigenes Wasser">Betriebseigenes Wasser</SelectItem>
+                          <SelectItem value="Sonstiges">Sonstiges</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
             </div>
             {watchCleaningProducts === 'sonstiges' && (
@@ -561,20 +593,6 @@ export function ProtocolForm() {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="water_temperature"
-                  render={({ field }) => (
-                    <FormItem>
-                      <LabelWithTooltip tooltipText="Температура воды" className="flex items-center gap-2"><Thermometer className="h-4 w-4"/>Wassertemperatur</LabelWithTooltip>
-                      <div className="relative">
-                        <FormControl><Input type="number" {...field} placeholder="z.B. 45" className="pr-8"/></FormControl>
-                        <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">°C</span>
-                      </div>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
                  <FormField
                   control={form.control}
                   name="odometer_reading"
@@ -590,24 +608,6 @@ export function ProtocolForm() {
                   )}
                 />
             </div>
-            <FormField
-              control={form.control}
-              name="water_quality"
-              render={({ field }) => (
-                <FormItem>
-                  <LabelWithTooltip tooltipText="Качество воды" className="flex items-center gap-2"><Droplets className="h-4 w-4"/>Wasserqualität</LabelWithTooltip>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl><SelectTrigger><SelectValue placeholder="Wählen Sie eine Qualität" /></SelectTrigger></FormControl>
-                    <SelectContent>
-                      <SelectItem value="Trinkwasserqualität">Trinkwasserqualität</SelectItem>
-                      <SelectItem value="Betriebseigenes Wasser">Betriebseigenes Wasser</SelectItem>
-                      <SelectItem value="Sonstiges">Sonstiges</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </CardContent>
         </Card>
 
@@ -621,6 +621,8 @@ export function ProtocolForm() {
     </Form>
   );
 }
+
+    
 
     
 
