@@ -18,12 +18,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import { Slider } from '../ui/slider';
+import { Switch } from '../ui/switch';
 
 import { LocationInput } from './LocationInput';
 import { ArrowLeft, Truck, Thermometer, MapPin, CircleCheck, Lock, Award, PackageCheck, MessageSquare, Timer, CalendarClock, ChevronsUpDown, PackageSearch, Camera, Trash2, File, Upload, Gauge } from 'lucide-react';
@@ -73,12 +74,15 @@ export function DeliveryProtocolForm() {
       unloading_duration: 0,
       odometer_reading: undefined,
       message: '',
-      cargo_area_temperature: 0,
+      cargo_area_temperature: 5,
       cargo_area_closed: false,
       has_seal: false,
       photos: [],
     }
   });
+
+  const watchCargoAreaTemp = form.watch('cargo_area_temperature');
+
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -329,28 +333,36 @@ export function DeliveryProtocolForm() {
               name="cargo_area_temperature"
               render={({ field }) => (
                 <FormItem>
-                  <LabelWithTooltip tooltipText="Температура в грузовом отсеке" className="flex items-center gap-2"><Thermometer className="h-4 w-4"/>Temperatur des Laderaums</LabelWithTooltip>
-                  <div className="relative">
-                    <FormControl><Input type="number" {...field} placeholder="z.B. 2" className="pr-8"/></FormControl>
-                    <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">°C</span>
+                  <div className="flex justify-between items-center">
+                    <LabelWithTooltip tooltipText="Температура в грузовом отсеке" className="flex items-center gap-2"><Thermometer className="h-4 w-4"/>Temperatur des Laderaums</LabelWithTooltip>
+                    <span className="font-bold text-lg">{watchCargoAreaTemp}°C</span>
                   </div>
+                  <FormControl>
+                    <Slider
+                      min={-25}
+                      max={30}
+                      step={1}
+                      value={[field.value]}
+                      onValueChange={(value) => field.onChange(value[0])}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <div className="flex items-center space-x-8">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
                 <FormField
                 control={form.control}
                 name="cargo_area_closed"
                 render={({ field }) => (
-                    <FormItem className="flex flex-row items-center space-x-3 space-y-0">
-                        <FormControl>
-                            <Checkbox checked={field.value} onCheckedChange={field.onChange} id="cargo_area_closed" />
-                        </FormControl>
-                        <LabelWithTooltip htmlFor="cargo_area_closed" tooltipText="Грузовой отсек заперт" className="font-normal flex items-center gap-2">
+                    <FormItem className="flex flex-row items-center justify-between sm:justify-start sm:gap-4 rounded-lg border p-3 w-full">
+                        <LabelWithTooltip htmlFor="delivery_cargo_area_closed" tooltipText="Грузовой отсек заперт" className="font-normal flex items-center gap-2">
                             <Lock className="h-4 w-4"/>
                             Laderaum abgeschlossen
                         </LabelWithTooltip>
+                        <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} id="delivery_cargo_area_closed" />
+                        </FormControl>
                     </FormItem>
                 )}
                 />
@@ -358,14 +370,14 @@ export function DeliveryProtocolForm() {
                 control={form.control}
                 name="has_seal"
                 render={({ field }) => (
-                    <FormItem className="flex flex-row items-center space-x-3 space-y-0">
-                        <FormControl>
-                            <Checkbox checked={field.value} onCheckedChange={field.onChange} id="has_seal" />
-                        </FormControl>
-                        <LabelWithTooltip htmlFor="has_seal" tooltipText="Пломба в наличии" className="font-normal flex items-center gap-2">
+                     <FormItem className="flex flex-row items-center justify-between sm:justify-start sm:gap-4 rounded-lg border p-3 w-full">
+                        <LabelWithTooltip htmlFor="delivery_has_seal" tooltipText="Пломба в наличии" className="font-normal flex items-center gap-2">
                             <Award className="h-4 w-4"/>
                             Siegel vorhanden
                         </LabelWithTooltip>
+                        <FormControl>
+                            <Switch checked={field.value} onCheckedChange={field.onChange} id="delivery_has_seal" />
+                        </FormControl>
                     </FormItem>
                 )}
                 />
@@ -452,3 +464,5 @@ export function DeliveryProtocolForm() {
     </Form>
   );
 }
+
+    
