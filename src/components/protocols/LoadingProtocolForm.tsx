@@ -28,6 +28,7 @@ import { LocationInput } from './LocationInput';
 import { RangeSlider } from './RangeSlider';
 import { ArrowLeft, Truck, Thermometer, MapPin, CircleCheck, Lock, Award, PackagePlus, Gauge, Timer, CalendarClock, ChevronsUpDown, Layers, Box, Camera, Upload, Trash2, File } from 'lucide-react';
 import { LabelWithTooltip } from '../ui/label-with-tooltip';
+import { Slider } from '../ui/slider';
 
 
 const photoSchema = z.object({
@@ -119,7 +120,7 @@ export function LoadingProtocolForm() {
       weight: undefined,
       pallets: undefined,
       crates: undefined,
-      cargo_area_temperature: undefined,
+      cargo_area_temperature: 5,
       cargo_area_closed: false,
       has_seal: false,
       photos: [],
@@ -128,6 +129,7 @@ export function LoadingProtocolForm() {
 
   const watchGoodsType = form.watch('goods_type');
   const watchArticles = form.watch('articles');
+  const watchCargoAreaTemp = form.watch('cargo_area_temperature');
 
   useEffect(() => {
     form.setValue('articles', '');
@@ -488,11 +490,19 @@ export function LoadingProtocolForm() {
               name="cargo_area_temperature"
               render={({ field }) => (
                 <FormItem>
-                  <LabelWithTooltip tooltipText="Температура в грузовом отсеке" className="flex items-center gap-2"><Thermometer className="h-4 w-4"/>Temperatur des Laderaums</LabelWithTooltip>
-                  <div className="relative">
-                    <FormControl><Input type="number" {...field} placeholder="z.B. 2" className="pr-8"/></FormControl>
-                    <span className="absolute inset-y-0 right-3 flex items-center text-sm text-muted-foreground">°C</span>
+                  <div className="flex justify-between items-center">
+                    <LabelWithTooltip tooltipText="Температура в грузовом отсеке" className="flex items-center gap-2"><Thermometer className="h-4 w-4"/>Temperatur des Laderaums</LabelWithTooltip>
+                    <span className="font-bold text-lg">{watchCargoAreaTemp}°C</span>
                   </div>
+                  <FormControl>
+                    <Slider
+                      min={-25}
+                      max={30}
+                      step={1}
+                      value={[field.value]}
+                      onValueChange={(value) => field.onChange(value[0])}
+                    />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
