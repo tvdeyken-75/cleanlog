@@ -47,6 +47,7 @@ const photoSchema = z.object({
 const protocolFormSchema = z.object({
   cleaning_type: z.string({ required_error: "Art der Reinigung ist ein Pflichtfeld." }),
   cleaning_products: z.string().min(1, "Reinigungsmittel ist ein Pflichtfeld."),
+  cleaning_products_other: z.string().optional(),
   control_type: z.string({ required_error: "Art der Kontrolle ist ein Pflichtfeld." }),
   control_result: z.enum(["i.O.", "n.i.O."], { required_error: "Ergebnis ist ein Pflichtfeld." }),
   location: z.string().min(1, "Ort ist ein Pflichtfeld."),
@@ -69,7 +70,16 @@ const protocolFormSchema = z.object({
       ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Korrekturmaßnahmen sind ein Pflichtfeld.", path: ['corrective_actions'] });
     }
   }
+}).superRefine((data, ctx) => {
+    if (data.cleaning_products === 'sonstiges' && !data.cleaning_products_other) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Bitte geben Sie das sonstige Reinigungsmittel an.",
+            path: ['cleaning_products_other'],
+        });
+    }
 });
+
 
 type ProtocolFormValues = z.infer<typeof protocolFormSchema>;
 
@@ -94,7 +104,8 @@ export function ProtocolForm() {
     defaultValues: {
       location: '',
       cleaning_type: undefined,
-      cleaning_products: '',
+      cleaning_products: undefined,
+      cleaning_products_other: '',
       control_type: undefined,
       control_result: undefined,
       water_temperature: 0,
@@ -108,6 +119,7 @@ export function ProtocolForm() {
   });
 
   const watchControlResult = form.watch('control_result');
+  const watchCleaningProducts = form.watch('cleaning_products');
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -194,8 +206,11 @@ export function ProtocolForm() {
       return;
     }
 
+    const finalCleaningProducts = data.cleaning_products === 'sonstiges' ? data.cleaning_products_other : data.cleaning_products;
+
     const protocolData = {
         ...data,
+      cleaning_products: finalCleaningProducts!,
       truck_license_plate: activeTour.truck_license_plate,
       trailer_license_plate: activeTour.trailer_license_plate,
       transport_order: activeTour.transport_order,
@@ -273,38 +288,62 @@ export function ProtocolForm() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2"><Sparkles className="text-primary"/>Reinigungsdetails</CardTitle>
           </CardHeader>
-          <CardContent className="grid md:grid-cols-2 gap-6">
-            <FormField
-              control={form.control}
-              name="cleaning_type"
-              render={({ field }) => (
-                <FormItem>
-                  <LabelWithTooltip tooltipText="Вид уборки">Art der Reinigung</LabelWithTooltip>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger><SelectValue placeholder="Wählen Sie eine Art" /></SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Tägliche Reinigung">Tägliche Reinigung</SelectItem>
-                      <SelectItem value="Grundreinigung">Grundreinigung</SelectItem>
-                      <SelectItem value="Desinfektion nach Ladungsart">Desinfektion nach Ladungsart</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="cleaning_products"
-              render={({ field }) => (
-                <FormItem>
-                  <LabelWithTooltip tooltipText="Используемые чистящие/дезинфицирующие средства">Verwendete Reinigungs-/Desinfektionsmittel</LabelWithTooltip>
-                  <FormControl><Input {...field} placeholder="z.B. Desinfekto-123" /></FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <CardContent className="space-y-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              <FormField
+                control={form.control}
+                name="cleaning_type"
+                render={({ field }) => (
+                  <FormItem>
+                    <LabelWithTooltip tooltipText="Вид уборки">Art der Reinigung</LabelWithTooltip>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger><SelectValue placeholder="Wählen Sie eine Art" /></SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="Tägliche Reinigung">Tägliche Reinigung</SelectItem>
+                        <SelectItem value="Grundreinigung">Grundreinigung</SelectItem>
+                        <SelectItem value="Desinfektion nach Ladungsart">Desinfektion nach Ladungsart</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="cleaning_products"
+                render={({ field }) => (
+                  <FormItem>
+                    <LabelWithTooltip tooltipText="Используемые чистящие/дезинфицирующие средства">Verwendete Reinigungs-/Desinfektionsmittel</LabelWithTooltip>
+                     <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger><SelectValue placeholder="Wählen Sie ein Mittel" /></SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="Bio Tec BTS 3100 (6%) für Laderaum">Bio Tec BTS 3100 (6%) für Laderaum</SelectItem>
+                          <SelectItem value="Dreiphar Truck & Pflege für Karosserie">Dreiphar Truck & Pflege für Karosserie</SelectItem>
+                          <SelectItem value="sonstiges">Sonstiges</SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            {watchCleaningProducts === 'sonstiges' && (
+              <FormField
+                control={form.control}
+                name="cleaning_products_other"
+                render={({ field }) => (
+                  <FormItem>
+                    <LabelWithTooltip tooltipText="Bitte geben Sie das verwendete Reinigungsmittel an">Sonstiges Reinigungsmittel</LabelWithTooltip>
+                    <FormControl><Input {...field} placeholder="Name des Reinigungsmittels" /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
           </CardContent>
         </Card>
         
@@ -554,3 +593,4 @@ export function ProtocolForm() {
     
 
     
+
