@@ -105,7 +105,7 @@ export function ProtocolForm() {
     resolver: zodResolver(protocolFormSchema),
     defaultValues: {
       location: '',
-      cleaning_type: undefined,
+      cleaning_type: 'Tägliche Reinigung',
       cleaning_products: undefined,
       cleaning_products_other: '',
       control_type: undefined,
@@ -304,8 +304,8 @@ export function ProtocolForm() {
                       </FormControl>
                       <SelectContent>
                         <SelectItem value="Tägliche Reinigung">Tägliche Reinigung</SelectItem>
-                        <SelectItem value="Grundreinigung">Grundreinigung</SelectItem>
-                        <SelectItem value="Desinfektion nach Ladungsart">Desinfektion nach Ladungsart</SelectItem>
+                        <SelectItem value="Reinigung nach None Food Fahrt">Reinigung nach None Food Fahrt</SelectItem>
+                        <SelectItem value="Außenreinigung">Außenreinigung</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
