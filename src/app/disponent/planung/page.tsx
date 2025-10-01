@@ -1,4 +1,5 @@
 
+
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,11 +11,14 @@ import { getWeek, getYear, eachWeekOfInterval, format, eachDayOfInterval, startO
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
+import { CreateTourModal } from '@/components/disponent/CreateTourModal';
 
 export default function PlanungPage() {
   const currentYear = getYear(new Date());
   const years = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i);
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const getWeeksForYear = (year: number) => {
     const firstDayOfYear = new Date(year, 0, 1);
@@ -110,41 +114,47 @@ export default function PlanungPage() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-            <Truck className="h-5 w-5 text-primary" />
-            Tourenübersicht
-          </CardTitle>
-          <Button size="sm">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Tour erstellen
-          </Button>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>TourNr.</TableHead>
-                <TableHead>Fahrername</TableHead>
-                <TableHead>LKW</TableHead>
-                <TableHead>Auflieger</TableHead>
-                <TableHead>Kunde</TableHead>
-                <TableHead>Beschreibung</TableHead>
-                <TableHead>Bemerkungen</TableHead>
-                <TableHead>Kundenref.</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              <TableRow>
-                <TableCell colSpan={8} className="text-center text-muted-foreground">
-                  Keine Touren für den ausgewählten Zeitraum.
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+                <Truck className="h-5 w-5 text-primary" />
+                Tourenübersicht
+            </CardTitle>
+            <DialogTrigger asChild>
+                <Button size="sm">
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Tour erstellen
+                </Button>
+            </DialogTrigger>
+            </CardHeader>
+            <CardContent>
+            <Table>
+                <TableHeader>
+                <TableRow>
+                    <TableHead>Tour-Nr.</TableHead>
+                    <TableHead>Fahrername</TableHead>
+                    <TableHead>LKW</TableHead>
+                    <TableHead>Auflieger</TableHead>
+                    <TableHead>Kunde</TableHead>
+                    <TableHead>Beschreibung</TableHead>
+                    <TableHead>Bemerkungen</TableHead>
+                    <TableHead>Kundenref.</TableHead>
+                </TableRow>
+                </TableHeader>
+                <TableBody>
+                <TableRow>
+                    <TableCell colSpan={8} className="text-center text-muted-foreground">
+                    Keine Touren für den ausgewählten Zeitraum.
+                    </TableCell>
+                </TableRow>
+                </TableBody>
+            </Table>
+            </CardContent>
+        </Card>
+        <CreateTourModal onTourCreated={() => setIsModalOpen(false)}/>
+      </Dialog>
+
 
       <Card>
         <CardHeader>
