@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -11,6 +12,8 @@ import { Button } from '@/components/ui/button';
 import { Save } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
 import { LabelWithTooltip } from '../ui/label-with-tooltip';
+
+const DB_SETTINGS_STORAGE_KEY = 'fahrerchecklisteDbSettings_v1';
 
 const sqliteSchema = z.object({
   dbType: z.literal('sqlite'),
@@ -55,14 +58,33 @@ export function DatabaseSettingsForm() {
     },
   });
 
+  useEffect(() => {
+    try {
+      const storedSettings = localStorage.getItem(DB_SETTINGS_STORAGE_KEY);
+      if (storedSettings) {
+        const parsedSettings = JSON.parse(storedSettings);
+        form.reset(parsedSettings);
+      }
+    } catch (error) {
+      console.error("Could not access localStorage for DB settings", error);
+    }
+  }, [form]);
+
   const onSubmit = (data: DbSettingsFormValues) => {
-    console.log("Saving database settings:", data);
-    // Here you would typically save the settings to a secure backend or config file.
-    // For this prototype, we'll just show a toast.
-    toast({
-      title: "Einstellungen gespeichert",
-      description: "Die Datenbankverbindung wurde erfolgreich konfiguriert.",
-    });
+    try {
+      localStorage.setItem(DB_SETTINGS_STORAGE_KEY, JSON.stringify(data));
+      toast({
+        title: "Einstellungen gespeichert",
+        description: "Die Datenbankverbindung wurde erfolgreich konfiguriert.",
+      });
+    } catch (error) {
+       console.error("Could not write DB settings to localStorage", error);
+       toast({
+        variant: "destructive",
+        title: "Fehler beim Speichern",
+        description: "Die Datenbankeinstellungen konnten nicht gespeichert werden.",
+      });
+    }
   };
 
   const dbType = form.watch('dbType');

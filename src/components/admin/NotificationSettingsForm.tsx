@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -12,6 +13,8 @@ import { Save, Mail, MessageSquare, Globe } from 'lucide-react';
 import { LabelWithTooltip } from '../ui/label-with-tooltip';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '../ui/card';
 import { Textarea } from '../ui/textarea';
+
+const NOTIFICATION_SETTINGS_STORAGE_KEY = 'fahrerchecklisteNotificationSettings_v1';
 
 const notificationSettingsSchema = z.object({
   emails: z.string().optional(),
@@ -33,13 +36,33 @@ export function NotificationSettingsForm() {
     },
   });
 
+  useEffect(() => {
+    try {
+      const storedSettings = localStorage.getItem(NOTIFICATION_SETTINGS_STORAGE_KEY);
+      if (storedSettings) {
+        const parsedSettings = JSON.parse(storedSettings);
+        form.reset(parsedSettings);
+      }
+    } catch (error) {
+      console.error("Could not access localStorage for notification settings", error);
+    }
+  }, [form]);
+
   const onSubmit = (data: NotificationSettingsFormValues) => {
-    console.log("Saving notification settings:", data);
-    // In a real app, you would save these settings to your backend.
-    toast({
-      title: "Einstellungen gespeichert",
-      description: "Die Benachrichtigungseinstellungen wurden erfolgreich aktualisiert.",
-    });
+    try {
+      localStorage.setItem(NOTIFICATION_SETTINGS_STORAGE_KEY, JSON.stringify(data));
+      toast({
+        title: "Einstellungen gespeichert",
+        description: "Die Benachrichtigungseinstellungen wurden erfolgreich aktualisiert.",
+      });
+    } catch(error) {
+        console.error("Could not write notification settings to localStorage", error);
+        toast({
+            variant: "destructive",
+            title: "Fehler beim Speichern",
+            description: "Die Benachrichtigungseinstellungen konnten nicht gespeichert werden.",
+        });
+    }
   };
 
   return (
