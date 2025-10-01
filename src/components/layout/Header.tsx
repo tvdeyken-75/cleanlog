@@ -348,6 +348,7 @@ export function Header() {
      return { head, body };
   }
 
+  const headerTitle = activeRole === 'disponent' ? 'AmbientTMS' : 'Fahrercheckliste';
 
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-card">
@@ -356,7 +357,7 @@ export function Header() {
             <DialogTrigger asChild>
               <button className="mr-6 flex items-center space-x-2">
                   <Truck className="h-6 w-6 text-primary" />
-                  <span className="inline-block font-bold font-headline text-xl">Fahrercheckliste</span>
+                  <span className="inline-block font-bold font-headline text-xl">{headerTitle}</span>
               </button>
             </DialogTrigger>
           
