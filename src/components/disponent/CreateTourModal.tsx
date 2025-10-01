@@ -9,7 +9,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useProtocols } from "@/hooks/useProtocols";
 import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
-import { format } from "date-fns";
+import { format, setHours, setMinutes } from "date-fns";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -51,12 +51,14 @@ const tourSchema = z.object({
   description: z.string().optional(),
   remarks: z.string().optional(),
   customerRef: z.string().optional(),
+  start_time: z.date().optional(),
+  end_time: z.date().optional(),
   // Tourfinanzen fields
   rohertrag: z.coerce.number().optional(),
   anSub: z.coerce.number().optional(),
   km: z.coerce.number().optional(),
   df: z.coerce.number().optional(),
-  maut: z.coerce.number().optional(),
+maut: z.coerce.number().optional(),
   rechnungsnummer: z.string().optional(),
   rechnungRaus: z.boolean().optional(),
   bezahlt: z.boolean().optional(),
@@ -104,6 +106,8 @@ export function CreateTourModal({ onTourCreated }: CreateTourModalProps) {
       description: "",
       remarks: "",
       customerRef: "",
+      start_time: undefined,
+      end_time: undefined,
       rohertrag: undefined,
       anSub: undefined,
       km: undefined,
@@ -143,6 +147,60 @@ export function CreateTourModal({ onTourCreated }: CreateTourModalProps) {
       tourNr: getNextTourNumber(), // update tour number for next form
     });
   }
+
+  const DateTimePicker = ({ field, label, tooltipText }: { field: any, label: string, tooltipText: string }) => {
+    const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const time = e.target.value;
+        const [hours, minutes] = time.split(':').map(Number);
+        const newDate = setMinutes(setHours(field.value || new Date(), hours), minutes);
+        field.onChange(newDate);
+    }
+    
+    return (
+        <FormItem>
+            <LabelWithTooltip tooltipText={tooltipText} className="flex items-center gap-2"><CalendarIcon className="w-4 h-4" />{label}</LabelWithTooltip>
+            <div className="flex gap-2">
+                <Popover>
+                    <PopoverTrigger asChild>
+                    <FormControl>
+                        <Button
+                        variant={"outline"}
+                        className={cn("w-[240px] pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
+                        >
+                        {field.value ? format(field.value, "PPP") : <span>Datum wählen</span>}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                    </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={(date) => {
+                            if (!date) return;
+                            const currentHours = field.value ? new Date(field.value).getHours() : 0;
+                            const currentMinutes = field.value ? new Date(field.value).getMinutes() : 0;
+                            const newDate = setMinutes(setHours(date, currentHours), currentMinutes);
+                            field.onChange(newDate);
+                        }}
+                        initialFocus
+                    />
+                    </PopoverContent>
+                </Popover>
+                 <FormControl>
+                    <Input
+                        type="time"
+                        value={field.value ? format(new Date(field.value), 'HH:mm') : ''}
+                        onChange={handleTimeChange}
+                        className="w-[120px]"
+                    />
+                </FormControl>
+            </div>
+            <FormMessage />
+        </FormItem>
+    );
+};
+
 
   return (
     <DialogContent className="sm:max-w-4xl">
@@ -269,6 +327,16 @@ export function CreateTourModal({ onTourCreated }: CreateTourModalProps) {
                                         <FormMessage />
                                     </FormItem>
                                     )}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="start_time"
+                                    render={({ field }) => <DateTimePicker field={field} label="Startzeit" tooltipText="Startdatum und -uhrzeit der Tour" />}
+                                />
+                                <FormField
+                                    control={form.control}
+                                    name="end_time"
+                                    render={({ field }) => <DateTimePicker field={field} label="Endzeit" tooltipText="Enddatum und -uhrzeit der Tour" />}
                                 />
                             </div>
                         </CollapsibleContent>

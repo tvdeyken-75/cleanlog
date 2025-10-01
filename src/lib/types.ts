@@ -32,6 +32,8 @@ export interface Tour {
   description?: string;
   remarks?: string;
   customerRef?: string;
+  start_time?: Date;
+  end_time?: Date;
   rohertrag?: number;
   anSub?: number;
   km?: number;
