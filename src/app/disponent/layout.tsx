@@ -118,7 +118,9 @@ export default function DisponentLayout({
                          <div className="md:hidden mb-4">
                             <SidebarTrigger />
                         </div>
-                        {children}
+                        <div className="max-w-7xl mx-auto w-full">
+                          {children}
+                        </div>
                     </main>
                 </SidebarInset>
             </div>
