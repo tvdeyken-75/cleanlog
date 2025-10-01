@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import type { Protocol, Photo, LoadingProtocol } from "@/lib/types";
+import type { Protocol, Photo, LoadingProtocol, DeliveryProtocol } from "@/lib/types";
 import { getProtocolTitle } from "@/lib/utils";
 import { File } from "lucide-react";
 
@@ -125,6 +125,8 @@ export function ProtocolDetailsDialog({ protocol, isOpen, onClose }: ProtocolDet
   }
 
   const photos = (protocol as any).photos || (protocol as any).documents;
+  
+  const deliveryProtocol = protocol.type === 'delivery' ? protocol as DeliveryProtocol : null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -138,6 +140,13 @@ export function ProtocolDetailsDialog({ protocol, isOpen, onClose }: ProtocolDet
         <ScrollArea className="max-h-[70vh] pr-6">
             <div className="space-y-4">
                 {renderDetails()}
+                {deliveryProtocol && (deliveryProtocol.pallets || deliveryProtocol.crates) && (
+                    <>
+                        <h4 className="font-semibold text-md mt-4 pt-4 border-t">Leergut Lieferung</h4>
+                        <DetailItem label="Gelieferte Paletten" value={deliveryProtocol.pallets} />
+                        <DetailItem label="Gelieferte Kisten/Boxen" value={deliveryProtocol.crates} />
+                    </>
+                )}
                 {'contamination_details' in protocol && protocol.contamination_details && (
                    <DetailItem label="Kontamination Details" value={<pre className="text-xs whitespace-pre-wrap">{JSON.stringify(protocol.contamination_details, null, 2)}</pre>} />
                 )}
@@ -151,3 +160,5 @@ export function ProtocolDetailsDialog({ protocol, isOpen, onClose }: ProtocolDet
     </Dialog>
   );
 }
+
+    

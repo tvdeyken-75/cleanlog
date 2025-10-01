@@ -27,7 +27,7 @@ import { Slider } from '../ui/slider';
 import { Switch } from '../ui/switch';
 
 import { LocationInput } from './LocationInput';
-import { ArrowLeft, Truck, Thermometer, MapPin, CircleCheck, Lock, Award, PackageCheck, MessageSquare, Timer, CalendarClock, ChevronsUpDown, PackageSearch, Camera, Trash2, File, Upload, Gauge } from 'lucide-react';
+import { ArrowLeft, Truck, Thermometer, MapPin, CircleCheck, Lock, Award, PackageCheck, MessageSquare, Timer, CalendarClock, ChevronsUpDown, PackageSearch, Camera, Trash2, File, Upload, Gauge, Layers, Box, Undo2 } from 'lucide-react';
 import { LabelWithTooltip } from '../ui/label-with-tooltip';
 
 
@@ -46,6 +46,8 @@ const deliveryProtocolFormSchema = z.object({
   cargo_area_closed: z.boolean().default(false),
   has_seal: z.boolean().default(false),
   photos: z.array(photoSchema).optional(),
+  pallets: z.coerce.number().optional(),
+  crates: z.coerce.number().optional(),
 });
 
 type DeliveryProtocolFormValues = z.infer<typeof deliveryProtocolFormSchema>;
@@ -58,6 +60,7 @@ export function DeliveryProtocolForm() {
   const { toast } = useToast();
   const [currentTime, setCurrentTime] = useState("");
   const [isTourInfoOpen, setIsTourInfoOpen] = useState(false);
+  const [isEmptiesOpen, setIsEmptiesOpen] = useState(false);
   const [isPhotoDocOpen, setIsPhotoDocOpen] = useState(false);
   
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -78,6 +81,8 @@ export function DeliveryProtocolForm() {
       cargo_area_closed: false,
       has_seal: false,
       photos: [],
+      pallets: undefined,
+      crates: undefined,
     }
   });
 
@@ -323,6 +328,46 @@ export function DeliveryProtocolForm() {
           </CardContent>
         </Card>
         
+        <Collapsible open={isEmptiesOpen} onOpenChange={setIsEmptiesOpen}>
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between cursor-pointer">
+                    <CardTitle className="flex items-center gap-2"><Undo2 className="text-primary"/>Leergut Lieferung (optional)</CardTitle>
+                    <CollapsibleTrigger asChild>
+                        <Button variant="ghost" size="sm">
+                            <ChevronsUpDown className="h-4 w-4" />
+                            <span className="sr-only">Toggle</span>
+                        </Button>
+                    </CollapsibleTrigger>
+                </CardHeader>
+                <CollapsibleContent>
+                    <CardContent className="grid md:grid-cols-2 gap-6 pt-4">
+                        <FormField
+                            control={form.control}
+                            name="pallets"
+                            render={({ field }) => (
+                            <FormItem>
+                                <LabelWithTooltip tooltipText="Anzahl der gelieferten Paletten" className="flex items-center gap-2"><Layers className='h-4 w-4' />Anzahl Paletten</LabelWithTooltip>
+                                <FormControl><Input type="number" {...field} placeholder="z.B. 10" /></FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                        <FormField
+                            control={form.control}
+                            name="crates"
+                            render={({ field }) => (
+                            <FormItem>
+                                <LabelWithTooltip tooltipText="Anzahl der gelieferten Kisten oder Boxen" className="flex items-center gap-2"><Box className='h-4 w-4' />Anzahl Kisten/Boxen</LabelWithTooltip>
+                                <FormControl><Input type="number" {...field} placeholder="z.B. 200" /></FormControl>
+                                <FormMessage />
+                            </FormItem>
+                            )}
+                        />
+                    </CardContent>
+                </CollapsibleContent>
+            </Card>
+        </Collapsible>
+
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2"><Truck className="text-primary"/>Laderaum-Check</CardTitle>

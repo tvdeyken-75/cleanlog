@@ -111,6 +111,8 @@ export interface DeliveryProtocol extends BaseProtocol {
     has_seal: boolean;
     cargo_area_temperature: number;
     photos?: Photo[];
+    pallets?: number;
+    crates?: number;
 }
 
 export type EmergencyType = 'vehicle-damage' | 'goods-blocked' | 'personal-injury' | 'delay' | 'break-in' | 'health-incident' | 'breakdown' | 'other';
@@ -159,3 +161,6 @@ export type Protocol = CleaningProtocol | FuelProtocol | PauseProtocol | Loading
 
 
 
+
+
+    

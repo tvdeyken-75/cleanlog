@@ -306,6 +306,8 @@ export function Header() {
                 ['Siegel vorhanden', protocol.has_seal ? 'Ja' : 'Nein'],
                 ['Nachricht', protocol.message || 'Keine'],
             ];
+            if (protocol.pallets) body.push(['Gelieferte Paletten', protocol.pallets]);
+            if (protocol.crates) body.push(['Gelieferte Kisten', protocol.crates]);
             break;
         case 'emergency':
              body = [
@@ -406,3 +408,5 @@ export function Header() {
     </header>
   );
 }
+
+    
