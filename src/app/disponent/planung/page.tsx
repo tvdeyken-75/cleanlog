@@ -7,16 +7,51 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DollarSign, Calendar as CalendarIcon, CalendarRange, Truck } from 'lucide-react';
 import { useState } from 'react';
 import { de } from 'date-fns/locale';
+import { format, getWeek } from 'date-fns';
+
+type ViewMode = 'week' | 'day';
 
 export default function PlanungPage() {
-  const [date, setDate] = useState<Date | undefined>(new Date())
+  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [selectedWeek, setSelectedWeek] = useState<number>(getWeek(new Date(), { locale: de }));
+  const [viewMode, setViewMode] = useState<ViewMode>('day');
+
+  const handleDayClick = (day: Date | undefined) => {
+    setDate(day);
+    setViewMode('day');
+  }
+
+  const handleWeekClick = (weekNumber: number, week: Date[]) => {
+    setSelectedWeek(weekNumber);
+    setDate(week[0]); // Set date to the first day of the clicked week
+    setViewMode('week');
+  }
+
+  const getDynamicTitle = () => {
+    if (viewMode === 'week') {
+      return `Wochenkalender (KW ${selectedWeek})`;
+    }
+    if (date) {
+      return `Tageskalender (${format(date, 'PPP', { locale: de })})`;
+    }
+    return 'Kalender';
+  }
+  
+  const getDynamicContent = () => {
+    if (viewMode === 'week') {
+      return `Touren für Kalenderwoche ${selectedWeek} werden hier angezeigt.`;
+    }
+    if (date) {
+      return `Touren für ${format(date, 'PPP', { locale: de })} werden hier angezeigt.`;
+    }
+    return "Wählen Sie einen Tag oder eine Woche aus.";
+  }
 
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold font-headline">Tourenplanung</h1>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Top-left: Calendar */}
         <div className="lg:col-span-1">
           <Card>
             <CardHeader>
@@ -29,7 +64,9 @@ export default function PlanungPage() {
               <Calendar
                 mode="single"
                 selected={date}
-                onSelect={setDate}
+                onSelect={handleDayClick}
+                onWeekClick={handleWeekClick}
+                showWeekNumber
                 className="rounded-md"
                 locale={de}
               />
@@ -37,25 +74,23 @@ export default function PlanungPage() {
           </Card>
         </div>
 
-        {/* Top-right: Week Calendar */}
         <div className="lg:col-span-2">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CalendarRange className="h-5 w-5 text-primary" />
-                Wochenkalender
+                {getDynamicTitle()}
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="h-64 flex items-center justify-center bg-muted rounded-md">
-                <p className="text-muted-foreground">Wochenkalender-Ansicht kommt hier hin.</p>
+                <p className="text-muted-foreground">{getDynamicContent()}</p>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
 
-      {/* Middle: Table */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -86,7 +121,6 @@ export default function PlanungPage() {
         </CardContent>
       </Card>
 
-      {/* Bottom: Tour Finances */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
