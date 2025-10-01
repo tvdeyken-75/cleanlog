@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useState } from "react";
 import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol, LoadingProtocol, DeliveryProtocol, EmergencyProtocol, MaintenanceProtocol, ExpenseProtocol } from "@/lib/types";
 import {
   Table,
@@ -12,7 +13,11 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Truck, AlertTriangle, CheckCircle2, Droplets, Fuel, Coffee, PackagePlus, PackageCheck, Siren, Camera, Wrench, Euro } from "lucide-react";
+import { Truck, AlertTriangle, CheckCircle2, Droplets, Fuel, Coffee, PackagePlus, PackageCheck, Siren, Camera, Wrench, Euro, Eye, Send } from "lucide-react";
+import { Button } from "../ui/button";
+import { ProtocolDetailsDialog } from "./ProtocolDetailsDialog";
+import { useToast } from "@/hooks/use-toast";
+import { formatProtocolForSharing } from "@/lib/utils";
 
 interface ProtocolsTableProps {
   protocols: Protocol[];
@@ -206,6 +211,46 @@ const renderProtocolDetails = (protocol: Protocol) => {
 
 
 export function ProtocolsTable({ protocols, isLoading }: ProtocolsTableProps) {
+  const [selectedProtocol, setSelectedProtocol] = useState<Protocol | null>(null);
+  const { toast } = useToast();
+
+  const handleSend = async (protocol: Protocol) => {
+    if (!navigator.share) {
+      toast({
+        variant: "destructive",
+        title: "Nicht unterstützt",
+        description: "Ihr Browser unterstützt die Web Share API nicht. Bitte verwenden Sie eine andere Methode, um die Daten zu senden.",
+      });
+      return;
+    }
+
+    try {
+      const { title, text, files } = formatProtocolForSharing(protocol);
+
+      if (navigator.canShare && navigator.canShare({ files })) {
+        await navigator.share({ title, text, files });
+      } else {
+        await navigator.share({ title, text });
+      }
+
+      toast({
+        title: "Protokoll geteilt",
+        description: "Das Protokoll wurde zum Teilen vorbereitet.",
+      });
+    } catch (error) {
+      // Ignore abort errors from the user cancelling the share
+      if ((error as DOMException).name !== 'AbortError') {
+        console.error("Fehler beim Teilen:", error);
+        toast({
+          variant: "destructive",
+          title: "Fehler",
+          description: "Das Protokoll konnte nicht geteilt werden.",
+        });
+      }
+    }
+  };
+
+
   if (isLoading) {
     return (
       <div className="p-6">
@@ -258,9 +303,10 @@ export function ProtocolsTable({ protocols, isLoading }: ProtocolsTableProps) {
     }
   }
 
-  const sortedProtocols = [...protocols].sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
+  const sortedProtocols = [...protocols].sort((a, b) => new Date(a.end_time).getTime() - new Date(b.end_time).getTime());
 
   return (
+    <>
     <div className="relative w-full overflow-auto">
       <Table>
         <TableHeader>
@@ -269,7 +315,8 @@ export function ProtocolsTable({ protocols, isLoading }: ProtocolsTableProps) {
             <TableHead>Fahrzeug</TableHead>
             <TableHead>Details</TableHead>
             <TableHead className="text-center">Status/Ergebnis</TableHead>
-            <TableHead className="text-right">Datum</TableHead>
+            <TableHead>Datum</TableHead>
+            <TableHead className="text-right">Aktionen</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -290,10 +337,30 @@ export function ProtocolsTable({ protocols, isLoading }: ProtocolsTableProps) {
                   year: 'numeric',
                 })}
               </TableCell>
+               <TableCell className="text-right">
+                <div className="flex justify-end gap-1">
+                  <Button variant="ghost" size="icon" onClick={() => setSelectedProtocol(protocol)}>
+                    <Eye className="h-4 w-4" />
+                    <span className="sr-only">Details ansehen</span>
+                  </Button>
+                  <Button variant="ghost" size="icon" onClick={() => handleSend(protocol)}>
+                    <Send className="h-4 w-4" />
+                    <span className="sr-only">Senden</span>
+                  </Button>
+                </div>
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
     </div>
+    {selectedProtocol && (
+        <ProtocolDetailsDialog 
+            protocol={selectedProtocol}
+            isOpen={!!selectedProtocol}
+            onClose={() => setSelectedProtocol(null)}
+        />
+    )}
+    </>
   );
 }
