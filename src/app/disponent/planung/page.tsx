@@ -3,12 +3,13 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DollarSign, Calendar as CalendarIcon, Search, Truck } from 'lucide-react';
+import { DollarSign, Calendar as CalendarIcon, Search, Truck, PlusCircle } from 'lucide-react';
 import { useState } from 'react';
 import { de } from 'date-fns/locale';
 import { getWeek, getYear, eachWeekOfInterval, format, eachDayOfInterval, startOfWeek, endOfWeek } from 'date-fns';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 export default function PlanungPage() {
   const currentYear = getYear(new Date());
@@ -110,11 +111,15 @@ export default function PlanungPage() {
       </Card>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Truck className="h-5 w-5 text-primary" />
             Tourenübersicht
           </CardTitle>
+          <Button size="sm">
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Tour erstellen
+          </Button>
         </CardHeader>
         <CardContent>
           <Table>
@@ -155,4 +160,3 @@ export default function PlanungPage() {
     </div>
   );
 }
-
