@@ -16,7 +16,7 @@ import type { Photo } from '@/lib/types';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -303,20 +303,16 @@ export function ProtocolForm() {
                         <SelectTrigger><SelectValue placeholder="Wählen Sie eine Art" /></SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="Tägliche Reinigung">
-                            <div>Tägliche Reinigung</div>
-                            <div className="text-xs text-muted-foreground">Ежедневная уборка</div>
-                        </SelectItem>
-                        <SelectItem value="Reinigung nach None Food Fahrt">
-                            <div>Reinigung nach None Food Fahrt</div>
-                            <div className="text-xs text-muted-foreground">Уборка после перевозки непродовольственных товаров</div>
-                        </SelectItem>
-                        <SelectItem value="Außenreinigung">
-                            <div>Außenreinigung</div>
-                            <div className="text-xs text-muted-foreground">Внешняя мойка</div>
-                        </SelectItem>
+                        <SelectItem value="Tägliche Reinigung">Tägliche Reinigung</SelectItem>
+                        <SelectItem value="Reinigung nach None Food Fahrt">Reinigung nach None Food Fahrt</SelectItem>
+                        <SelectItem value="Außenreinigung">Außenreinigung</SelectItem>
                       </SelectContent>
                     </Select>
+                    <FormDescription className="text-xs text-muted-foreground">
+                      Tägliche Reinigung: Ежедневная уборка<br/>
+                      Reinigung nach None Food Fahrt: Уборка после перевозки непродовольственных товаров<br/>
+                      Außenreinigung: Внешняя мойка
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
