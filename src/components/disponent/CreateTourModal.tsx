@@ -22,7 +22,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
@@ -217,7 +216,7 @@ export function CreateTourModal({ onTourCreated }: CreateTourModalProps) {
                 name="remarks"
                 render={({ field }) => (
                 <FormItem className="md:col-span-2">
-                    <LabelWithTooltip tooltipText="Interne Bemerkungen zur Tour" className="flex items-center gap-2"><MessageSquare className="w-4 h-4" />Bemerkungen</fLabelWithTooltip>
+                    <LabelWithTooltip tooltipText="Interne Bemerkungen zur Tour" className="flex items-center gap-2"><MessageSquare className="w-4 h-4" />Bemerkungen</LabelWithTooltip>
                     <FormControl>
                         <Textarea placeholder="Besonderheiten oder Anweisungen" {...field} />
                     </FormControl>
