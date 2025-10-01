@@ -6,6 +6,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { DollarSign, Calendar as CalendarIcon, CalendarRange, Truck } from 'lucide-react';
 import { useState } from 'react';
+import { de } from 'date-fns/locale';
 
 export default function PlanungPage() {
   const [date, setDate] = useState<Date | undefined>(new Date())
@@ -30,7 +31,7 @@ export default function PlanungPage() {
                 selected={date}
                 onSelect={setDate}
                 className="rounded-md"
-                locale="de"
+                locale={de}
               />
             </CardContent>
           </Card>
