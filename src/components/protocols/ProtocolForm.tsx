@@ -24,11 +24,13 @@ import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 
 import { LocationInput } from './LocationInput';
-import { ArrowLeft, Sparkles, Truck, ClipboardList, Thermometer, Droplets, MapPin, AlertTriangle, CircleCheck, CalendarClock, ChevronsUpDown, Camera, Upload, Trash2, File, Gauge } from 'lucide-react';
+import { ArrowLeft, Sparkles, Truck, ClipboardList, Thermometer, Droplets, MapPin, AlertTriangle, CircleCheck, CalendarClock, ChevronsUpDown, Camera, Upload, Trash2, File, Gauge, Info } from 'lucide-react';
 import { LabelWithTooltip } from '../ui/label-with-tooltip';
+import { Hygieneplan } from './Hygieneplan';
 
 const contaminationTypes = [
   { id: 'chemical', label: 'Chemisch (Reinigungsmittelrückstand)' },
@@ -289,7 +291,7 @@ export function ProtocolForm() {
             <CardTitle className="flex items-center gap-2"><Sparkles className="text-primary"/>Reinigungsdetails</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-2 gap-6 items-start">
               <FormField
                 control={form.control}
                 name="cleaning_type"
@@ -310,26 +312,44 @@ export function ProtocolForm() {
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="cleaning_products"
-                render={({ field }) => (
-                  <FormItem>
-                    <LabelWithTooltip tooltipText="Используемые чистящие/дезинфицирующие средства">Verwendete Reinigungs-/Desinfektionsmittel</LabelWithTooltip>
-                     <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger><SelectValue placeholder="Wählen Sie ein Mittel" /></SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="Bio Tec BTS 3100 (6%) für Laderaum">Bio Tec BTS 3100 (6%) für Laderaum</SelectItem>
-                          <SelectItem value="Dreiphar Truck & Pflege für Karosserie">Dreiphar Truck & Pflege für Karosserie</SelectItem>
-                          <SelectItem value="sonstiges">Sonstiges</SelectItem>
-                        </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className='space-y-2'>
+                <FormField
+                  control={form.control}
+                  name="cleaning_products"
+                  render={({ field }) => (
+                    <FormItem>
+                      <LabelWithTooltip tooltipText="Используемые чистящие/дезинфицирующие средства">Verwendete Reinigungs-/Desinfektionsmittel</LabelWithTooltip>
+                       <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger><SelectValue placeholder="Wählen Sie ein Mittel" /></SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="Bio Tec BTS 3100 (6%) für Laderaum">Bio Tec BTS 3100 (6%) für Laderaum</SelectItem>
+                            <SelectItem value="Dreiphar Truck & Pflege für Karosserie">Dreiphar Truck & Pflege für Karosserie</SelectItem>
+                            <SelectItem value="sonstiges">Sonstiges</SelectItem>
+                          </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                 {watchCleaningProducts === 'Bio Tec BTS 3100 (6%) für Laderaum' && (
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" size="sm" className="text-xs">
+                          <Info className="mr-2 h-4 w-4" /> Hygieneplan anzeigen
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-4xl">
+                        <DialogHeader>
+                          <DialogTitle>Hygieneplan</DialogTitle>
+                        </DialogHeader>
+                        <Hygieneplan />
+                      </DialogContent>
+                    </Dialog>
+                  )}
+              </div>
+
             </div>
             {watchCleaningProducts === 'sonstiges' && (
               <FormField
@@ -589,8 +609,3 @@ export function ProtocolForm() {
     </Form>
   );
 }
-
-    
-
-    
-
