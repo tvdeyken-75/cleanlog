@@ -18,8 +18,12 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.replace('/login');
-    } else if (!authLoading && isAuthenticated && activeRole === 'driver' && !tourLoading && !activeTour && !isMaintenanceMode) {
-      router.replace('/tour-selection');
+    } else if (!authLoading && isAuthenticated) {
+        if (activeRole === 'driver' && !tourLoading && !activeTour && !isMaintenanceMode) {
+          router.replace('/tour-selection');
+        } else if (activeRole === 'disponent') {
+          router.replace('/disponent');
+        }
     }
   }, [authLoading, isAuthenticated, activeRole, tourLoading, activeTour, isMaintenanceMode, router]);
 

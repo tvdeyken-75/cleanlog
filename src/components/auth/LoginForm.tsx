@@ -96,6 +96,8 @@ export function LoginForm() {
     if (activeRole) {
       if (activeRole === 'admin') {
         router.push('/admin');
+      } else if (activeRole === 'disponent') {
+        router.push('/disponent');
       } else if (activeRole === 'driver') {
         router.push('/tour-selection');
       } else {
