@@ -253,7 +253,8 @@ const Sidebar = React.forwardRef<
           ref={sidebarRef}
           className={cn(
             "duration-200 fixed inset-y-0 z-10 hidden h-svh transition-[left,right,width] ease-linear md:flex",
-            "w-auto min-w-min",
+            "min-w-min",
+            "w-auto",
             side === "left"
               ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
               : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
@@ -352,6 +353,7 @@ const SidebarInset = React.forwardRef<
       ref={ref}
       className={cn(
         "relative flex min-h-svh flex-1 flex-col bg-background",
+        "duration-200 transition-[margin] ease-linear",
         "md:peer-data-[variant=sidebar]:ml-[var(--sidebar-width)]",
         "md:peer-data-[variant=floating]:ml-[var(--sidebar-width)]",
         "peer-data-[variant=inset]:min-h-[calc(100svh-theme(spacing.4))] md:peer-data-[variant=inset]:m-2 md:peer-data-[state=collapsed]:peer-data-[variant=inset]:ml-[calc(var(--sidebar-width-icon)+theme(spacing.4))] md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow transition-[margin-left]",
@@ -523,7 +525,7 @@ const SidebarMenu = React.forwardRef<
   <ul
     ref={ref}
     data-sidebar="menu"
-    className={cn("flex w-full min-w-0 flex-col gap-1 p-2", className)}
+    className={cn("flex w-full min-w-0 flex-col gap-1 px-2", className)}
     {...props}
   />
 ))
