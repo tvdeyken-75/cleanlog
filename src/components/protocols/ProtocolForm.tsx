@@ -303,9 +303,18 @@ export function ProtocolForm() {
                         <SelectTrigger><SelectValue placeholder="Wählen Sie eine Art" /></SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="Tägliche Reinigung">Tägliche Reinigung</SelectItem>
-                        <SelectItem value="Reinigung nach None Food Fahrt">Reinigung nach None Food Fahrt</SelectItem>
-                        <SelectItem value="Außenreinigung">Außenreinigung</SelectItem>
+                        <SelectItem value="Tägliche Reinigung">
+                            <div>Tägliche Reinigung</div>
+                            <div className="text-xs text-muted-foreground">Ежедневная уборка</div>
+                        </SelectItem>
+                        <SelectItem value="Reinigung nach None Food Fahrt">
+                            <div>Reinigung nach None Food Fahrt</div>
+                            <div className="text-xs text-muted-foreground">Уборка после перевозки непродовольственных товаров</div>
+                        </SelectItem>
+                        <SelectItem value="Außenreinigung">
+                            <div>Außenreinigung</div>
+                            <div className="text-xs text-muted-foreground">Внешняя мойка</div>
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -609,3 +618,5 @@ export function ProtocolForm() {
     </Form>
   );
 }
+
+    
