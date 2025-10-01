@@ -132,6 +132,8 @@ export default function PlanungPage() {
                 <TableHeader>
                 <TableRow>
                     <TableHead>Tour-Nr.</TableHead>
+                    <TableHead>Datum</TableHead>
+                    <TableHead>Anfangzeit</TableHead>
                     <TableHead>Fahrername</TableHead>
                     <TableHead>LKW</TableHead>
                     <TableHead>Auflieger</TableHead>
@@ -143,7 +145,7 @@ export default function PlanungPage() {
                 </TableHeader>
                 <TableBody>
                 <TableRow>
-                    <TableCell colSpan={8} className="text-center text-muted-foreground">
+                    <TableCell colSpan={10} className="text-center text-muted-foreground">
                     Keine Touren für den ausgewählten Zeitraum.
                     </TableCell>
                 </TableRow>
