@@ -25,7 +25,6 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 
-import { LocationInput } from './LocationInput';
 import { ArrowLeft, Truck, Thermometer, MapPin, CircleCheck, Lock, Award, PackageCheck, MessageSquare, Timer, CalendarClock, ChevronsUpDown, PackageSearch, Camera, Trash2, File, Upload, Gauge } from 'lucide-react';
 import { LabelWithTooltip } from '../ui/label-with-tooltip';
 
@@ -271,7 +270,7 @@ export function DeliveryProtocolForm() {
                 render={({ field }) => (
                 <FormItem>
                     <LabelWithTooltip tooltipText="Место доставки" className="flex items-center gap-2"><MapPin className="h-4 w-4"/>Ort der Lieferung</LabelWithTooltip>
-                    <FormControl><LocationInput value={field.value} onChange={field.onChange} /></FormControl>
+                    <FormControl><Input placeholder="z.B. Musterstraße 1, 12345 Musterstadt" {...field} /></FormControl>
                     <FormMessage />
                 </FormItem>
                 )}
@@ -439,3 +438,5 @@ export function DeliveryProtocolForm() {
     </Form>
   );
 }
+
+    

@@ -25,7 +25,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '../ui/textarea';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 
-import { LocationInput } from './LocationInput';
 import { ArrowLeft, Truck, Thermometer, MapPin, CircleCheck, Lock, Award, PackagePlus, Gauge, Timer, CalendarClock, ChevronsUpDown, Layers, Box, Camera, Upload, Trash2, File } from 'lucide-react';
 import { LabelWithTooltip } from '../ui/label-with-tooltip';
 
@@ -295,7 +294,7 @@ export function LoadingProtocolForm() {
               render={({ field }) => (
                 <FormItem>
                   <LabelWithTooltip tooltipText="Место погрузки" className="flex items-center gap-2"><MapPin className="h-4 w-4"/>Ort der Beladung</LabelWithTooltip>
-                  <FormControl><LocationInput value={field.value} onChange={field.onChange} /></FormControl>
+                  <FormControl><Input placeholder="z.B. Musterstraße 1, 12345 Musterstadt" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -594,3 +593,5 @@ export function LoadingProtocolForm() {
     </Form>
   );
 }
+
+    
