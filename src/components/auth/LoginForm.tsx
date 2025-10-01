@@ -74,7 +74,7 @@ export function LoginForm() {
                 name="username"
                 render={({ field }) => (
                     <FormItem>
-                        <LabelWithTooltip htmlFor="username" tooltipText="Имя пользователя">Benutzerkennung</LabelWithTooltip>
+                        <LabelWithTooltip htmlFor="username" tooltipText="Имя пользователя">Benutzername</LabelWithTooltip>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                                 <SelectTrigger id="username">
