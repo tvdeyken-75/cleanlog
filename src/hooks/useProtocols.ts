@@ -2,7 +2,7 @@
 
 "use client";
 import { useState, useEffect, useCallback } from 'react';
-import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol, LoadingProtocol, DeliveryProtocol, EmergencyProtocol, MaintenanceProtocol, ExpenseProtocol, Vehicle } from '@/lib/types';
+import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol, LoadingProtocol, DeliveryProtocol, EmergencyProtocol, MaintenanceProtocol, ExpenseProtocol, Vehicle, Tour } from '@/lib/types';
 
 type NewProtocolPayload = 
     Omit<CleaningProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | 
@@ -18,11 +18,13 @@ type ProtocolType = Protocol['type'];
 
 export function useProtocols(userId: string | null) {
   const [protocols, setProtocols] = useState<Protocol[]>([]);
+  const [tours, setTours] = useState<Tour[]>([]);
   const [vehicles, setVehicles] = useState<{truck: Vehicle[], trailer: Vehicle[]}>({ truck: [], trailer: [] });
   const [isLoading, setIsLoading] = useState(true);
 
   const getProtocolsStorageKey = useCallback(() => `fahrerchecklisteProtocols_v4_${userId}`, [userId]);
   const getVehiclesStorageKey = () => `fahrerchecklisteVehicles_v2`;
+  const getToursStorageKey = () => `fahrerchecklisteTours_v1`;
 
   useEffect(() => {
     // Load vehicles (global for all users)
@@ -33,6 +35,16 @@ export function useProtocols(userId: string | null) {
       }
     } catch (error) {
       console.error("Could not access localStorage for vehicles", error);
+    }
+    
+    // Load tours (global for all users)
+    try {
+        const storedTours = localStorage.getItem(getToursStorageKey());
+        if (storedTours) {
+            setTours(JSON.parse(storedTours));
+        }
+    } catch (error) {
+        console.error("Could not access localStorage for tours", error);
     }
 
     // Load protocols (user-specific)
@@ -64,6 +76,15 @@ export function useProtocols(userId: string | null) {
     } catch (error) {
         console.error("Could not write vehicles to localStorage", error);
     }
+  }
+
+  const saveTours = (newTours: Tour[]) => {
+      setTours(newTours);
+      try {
+          localStorage.setItem(getToursStorageKey(), JSON.stringify(newTours));
+      } catch(error) {
+          console.error("Could not write tours to localStorage", error);
+      }
   }
 
   const addProtocol = (newProtocol: NewProtocolPayload, type: ProtocolType) => {
@@ -108,6 +129,11 @@ export function useProtocols(userId: string | null) {
       return updatedProtocols;
     });
   };
+  
+  const addTour = (newTour: Tour) => {
+      const updatedTours = [...tours, newTour];
+      saveTours(updatedTours);
+  }
 
   const addVehicle = (type: 'truck' | 'trailer', newVehicle: Omit<Vehicle, 'active'>): boolean => {
     const currentVehicles = vehicles[type];
@@ -159,7 +185,5 @@ export function useProtocols(userId: string | null) {
     return [...new Set([...protocolPlates, ...adminPlateStrings])];
   };
 
-  return { protocols, addProtocol, isLoading, getUniqueLicensePlates, addVehicle, vehicles, updateVehicle, updateVehicleStatus };
+  return { protocols, addProtocol, isLoading, getUniqueLicensePlates, addVehicle, vehicles, updateVehicle, updateVehicleStatus, tours, addTour };
 }
-
-    

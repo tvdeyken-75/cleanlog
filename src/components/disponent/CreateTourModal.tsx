@@ -1,4 +1,5 @@
 
+
 "use client"
 
 import { useForm } from "react-hook-form";
@@ -7,7 +8,7 @@ import { z } from "zod";
 import { useAuth } from "@/context/AuthContext";
 import { useProtocols } from "@/hooks/useProtocols";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { Truck, User as UserIcon, Building, Briefcase, FileText, MessageSquare, Ticket, ChevronsUpDown, DollarSign, CalendarIcon } from 'lucide-react';
 import { cn } from "@/lib/utils";
+import { Tour } from "@/lib/types";
 
 
 const tourSchema = z.object({
@@ -69,13 +71,29 @@ interface CreateTourModalProps {
 export function CreateTourModal({ onTourCreated }: CreateTourModalProps) {
   const { toast } = useToast();
   const { getUsers, user } = useAuth();
-  const { vehicles } = useProtocols(user);
+  const { vehicles, addTour, tours } = useProtocols(user);
   const [isFinancesOpen, setIsFinancesOpen] = useState(false);
+  
+  const getNextTourNumber = () => {
+    if (!tours || tours.length === 0) {
+      return "T-00001";
+    }
+    const lastTour = tours.reduce((latest, current) => {
+      const latestNum = parseInt(latest.tourNr.split('-')[1]);
+      const currentNum = parseInt(current.tourNr.split('-')[1]);
+      return currentNum > latestNum ? current : latest;
+    });
+
+    const lastNumber = parseInt(lastTour.tourNr.split('-')[1]);
+    const nextNumber = lastNumber + 1;
+    return `T-${String(nextNumber).padStart(5, '0')}`;
+  };
+
 
   const form = useForm<TourFormValues>({
     resolver: zodResolver(tourSchema),
     defaultValues: {
-      tourNr: "",
+      tourNr: getNextTourNumber(),
       driver: "",
       truck: "",
       trailer: "",
@@ -95,6 +113,10 @@ export function CreateTourModal({ onTourCreated }: CreateTourModalProps) {
     },
   });
 
+  useEffect(() => {
+    form.setValue("tourNr", getNextTourNumber());
+  }, [tours, form]);
+
   const drivers = getUsers().filter(u => u.role.includes("driver"));
   const trucks = vehicles.truck.filter(v => v.active);
   const trailers = vehicles.trailer.filter(v => v.active);
@@ -107,13 +129,16 @@ export function CreateTourModal({ onTourCreated }: CreateTourModalProps) {
   const euroPerKm = km > 0 ? rohertrag / km : 0;
 
   function onSubmit(data: TourFormValues) {
-    console.log(data);
+    addTour(data as Tour);
     toast({
       title: "Tour erstellt",
       description: `Die Tour ${data.tourNr} wurde erfolgreich geplant.`,
     });
     onTourCreated();
-    form.reset();
+    form.reset({
+      ...form.getValues(), // keep other values if needed
+      tourNr: getNextTourNumber(), // update tour number for next form
+    });
   }
 
   return (
@@ -134,7 +159,7 @@ export function CreateTourModal({ onTourCreated }: CreateTourModalProps) {
                     <FormItem>
                         <LabelWithTooltip tooltipText="Eindeutige Nummer der Tour" className="flex items-center gap-2"><Ticket className="w-4 h-4" />Tour-Nr.</LabelWithTooltip>
                         <FormControl>
-                            <Input placeholder="z.B. 2024-001" {...field} />
+                            <Input placeholder="z.B. 2024-001" {...field} disabled />
                         </FormControl>
                         <FormMessage />
                     </FormItem>

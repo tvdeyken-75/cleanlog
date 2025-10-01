@@ -1,7 +1,5 @@
 
 
-
-
 export type UserRole = 'driver' | 'admin' | 'disponent' | 'geschaftsfuhrer' | 'buchhaltung' | 'qm_manager';
 
 export interface User {
@@ -26,9 +24,27 @@ export interface ContaminationDetails {
 export type ProtocolType = 'cleaning' | 'fuel' | 'pause' | 'loading' | 'delivery' | 'emergency' | 'maintenance' | 'expense';
 
 export interface Tour {
-  truck_license_plate: string;
-  trailer_license_plate: string;
-  transport_order: string;
+  tourNr: string;
+  driver: string;
+  truck: string;
+  trailer: string;
+  customer: string;
+  description?: string;
+  remarks?: string;
+  customerRef?: string;
+  rohertrag?: number;
+  anSub?: number;
+  km?: number;
+  df?: number;
+  maut?: number;
+  rechnungsnummer?: string;
+  rechnungRaus?: boolean;
+  bezahlt?: boolean;
+  bezahldatum?: Date;
+  // This is from the old tour type, might need to consolidate
+  transport_order?: string; 
+  truck_license_plate?: string;
+  trailer_license_plate?: string;
 }
 
 export interface Photo {
@@ -155,15 +171,3 @@ export interface ExpenseProtocol extends BaseProtocol {
 
 
 export type Protocol = CleaningProtocol | FuelProtocol | PauseProtocol | LoadingProtocol | DeliveryProtocol | EmergencyProtocol | MaintenanceProtocol | ExpenseProtocol;
-
-
-    
-
-    
-
-
-
-
-
-
-    
