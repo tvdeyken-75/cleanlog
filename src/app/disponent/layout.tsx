@@ -119,9 +119,7 @@ export default function DisponentLayout({
                          <div className="md:hidden p-4">
                             <SidebarTrigger />
                         </div>
-                        <div className="p-4 md:p-6">
-                          {children}
-                        </div>
+                        {children}
                     </main>
                 </SidebarInset>
             </div>

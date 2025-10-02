@@ -74,7 +74,7 @@ export default function PlanungPage() {
 
 
   return (
-    <div className="space-y-6">
+    <div className="p-4 md:p-6 space-y-6">
       <h1 className="text-3xl font-bold font-headline">Tourenplanung</h1>
       
       <Card>
