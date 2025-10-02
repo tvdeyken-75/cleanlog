@@ -10,7 +10,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { LayoutDashboard, Menu } from "lucide-react";
+import { LayoutDashboard, Menu, Truck } from "lucide-react";
+import Link from 'next/link';
 
 export function DisponentDashboard() {
   return (
@@ -30,10 +31,18 @@ export function DisponentDashboard() {
             <DialogTitle>Menü</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-2">
-            <Button variant="ghost" className="justify-start">
-              <LayoutDashboard className="mr-2 h-4 w-4" />
-              Dashboard
-            </Button>
+            <Link href="/disponent" passHref>
+                <Button variant="ghost" className="w-full justify-start">
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    Dashboard
+                </Button>
+            </Link>
+            <Link href="/disponent/planung" passHref>
+                 <Button variant="ghost" className="w-full justify-start">
+                    <Truck className="mr-2 h-4 w-4" />
+                    Tourplanung
+                </Button>
+            </Link>
           </div>
         </DialogContent>
       </Dialog>
