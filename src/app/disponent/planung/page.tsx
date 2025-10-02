@@ -78,15 +78,15 @@ export default function PlanungPage() {
       <h1 className="text-3xl font-bold font-headline">Tourenplanung</h1>
       
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+        <CardHeader className="p-4">
+          <CardTitle className="flex items-center gap-2 text-lg">
             <CalendarIcon className="h-5 w-5 text-primary" />
             Filter
           </CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="space-y-2">
-                <label className="text-sm font-medium">Jahr</label>
+        <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+            <div className="flex items-center gap-2">
+                <label className="text-sm font-medium shrink-0">Jahr</label>
                 <Select
                     onValueChange={(value) => {
                         const year = parseInt(value, 10);
@@ -96,7 +96,7 @@ export default function PlanungPage() {
                     }}
                     defaultValue={selectedYear.toString()}
                 >
-                    <SelectTrigger>
+                    <SelectTrigger className="h-8">
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -104,13 +104,13 @@ export default function PlanungPage() {
                     </SelectContent>
                 </Select>
             </div>
-            <div className="space-y-2">
-                <label className="text-sm font-medium">Woche</label>
+            <div className="flex items-center gap-2">
+                <label className="text-sm font-medium shrink-0">Woche</label>
                 <Select
                     onValueChange={(value) => setSelectedWeek(parseInt(value, 10))}
                     value={selectedWeek.toString()}
                 >
-                    <SelectTrigger>
+                    <SelectTrigger className="h-8">
                         <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -118,10 +118,10 @@ export default function PlanungPage() {
                     </SelectContent>
                 </Select>
             </div>
-            <div className="space-y-2">
-                <label className="text-sm font-medium">Tag</label>
+            <div className="flex items-center gap-2">
+                <label className="text-sm font-medium shrink-0">Tag</label>
                  <Select>
-                    <SelectTrigger>
+                    <SelectTrigger className="h-8">
                         <SelectValue placeholder="Tag auswählen" />
                     </SelectTrigger>
                     <SelectContent>
@@ -133,12 +133,9 @@ export default function PlanungPage() {
                     </SelectContent>
                 </Select>
             </div>
-            <div className="space-y-2">
-                 <label className="text-sm font-medium">Suche</label>
-                 <div className="relative">
-                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                    <Input placeholder="Tour, Fahrer, Fahrzeug..." className="pl-8" />
-                 </div>
+            <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input placeholder="Tour, Fahrer, Fahrzeug..." className="pl-8 h-8" />
             </div>
         </CardContent>
       </Card>
@@ -207,14 +204,14 @@ export default function PlanungPage() {
       </Card>
 
       <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+        <CardHeader className="p-4">
+          <CardTitle className="flex items-center gap-2 text-lg">
             <DollarSign className="h-5 w-5 text-primary" />
             Tourfinanzen
           </CardTitle>
         </CardHeader>
-        <CardContent>
-           <div className="h-40 flex items-center justify-center bg-muted rounded-md">
+        <CardContent className="p-4">
+           <div className="h-20 flex items-center justify-center bg-muted rounded-md">
                 <p className="text-muted-foreground">Finanzübersicht der Touren kommt hier hin.</p>
             </div>
         </CardContent>
