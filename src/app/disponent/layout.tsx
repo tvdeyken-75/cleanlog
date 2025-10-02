@@ -115,12 +115,10 @@ export default function DisponentLayout({
                     </SidebarContent>
                 </Sidebar>
                 <SidebarInset>
-                    <main className="flex-1">
-                         <div className="md:hidden p-4">
-                            <SidebarTrigger />
-                        </div>
-                        {children}
-                    </main>
+                    <div className="md:hidden p-4">
+                        <SidebarTrigger />
+                    </div>
+                    {children}
                 </SidebarInset>
             </div>
         </div>
