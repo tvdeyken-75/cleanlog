@@ -362,7 +362,7 @@ export function Header() {
           {isAuthenticated && (
             <div className="flex flex-1 items-center justify-end space-x-2">
               {activeRole === 'disponent' && (
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" className="relative h-9 w-9 rounded-full">
                   <Settings className="h-5 w-5" />
                   <span className="sr-only">Einstellungen</span>
                 </Button>
