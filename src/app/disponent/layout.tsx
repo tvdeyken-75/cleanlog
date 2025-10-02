@@ -79,7 +79,7 @@ export default function DisponentLayout({
             </DialogContent>
           </Dialog>
         </div>
-        <div className="p-4 md:p-6 md:pl-20">
+        <div className="px-4 md:px-6 md:pl-20">
           {children}
         </div>
       </main>
