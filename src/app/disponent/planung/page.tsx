@@ -74,148 +74,150 @@ export default function PlanungPage() {
 
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold font-headline">Tourenplanung</h1>
-      
-      <Card>
-        <CardHeader className="p-4">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <CalendarIcon className="h-5 w-5 text-primary" />
-            Filter
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
-            <div className="flex items-center gap-2">
-                <label className="text-sm font-medium shrink-0">Jahr</label>
-                <Select
-                    onValueChange={(value) => {
-                        const year = parseInt(value, 10);
-                        setSelectedYear(year);
-                        setWeeks(getWeeksForYear(year));
-                        setSelectedWeek(1); // Reset week
-                    }}
-                    defaultValue={selectedYear.toString()}
-                >
-                    <SelectTrigger className="h-8">
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {years.map(year => <SelectItem key={year} value={year.toString()}>{year}</SelectItem>)}
-                    </SelectContent>
-                </Select>
-            </div>
-            <div className="flex items-center gap-2">
-                <label className="text-sm font-medium shrink-0">Woche</label>
-                <Select
-                    onValueChange={(value) => setSelectedWeek(parseInt(value, 10))}
-                    value={selectedWeek.toString()}
-                >
-                    <SelectTrigger className="h-8">
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {weeks.map(({weekNumber, startDate}) => <SelectItem key={startDate.toISOString()} value={weekNumber.toString()}>KW {weekNumber}</SelectItem>)}
-                    </SelectContent>
-                </Select>
-            </div>
-            <div className="flex items-center gap-2">
-                <label className="text-sm font-medium shrink-0">Tag</label>
-                 <Select>
-                    <SelectTrigger className="h-8">
-                        <SelectValue placeholder="Tag auswählen" />
-                    </SelectTrigger>
-                    <SelectContent>
-                       {getDaysForWeek(selectedYear, selectedWeek).map(day => (
-                           <SelectItem key={day.toISOString()} value={day.toISOString()}>
-                               {format(day, 'eeee, dd.MM', {locale: de})}
-                           </SelectItem>
-                       ))}
-                    </SelectContent>
-                </Select>
-            </div>
-            <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Tour, Fahrer, Fahrzeug..." className="pl-8 h-8" />
-            </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-              <Truck className="h-5 w-5 text-primary" />
-              Tourenübersicht
-          </CardTitle>
-              <Button size="sm" onClick={handleAddTour}>
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Tour erstellen
-              </Button>
+    <div className="-mx-4 md:-mx-6 px-4 md:px-6">
+      <div className="space-y-6">
+        <h1 className="text-3xl font-bold font-headline">Tourenplanung</h1>
+        
+        <Card>
+          <CardHeader className="p-4">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <CalendarIcon className="h-5 w-5 text-primary" />
+              Filter
+            </CardTitle>
           </CardHeader>
-          <CardContent>
-          <Table>
-              <TableHeader>
-              <TableRow>
-                  <TableHead>Tour-Nr.</TableHead>
-                  <TableHead>Datum</TableHead>
-                  <TableHead>Anfangzeit</TableHead>
-                  <TableHead>Fahrername</TableHead>
-                  <TableHead>LKW</TableHead>
-                  <TableHead>Auflieger</TableHead>
-                  <TableHead>Kunde</TableHead>
-                  <TableHead>Beschreibung</TableHead>
-                  <TableHead>Bemerkungen</TableHead>
-                  <TableHead>Kundenref.</TableHead>
-              </TableRow>
-              </TableHeader>
-              <TableBody>
-                {tours.length === 0 ? (
-                    <TableRow>
-                        <TableCell colSpan={10} className="text-center text-muted-foreground">
-                        Keine Touren für den ausgewählten Zeitraum. Fügen Sie eine neue Tour hinzu.
-                        </TableCell>
-                    </TableRow>
-                ) : (
-                  tours.map((tour, index) => (
-                    <TableRow key={tour.tourNr}>
-                        <TableCell><Input value={tour.tourNr || ''} readOnly className="border-none bg-transparent p-1 h-8 min-w-[100px]" /></TableCell>
-                        <TableCell><Input type="date" value={tour.start_time ? format(new Date(tour.start_time), 'yyyy-MM-dd') : ''} onChange={e => handleInputChange(index, 'start_time', new Date(e.target.value))} className="p-1 h-8 min-w-[100px]" /></TableCell>
-                        <TableCell><Input type="time" value={tour.start_time ? format(new Date(tour.start_time), 'HH:mm') : ''} onChange={e => handleInputChange(index, 'start_time', new Date(`1970-01-01T${e.target.value}`))} className="p-1 h-8 min-w-[100px]" /></TableCell>
-                        <TableCell>
-                           <Combobox
-                                options={drivers}
-                                value={tour.driver || ''}
-                                onChange={(value) => handleInputChange(index, 'driver', value)}
-                                placeholder="Fahrer auswählen"
-                                notFoundMessage="Kein Fahrer gefunden."
-                            />
-                        </TableCell>
-                        <TableCell><Input value={tour.truck || ''} onChange={e => handleInputChange(index, 'truck', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
-                        <TableCell><Input value={tour.trailer || ''} onChange={e => handleInputChange(index, 'trailer', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
-                        <TableCell><Input value={tour.customer || ''} onChange={e => handleInputChange(index, 'customer', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
-                        <TableCell><Input value={tour.description || ''} onChange={e => handleInputChange(index, 'description', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
-                        <TableCell><Input value={tour.remarks || ''} onChange={e => handleInputChange(index, 'remarks', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
-                        <TableCell><Input value={tour.customerRef || ''} onChange={e => handleInputChange(index, 'customerRef', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-          </Table>
+          <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+              <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium shrink-0">Jahr</label>
+                  <Select
+                      onValueChange={(value) => {
+                          const year = parseInt(value, 10);
+                          setSelectedYear(year);
+                          setWeeks(getWeeksForYear(year));
+                          setSelectedWeek(1); // Reset week
+                      }}
+                      defaultValue={selectedYear.toString()}
+                  >
+                      <SelectTrigger className="h-8">
+                          <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                          {years.map(year => <SelectItem key={year} value={year.toString()}>{year}</SelectItem>)}
+                      </SelectContent>
+                  </Select>
+              </div>
+              <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium shrink-0">Woche</label>
+                  <Select
+                      onValueChange={(value) => setSelectedWeek(parseInt(value, 10))}
+                      value={selectedWeek.toString()}
+                  >
+                      <SelectTrigger className="h-8">
+                          <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                          {weeks.map(({weekNumber, startDate}) => <SelectItem key={startDate.toISOString()} value={weekNumber.toString()}>KW {weekNumber}</SelectItem>)}
+                      </SelectContent>
+                  </Select>
+              </div>
+              <div className="flex items-center gap-2">
+                  <label className="text-sm font-medium shrink-0">Tag</label>
+                   <Select>
+                      <SelectTrigger className="h-8">
+                          <SelectValue placeholder="Tag auswählen" />
+                      </SelectTrigger>
+                      <SelectContent>
+                         {getDaysForWeek(selectedYear, selectedWeek).map(day => (
+                             <SelectItem key={day.toISOString()} value={day.toISOString()}>
+                                 {format(day, 'eeee, dd.MM', {locale: de})}
+                             </SelectItem>
+                         ))}
+                      </SelectContent>
+                  </Select>
+              </div>
+              <div className="relative">
+                  <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Input placeholder="Tour, Fahrer, Fahrzeug..." className="pl-8 h-8" />
+              </div>
           </CardContent>
-      </Card>
+        </Card>
 
-      <Card>
-        <CardHeader className="p-4">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <DollarSign className="h-5 w-5 text-primary" />
-            Tourfinanzen
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-4">
-           <div className="h-20 flex items-center justify-center bg-muted rounded-md">
-                <p className="text-muted-foreground">Finanzübersicht der Touren kommt hier hin.</p>
-            </div>
-        </CardContent>
-      </Card>
+        <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="flex items-center gap-2">
+                <Truck className="h-5 w-5 text-primary" />
+                Tourenübersicht
+            </CardTitle>
+                <Button size="sm" onClick={handleAddTour}>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Tour erstellen
+                </Button>
+            </CardHeader>
+            <CardContent>
+            <Table>
+                <TableHeader>
+                <TableRow>
+                    <TableHead>Tour-Nr.</TableHead>
+                    <TableHead>Datum</TableHead>
+                    <TableHead>Anfangzeit</TableHead>
+                    <TableHead>Fahrername</TableHead>
+                    <TableHead>LKW</TableHead>
+                    <TableHead>Auflieger</TableHead>
+                    <TableHead>Kunde</TableHead>
+                    <TableHead>Beschreibung</TableHead>
+                    <TableHead>Bemerkungen</TableHead>
+                    <TableHead>Kundenref.</TableHead>
+                </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {tours.length === 0 ? (
+                      <TableRow>
+                          <TableCell colSpan={10} className="text-center text-muted-foreground">
+                          Keine Touren für den ausgewählten Zeitraum. Fügen Sie eine neue Tour hinzu.
+                          </TableCell>
+                      </TableRow>
+                  ) : (
+                    tours.map((tour, index) => (
+                      <TableRow key={tour.tourNr}>
+                          <TableCell><Input value={tour.tourNr || ''} readOnly className="border-none bg-transparent p-1 h-8 min-w-[100px]" /></TableCell>
+                          <TableCell><Input type="date" value={tour.start_time ? format(new Date(tour.start_time), 'yyyy-MM-dd') : ''} onChange={e => handleInputChange(index, 'start_time', new Date(e.target.value))} className="p-1 h-8 min-w-[100px]" /></TableCell>
+                          <TableCell><Input type="time" value={tour.start_time ? format(new Date(tour.start_time), 'HH:mm') : ''} onChange={e => handleInputChange(index, 'start_time', new Date(`1970-01-01T${e.target.value}`))} className="p-1 h-8 min-w-[100px]" /></TableCell>
+                          <TableCell>
+                             <Combobox
+                                  options={drivers}
+                                  value={tour.driver || ''}
+                                  onChange={(value) => handleInputChange(index, 'driver', value)}
+                                  placeholder="Fahrer auswählen"
+                                  notFoundMessage="Kein Fahrer gefunden."
+                              />
+                          </TableCell>
+                          <TableCell><Input value={tour.truck || ''} onChange={e => handleInputChange(index, 'truck', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
+                          <TableCell><Input value={tour.trailer || ''} onChange={e => handleInputChange(index, 'trailer', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
+                          <TableCell><Input value={tour.customer || ''} onChange={e => handleInputChange(index, 'customer', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
+                          <TableCell><Input value={tour.description || ''} onChange={e => handleInputChange(index, 'description', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
+                          <TableCell><Input value={tour.remarks || ''} onChange={e => handleInputChange(index, 'remarks', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
+                          <TableCell><Input value={tour.customerRef || ''} onChange={e => handleInputChange(index, 'customerRef', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+            </Table>
+            </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="p-4">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <DollarSign className="h-5 w-5 text-primary" />
+              Tourfinanzen
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4">
+             <div className="h-20 flex items-center justify-center bg-muted rounded-md">
+                  <p className="text-muted-foreground">Finanzübersicht der Touren kommt hier hin.</p>
+              </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
