@@ -4,7 +4,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DollarSign, Calendar as CalendarIcon, Search, Truck, PlusCircle } from 'lucide-react';
+import { Search, Truck, PlusCircle } from 'lucide-react';
 import { useState } from 'react';
 import { de } from 'date-fns/locale';
 import { getWeek, getYear, eachWeekOfInterval, format, eachDayOfInterval, startOfWeek, endOfWeek } from 'date-fns';
@@ -76,80 +76,73 @@ export default function PlanungPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold font-headline">Tourenplanung</h1>
-      
-      <Card>
-        <CardHeader className="p-4">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <CalendarIcon className="h-5 w-5 text-primary" />
-            Filter
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4">
-            <div className="flex items-center gap-2">
-                <label className="text-sm font-medium shrink-0">Jahr</label>
-                <Select
-                    onValueChange={(value) => {
-                        const year = parseInt(value, 10);
-                        setSelectedYear(year);
-                        setWeeks(getWeeksForYear(year));
-                        setSelectedWeek(1); // Reset week
-                    }}
-                    defaultValue={selectedYear.toString()}
-                >
-                    <SelectTrigger className="h-8">
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {years.map(year => <SelectItem key={year} value={year.toString()}>{year}</SelectItem>)}
-                    </SelectContent>
-                </Select>
-            </div>
-            <div className="flex items-center gap-2">
-                <label className="text-sm font-medium shrink-0">Woche</label>
-                <Select
-                    onValueChange={(value) => setSelectedWeek(parseInt(value, 10))}
-                    value={selectedWeek.toString()}
-                >
-                    <SelectTrigger className="h-8">
-                        <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {weeks.map(({weekNumber, startDate}) => <SelectItem key={startDate.toISOString()} value={weekNumber.toString()}>KW {weekNumber}</SelectItem>)}
-                    </SelectContent>
-                </Select>
-            </div>
-            <div className="flex items-center gap-2">
-                <label className="text-sm font-medium shrink-0">Tag</label>
-                 <Select>
-                    <SelectTrigger className="h-8">
-                        <SelectValue placeholder="Tag auswählen" />
-                    </SelectTrigger>
-                    <SelectContent>
-                       {getDaysForWeek(selectedYear, selectedWeek).map(day => (
-                           <SelectItem key={day.toISOString()} value={day.toISOString()}>
-                               {format(day, 'eeee, dd.MM', {locale: de})}
-                           </SelectItem>
-                       ))}
-                    </SelectContent>
-                </Select>
-            </div>
-            <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Tour, Fahrer, Fahrzeug..." className="pl-8 h-8" />
-            </div>
-        </CardContent>
-      </Card>
 
       <Card>
-          <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
-              <Truck className="h-5 w-5 text-primary" />
-              Tourenübersicht
-          </CardTitle>
-              <Button size="sm" onClick={handleAddTour}>
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Tour erstellen
-              </Button>
+          <CardHeader className="flex-col space-y-4">
+            <div className="flex flex-row items-center justify-between">
+                <CardTitle className="flex items-center gap-2">
+                    <Truck className="h-5 w-5 text-primary" />
+                    Tourenübersicht
+                </CardTitle>
+                <Button size="sm" onClick={handleAddTour}>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Tour erstellen
+                </Button>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t">
+                <div className="flex items-center gap-2">
+                    <label className="text-sm font-medium shrink-0">Jahr</label>
+                    <Select
+                        onValueChange={(value) => {
+                            const year = parseInt(value, 10);
+                            setSelectedYear(year);
+                            setWeeks(getWeeksForYear(year));
+                            setSelectedWeek(1); // Reset week
+                        }}
+                        defaultValue={selectedYear.toString()}
+                    >
+                        <SelectTrigger className="h-8">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {years.map(year => <SelectItem key={year} value={year.toString()}>{year}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="flex items-center gap-2">
+                    <label className="text-sm font-medium shrink-0">Woche</label>
+                    <Select
+                        onValueChange={(value) => setSelectedWeek(parseInt(value, 10))}
+                        value={selectedWeek.toString()}
+                    >
+                        <SelectTrigger className="h-8">
+                            <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {weeks.map(({weekNumber, startDate}) => <SelectItem key={startDate.toISOString()} value={weekNumber.toString()}>KW {weekNumber}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="flex items-center gap-2">
+                    <label className="text-sm font-medium shrink-0">Tag</label>
+                    <Select>
+                        <SelectTrigger className="h-8">
+                            <SelectValue placeholder="Tag auswählen" />
+                        </SelectTrigger>
+                        <SelectContent>
+                        {getDaysForWeek(selectedYear, selectedWeek).map(day => (
+                            <SelectItem key={day.toISOString()} value={day.toISOString()}>
+                                {format(day, 'eeee, dd.MM', {locale: de})}
+                            </SelectItem>
+                        ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="relative">
+                    <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+                    <Input placeholder="Tour, Fahrer, Fahrzeug..." className="pl-8 h-8" />
+                </div>
+            </div>
           </CardHeader>
           <CardContent>
           <Table>
@@ -201,20 +194,6 @@ export default function PlanungPage() {
               </TableBody>
           </Table>
           </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="p-4">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <DollarSign className="h-5 w-5 text-primary" />
-            Tourfinanzen
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-4">
-           <div className="h-20 flex items-center justify-center bg-muted rounded-md">
-                <p className="text-muted-foreground">Finanzübersicht der Touren kommt hier hin.</p>
-            </div>
-        </CardContent>
       </Card>
     </div>
   );
