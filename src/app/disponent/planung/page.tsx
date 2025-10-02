@@ -143,7 +143,7 @@ export default function PlanungPage() {
                 </div>
             </div>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pb-2">
           <Table>
               <TableHeader>
               <TableRow>
@@ -197,5 +197,3 @@ export default function PlanungPage() {
     </div>
   );
 }
-
-    
