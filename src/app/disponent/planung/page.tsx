@@ -169,10 +169,10 @@ export default function PlanungPage() {
                 ) : (
                   tours.map((tour, index) => (
                     <TableRow key={tour.tourNr}>
-                        <TableCell><Input value={tour.tourNr || ''} readOnly className="border-none bg-transparent p-1 h-8 min-w-[100px]" /></TableCell>
-                        <TableCell><Input type="date" value={tour.start_time ? format(new Date(tour.start_time), 'yyyy-MM-dd') : ''} onChange={e => handleInputChange(index, 'start_time', new Date(e.target.value))} className="p-1 h-8 min-w-[100px]" /></TableCell>
-                        <TableCell><Input type="time" value={tour.start_time ? format(new Date(tour.start_time), 'HH:mm') : ''} onChange={e => handleInputChange(index, 'start_time', new Date(`1970-01-01T${e.target.value}`))} className="p-1 h-8 min-w-[100px]" /></TableCell>
-                        <TableCell>
+                        <TableCell className="p-0"><Input value={tour.tourNr || ''} readOnly className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1" /></TableCell>
+                        <TableCell className="p-0"><Input type="date" value={tour.start_time ? format(new Date(tour.start_time), 'yyyy-MM-dd') : ''} onChange={e => handleInputChange(index, 'start_time', new Date(e.target.value))} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1" /></TableCell>
+                        <TableCell className="p-0"><Input type="time" value={tour.start_time ? format(new Date(tour.start_time), 'HH:mm') : ''} onChange={e => handleInputChange(index, 'start_time', new Date(`1970-01-01T${e.target.value}`))} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1" /></TableCell>
+                        <TableCell className="p-0">
                            <Combobox
                                 options={drivers}
                                 value={tour.driver || ''}
@@ -181,12 +181,12 @@ export default function PlanungPage() {
                                 notFoundMessage="Kein Fahrer gefunden."
                             />
                         </TableCell>
-                        <TableCell><Input value={tour.truck || ''} onChange={e => handleInputChange(index, 'truck', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
-                        <TableCell><Input value={tour.trailer || ''} onChange={e => handleInputChange(index, 'trailer', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
-                        <TableCell><Input value={tour.customer || ''} onChange={e => handleInputChange(index, 'customer', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
-                        <TableCell><Input value={tour.description || ''} onChange={e => handleInputChange(index, 'description', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
-                        <TableCell><Input value={tour.remarks || ''} onChange={e => handleInputChange(index, 'remarks', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
-                        <TableCell><Input value={tour.customerRef || ''} onChange={e => handleInputChange(index, 'customerRef', e.target.value)} className="p-1 h-8 min-w-[100px]" /></TableCell>
+                        <TableCell className="p-0"><Input value={tour.truck || ''} onChange={e => handleInputChange(index, 'truck', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1" /></TableCell>
+                        <TableCell className="p-0"><Input value={tour.trailer || ''} onChange={e => handleInputChange(index, 'trailer', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1" /></TableCell>
+                        <TableCell className="p-0"><Input value={tour.customer || ''} onChange={e => handleInputChange(index, 'customer', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1" /></TableCell>
+                        <TableCell className="p-0"><Input value={tour.description || ''} onChange={e => handleInputChange(index, 'description', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1" /></TableCell>
+                        <TableCell className="p-0"><Input value={tour.remarks || ''} onChange={e => handleInputChange(index, 'remarks', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1" /></TableCell>
+                        <TableCell className="p-0"><Input value={tour.customerRef || ''} onChange={e => handleInputChange(index, 'customerRef', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1" /></TableCell>
                     </TableRow>
                   ))
                 )}
