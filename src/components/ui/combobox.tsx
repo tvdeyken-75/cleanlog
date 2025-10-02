@@ -43,10 +43,10 @@ export function Combobox({
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          variant="outline"
+          variant="ghost"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between h-8 px-2 font-normal"
+          className="w-full justify-between h-8 px-2 font-normal focus-visible:ring-1 focus-visible:ring-ring"
         >
           <span className="truncate">
           {value
