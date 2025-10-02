@@ -35,7 +35,7 @@ export default function DisponentLayout({
      return (
       <div className="flex min-h-screen w-full flex-col">
         <Header />
-        <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-6">
+        <main className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-10">
             <Skeleton className="h-10 w-1/2" />
             <Skeleton className="w-full h-96" />
         </main>
@@ -79,7 +79,7 @@ export default function DisponentLayout({
             </DialogContent>
           </Dialog>
         </div>
-        <div className="p-4 md:p-6">
+        <div className="p-4 md:p-8 md:pl-20">
           {children}
         </div>
       </main>
