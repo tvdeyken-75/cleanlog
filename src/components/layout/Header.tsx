@@ -1,14 +1,12 @@
 
 
-
-
 "use client";
 
 import { useAuth } from '@/context/AuthContext';
 import { useTour } from '@/context/TourContext';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Truck, LogOut, Map, UserCog, Printer, Loader2, Archive } from 'lucide-react';
+import { Truck, LogOut, Map, UserCog, Printer, Loader2, Archive, Settings } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -362,7 +360,13 @@ export function Header() {
             </DialogTrigger>
           
           {isAuthenticated && (
-            <div className="flex flex-1 items-center justify-end space-x-4">
+            <div className="flex flex-1 items-center justify-end space-x-2">
+              {activeRole === 'disponent' && (
+                <Button variant="ghost" size="icon">
+                  <Settings className="h-5 w-5" />
+                  <span className="sr-only">Einstellungen</span>
+                </Button>
+              )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-9 w-9 rounded-full">
