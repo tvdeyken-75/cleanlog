@@ -1,5 +1,4 @@
 
-
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -78,7 +77,7 @@ export default function PlanungPage() {
       <h1 className="text-3xl font-bold font-headline">Tourenplanung</h1>
 
       <Card>
-          <CardHeader className="flex-col space-y-4">
+          <CardHeader>
             <div className="flex flex-row items-center justify-between">
                 <CardTitle className="flex items-center gap-2">
                     <Truck className="h-5 w-5 text-primary" />
@@ -148,16 +147,16 @@ export default function PlanungPage() {
           <Table>
               <TableHeader>
               <TableRow>
-                  <TableHead>Tour-Nr.</TableHead>
-                  <TableHead>Datum</TableHead>
-                  <TableHead>Anfangzeit</TableHead>
-                  <TableHead>Fahrername</TableHead>
-                  <TableHead>LKW</TableHead>
-                  <TableHead>Auflieger</TableHead>
-                  <TableHead>Kunde</TableHead>
-                  <TableHead>Beschreibung</TableHead>
-                  <TableHead>Bemerkungen</TableHead>
-                  <TableHead>Kundenref.</TableHead>
+                  <TableHead className="h-10 px-2">Tour-Nr.</TableHead>
+                  <TableHead className="h-10 px-2">Datum</TableHead>
+                  <TableHead className="h-10 px-2">Anfangzeit</TableHead>
+                  <TableHead className="h-10 px-2">Fahrername</TableHead>
+                  <TableHead className="h-10 px-2">LKW</TableHead>
+                  <TableHead className="h-10 px-2">Auflieger</TableHead>
+                  <TableHead className="h-10 px-2">Kunde</TableHead>
+                  <TableHead className="h-10 px-2">Beschreibung</TableHead>
+                  <TableHead className="h-10 px-2">Bemerkungen</TableHead>
+                  <TableHead className="h-10 px-2">Kundenref.</TableHead>
               </TableRow>
               </TableHeader>
               <TableBody>
@@ -198,3 +197,5 @@ export default function PlanungPage() {
     </div>
   );
 }
+
+    
