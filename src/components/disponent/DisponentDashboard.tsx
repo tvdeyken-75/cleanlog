@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Menu } from "lucide-react";
+import { LayoutDashboard, Menu } from "lucide-react";
 
 export function DisponentDashboard() {
   return (
@@ -25,15 +25,15 @@ export function DisponentDashboard() {
             <span className="sr-only">Menü öffnen</span>
           </Button>
         </DialogTrigger>
-        <DialogContent>
+        <DialogContent className="sm:max-w-xs">
           <DialogHeader>
             <DialogTitle>Menü</DialogTitle>
-            <DialogDescription>
-              Hier können Sie Ihre Einstellungen verwalten.
-            </DialogDescription>
           </DialogHeader>
-          <div className="py-4">
-            <p>Menüinhalt kommt hier hin.</p>
+          <div className="flex flex-col gap-2">
+            <Button variant="ghost" className="justify-start">
+              <LayoutDashboard className="mr-2 h-4 w-4" />
+              Dashboard
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
