@@ -216,9 +216,9 @@ export default function PlanungPage() {
         });
         vehicleForm.reset();
         if (isCreateVehicleModalOpen === 'truck') {
-            setTrucks(vehicles.truck.map(v => ({ value: v.license_plate, label: v.license_plate })))
+            setTrucks(prev => [...prev, { value: data.license_plate, label: data.license_plate}]);
         } else {
-            setTrailers(vehicles.trailer.map(v => ({ value: v.license_plate, label: v.license_plate })))
+            setTrailers(prev => [...prev, { value: data.license_plate, label: data.license_plate}]);
         }
         setIsCreateVehicleModalOpen(null);
     } else {
@@ -239,7 +239,7 @@ export default function PlanungPage() {
             description: `Der Kunde ${data.name} wurde erfolgreich erstellt.`,
         });
         customerForm.reset();
-        setCustomerOptions(customers.map(c => ({ value: c.name, label: c.name })));
+        setCustomerOptions(prev => [...prev, { value: data.name, label: data.name }]);
         setIsCreateCustomerModalOpen(false);
     } else {
         toast({
