@@ -41,6 +41,7 @@ export interface Vehicle {
   owner?: string;
   insurance_number?: string;
   green_sticker?: boolean;
+  documents?: Photo[];
 }
 
 

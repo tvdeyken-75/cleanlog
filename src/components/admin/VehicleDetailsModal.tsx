@@ -1,11 +1,12 @@
 
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from 'zod';
-import { Vehicle } from "@/lib/types";
+import { Vehicle, Photo } from "@/lib/types";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
@@ -14,6 +15,12 @@ import { LabelWithTooltip } from "../ui/label-with-tooltip";
 import { ScrollArea } from "../ui/scroll-area";
 import { Switch } from "../ui/switch";
 import { Separator } from "../ui/separator";
+import { Camera, File, Trash2, Upload } from "lucide-react";
+
+const documentSchema = z.object({
+  dataUrl: z.string(),
+  mimeType: z.string(),
+});
 
 const vehicleDetailsSchema = z.object({
   // Basic Info
@@ -49,6 +56,7 @@ const vehicleDetailsSchema = z.object({
   owner: z.string().optional(),
   insurance_number: z.string().optional(),
   green_sticker: z.boolean().optional(),
+  documents: z.array(documentSchema).optional(),
 });
 
 
@@ -63,6 +71,9 @@ interface VehicleDetailsModalProps {
 }
 
 export function VehicleDetailsModal({ isOpen, onClose, vehicle, vehicleType, onSave }: VehicleDetailsModalProps) {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [documents, setDocuments] = useState<Photo[]>(vehicle.documents || []);
+
     const form = useForm<VehicleDetailsFormValues>({
         resolver: zodResolver(vehicleDetailsSchema),
         defaultValues: {},
@@ -75,7 +86,9 @@ export function VehicleDetailsModal({ isOpen, onClose, vehicle, vehicleType, onS
                 length_m: vehicle.dimensions_m?.length,
                 width_m: vehicle.dimensions_m?.width,
                 height_m: vehicle.dimensions_m?.height,
+                documents: vehicle.documents || [],
             });
+            setDocuments(vehicle.documents || []);
         }
     }, [vehicle, form])
 
@@ -84,6 +97,7 @@ export function VehicleDetailsModal({ isOpen, onClose, vehicle, vehicleType, onS
         const { length_m, width_m, height_m, ...restData } = data;
         const finalData: Partial<Vehicle> = {
             ...restData,
+            documents,
             dimensions_m: {
                 length: length_m,
                 width: width_m,
@@ -93,6 +107,31 @@ export function VehicleDetailsModal({ isOpen, onClose, vehicle, vehicleType, onS
         onSave(vehicle.license_plate, finalData);
     }
     
+    const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+        if (!files) return;
+
+        for (let i = 0; i < files.length; i++) {
+          const file = files[i];
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const dataUrl = e.target?.result as string;
+            if (dataUrl) {
+                const newDocs: Photo[] = [...documents, { dataUrl, mimeType: file.type }];
+                setDocuments(newDocs);
+                form.setValue('documents', newDocs, { shouldValidate: true });
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+
+    const removeDocument = (index: number) => {
+        const newDocs = documents.filter((_, i) => i !== index);
+        setDocuments(newDocs);
+        form.setValue('documents', newDocs, { shouldValidate: true });
+    }
+
     return (
          <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="max-w-3xl">
@@ -169,6 +208,44 @@ export function VehicleDetailsModal({ isOpen, onClose, vehicle, vehicleType, onS
                                         )}
                                         />
                                  </div>
+                                 
+                                <Separator />
+                                <h3 className="text-lg font-medium border-b pb-2">Dokumente</h3>
+                                <div className="space-y-4">
+                                    <Button type="button" onClick={() => fileInputRef.current?.click()} variant="outline">
+                                        <Upload className="mr-2 h-4 w-4"/> Dokumenten Upload
+                                    </Button>
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        onChange={handleFileSelect}
+                                        className="hidden"
+                                        accept="image/*,application/pdf"
+                                        multiple
+                                    />
+                                    <FormField control={form.control} name="documents" render={({ field }) => (
+                                        <FormItem>
+                                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                                                {documents.map((doc, index) => (
+                                                    <div key={index} className="relative group">
+                                                        {doc.mimeType.startsWith('image/') ? (
+                                                            <Image src={doc.dataUrl} alt={`Dokument ${index + 1}`} width={200} height={150} className="rounded-md object-cover aspect-video"/>
+                                                        ) : (
+                                                            <div className="w-full aspect-video bg-muted rounded-md flex flex-col items-center justify-center p-2">
+                                                                <File className="h-10 w-10 text-muted-foreground"/>
+                                                                <p className="text-xs text-center text-muted-foreground mt-1 truncate">Dokument</p>
+                                                            </div>
+                                                        )}
+                                                        <Button type="button" variant="destructive" size="icon" className="absolute top-1 right-1 h-7 w-7 opacity-0 group-hover:opacity-100" onClick={() => removeDocument(index)}>
+                                                            <Trash2 className="h-4 w-4"/>
+                                                        </Button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )} />
+                                </div>
                             </div>
                         </ScrollArea>
                         <DialogFooter className="pt-4">
