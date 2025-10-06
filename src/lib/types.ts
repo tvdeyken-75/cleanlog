@@ -15,6 +15,10 @@ export interface Vehicle {
   active: boolean;
 }
 
+export interface Customer {
+  name: string;
+}
+
 export interface ContaminationDetails {
   types: string[];
   description: string;

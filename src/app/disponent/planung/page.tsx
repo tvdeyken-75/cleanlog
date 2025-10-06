@@ -4,14 +4,14 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Search, Truck, PlusCircle } from 'lucide-react';
+import { Search, Truck, PlusCircle, Briefcase } from 'lucide-react';
 import { useState } from 'react';
 import { de } from 'date-fns/locale';
 import { getWeek, getYear, eachWeekOfInterval, format, eachDayOfInterval, startOfWeek, endOfWeek } from 'date-fns';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Tour, User, UserRole, Vehicle } from '@/lib/types';
+import { Tour, User, UserRole, Vehicle, Customer } from '@/lib/types';
 import { useAuth } from '@/context/AuthContext';
 import { Combobox } from '@/components/ui/combobox';
 import { KilometerpreisModal } from '@/components/disponent/KilometerpreisModal';
@@ -43,6 +43,11 @@ const vehicleSchema = z.object({
 });
 type VehicleFormValues = z.infer<typeof vehicleSchema>;
 
+const customerSchema = z.object({
+  name: z.string().min(1, "Kundenname ist ein Pflichtfeld."),
+});
+type CustomerFormValues = z.infer<typeof customerSchema>;
+
 
 const roleTranslations: { [key in UserRole]: string } = {
     admin: 'Admin',
@@ -60,16 +65,18 @@ export default function PlanungPage() {
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
   const [tours, setTours] = useState<Partial<Tour>[]>([]);
   const { user, getUsers, addUser } = useAuth();
-  const { vehicles, addVehicle } = useProtocols(user);
+  const { vehicles, addVehicle, customers, addCustomer } = useProtocols(user);
   const [isKmModalOpen, setIsKmModalOpen] = useState(false);
   const [selectedTour, setSelectedTour] = useState<Partial<Tour> | null>(null);
   const [isCreateTourModalOpen, setIsCreateTourModalOpen] = useState(false);
   const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false);
   const [isCreateVehicleModalOpen, setIsCreateVehicleModalOpen] = useState<'truck' | 'trailer' | null>(null);
+  const [isCreateCustomerModalOpen, setIsCreateCustomerModalOpen] = useState(false);
   
   const [drivers, setDrivers] = useState(getUsers().filter(u => u.role.includes('driver' as UserRole)).map(u => ({ value: u.username, label: u.username })));
   const [trucks, setTrucks] = useState(vehicles.truck.map(v => ({ value: v.license_plate, label: v.license_plate })));
   const [trailers, setTrailers] = useState(vehicles.trailer.map(v => ({ value: v.license_plate, label: v.license_plate })));
+  const [customerOptions, setCustomerOptions] = useState(customers.map(c => ({ value: c.name, label: c.name })));
 
   const { toast } = useToast();
 
@@ -89,6 +96,13 @@ export default function PlanungPage() {
       maintenance_number: '',
       api_key: '',
     }
+  });
+
+  const customerForm = useForm<CustomerFormValues>({
+    resolver: zodResolver(customerSchema),
+    defaultValues: {
+        name: '',
+    },
   });
 
 
@@ -191,6 +205,26 @@ export default function PlanungPage() {
             variant: "destructive",
             title: "Fehler",
             description: `Ein Fahrzeug mit dem Kennzeichen ${data.license_plate} existiert bereits.`,
+        });
+    }
+  };
+  
+  const handleAddNewCustomer = (data: CustomerFormValues) => {
+    const success = addCustomer({ name: data.name });
+
+    if (success) {
+        toast({
+            title: "Kunde erstellt",
+            description: `Der Kunde ${data.name} wurde erfolgreich erstellt.`,
+        });
+        customerForm.reset();
+        setCustomerOptions(customers.map(c => ({ value: c.name, label: c.name })));
+        setIsCreateCustomerModalOpen(false);
+    } else {
+        toast({
+            variant: "destructive",
+            title: "Fehler",
+            description: `Der Kunde ${data.name} existiert bereits.`,
         });
     }
   };
@@ -487,7 +521,47 @@ export default function PlanungPage() {
                          </Dialog>
                     </div>
                   </TableHead>
-                  <TableHead className="h-10 px-2">Kunde</TableHead>
+                  <TableHead className="h-10 px-2">
+                    <div className="flex items-center gap-2">
+                      <span>Kunde</span>
+                      <Dialog open={isCreateCustomerModalOpen} onOpenChange={setIsCreateCustomerModalOpen}>
+                          <DialogTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-6 w-6">
+                                  <PlusCircle className="h-4 w-4" />
+                              </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                              <DialogHeader>
+                                  <DialogTitle>Neuen Kunden anlegen</DialogTitle>
+                              </DialogHeader>
+                               <Form {...customerForm}>
+                                  <form onSubmit={customerForm.handleSubmit(handleAddNewCustomer)} className="space-y-4">
+                                      <FormField
+                                          control={customerForm.control}
+                                          name="name"
+                                          render={({ field }) => (
+                                              <FormItem>
+                                              <LabelWithTooltip tooltipText="Kundenname">Kundenname</LabelWithTooltip>
+                                              <FormControl>
+                                                  <Input {...field} placeholder="z.B. Musterfirma GmbH" />
+                                              </FormControl>
+                                              <FormMessage />
+                                              </FormItem>
+                                          )}
+                                      />
+                                      <DialogFooter>
+                                          <DialogClose asChild><Button type="button" variant="outline">Abbrechen</Button></DialogClose>
+                                          <Button type="submit">
+                                              <Briefcase className="mr-2 h-4 w-4" />
+                                              Kunden anlegen
+                                          </Button>
+                                      </DialogFooter>
+                                  </form>
+                              </Form>
+                          </DialogContent>
+                       </Dialog>
+                    </div>
+                  </TableHead>
                   <TableHead className="h-10 px-2">Beschreibung</TableHead>
                   <TableHead className="h-10 px-2">Bemerkungen</TableHead>
                   <TableHead className="h-10 px-2">Kundenref.</TableHead>
@@ -534,7 +608,15 @@ export default function PlanungPage() {
                                 notFoundMessage="Kein Auflieger gefunden."
                             />
                         </TableCell>
-                        <TableCell className="p-0"><Input value={tour.customer || ''} onChange={e => handleInputChange(index, 'customer', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
+                        <TableCell className="p-0">
+                            <Combobox
+                                options={customerOptions}
+                                value={tour.customer || ''}
+                                onChange={(value) => handleInputChange(index, 'customer', value)}
+                                placeholder="Kunde auswählen"
+                                notFoundMessage="Kein Kunde gefunden."
+                            />
+                        </TableCell>
                         <TableCell className="p-0"><Input value={tour.description || ''} onChange={e => handleInputChange(index, 'description', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
                         <TableCell className="p-0"><Input value={tour.remarks || ''} onChange={e => handleInputChange(index, 'remarks', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
                         <TableCell className="p-0"><Input value={tour.customerRef || ''} onChange={e => handleInputChange(index, 'customerRef', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
