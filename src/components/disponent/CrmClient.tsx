@@ -23,6 +23,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogC
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { LabelWithTooltip } from '../ui/label-with-tooltip';
 import { Users, PlusCircle, Edit, Trash2, Phone, Mail, Building, User as UserIcon } from 'lucide-react';
+import { Separator } from '../ui/separator';
 
 
 const customerSchema = z.object({
