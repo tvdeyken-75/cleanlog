@@ -59,6 +59,20 @@ export interface Customer {
   country?: string;
 }
 
+export interface Employee {
+  id: string;
+  name: string;
+  position: string;
+  entryDate: string; // Date string
+  status: 'active' | 'inactive';
+  email?: string;
+  phone?: string;
+  street?: string;
+  zip?: string;
+  city?: string;
+  country?: string;
+}
+
 export interface ContaminationDetails {
   types: string[];
   description: string;

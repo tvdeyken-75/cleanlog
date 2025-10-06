@@ -2,7 +2,7 @@
 
 "use client";
 import { useState, useEffect, useCallback } from 'react';
-import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol, LoadingProtocol, DeliveryProtocol, EmergencyProtocol, MaintenanceProtocol, ExpenseProtocol, Vehicle, Tour, Customer } from '@/lib/types';
+import type { Protocol, CleaningProtocol, FuelProtocol, PauseProtocol, LoadingProtocol, DeliveryProtocol, EmergencyProtocol, MaintenanceProtocol, ExpenseProtocol, Vehicle, Tour, Customer, Employee } from '@/lib/types';
 
 type NewProtocolPayload = 
     Omit<CleaningProtocol, 'id' | 'driverId' | 'end_time' | 'type'> | 
@@ -21,12 +21,14 @@ export function useProtocols(userId: string | null) {
   const [tours, setTours] = useState<Tour[]>([]);
   const [vehicles, setVehicles] = useState<{truck: Vehicle[], trailer: Vehicle[]}>({ truck: [], trailer: [] });
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const getProtocolsStorageKey = useCallback(() => `fahrerchecklisteProtocols_v4_${userId}`, [userId]);
   const getVehiclesStorageKey = () => `fahrerchecklisteVehicles_v3`;
   const getToursStorageKey = () => `fahrerchecklisteTours_v1`;
   const getCustomersStorageKey = () => `fahrerchecklisteCustomers_v2`;
+  const getEmployeesStorageKey = () => `fahrerchecklisteEmployees_v1`;
 
   useEffect(() => {
     // Load vehicles (global for all users)
@@ -58,6 +60,17 @@ export function useProtocols(userId: string | null) {
     } catch (error) {
         console.error("Could not access localStorage for customers", error);
     }
+    
+    // Load employees (global for all users)
+    try {
+        const storedEmployees = localStorage.getItem(getEmployeesStorageKey());
+        if (storedEmployees) {
+            setEmployees(JSON.parse(storedEmployees));
+        }
+    } catch (error) {
+        console.error("Could not access localStorage for employees", error);
+    }
+
 
     // Load protocols (user-specific)
     if (userId) {
@@ -107,6 +120,16 @@ export function useProtocols(userId: string | null) {
         console.error("Could not write customers to localStorage", error);
     }
   }
+  
+  const saveEmployees = (newEmployees: Employee[]) => {
+    setEmployees(newEmployees);
+    try {
+        localStorage.setItem(getEmployeesStorageKey(), JSON.stringify(newEmployees));
+    } catch(error) {
+        console.error("Could not write employees to localStorage", error);
+    }
+  }
+
 
   const addProtocol = (newProtocol: NewProtocolPayload, type: ProtocolType) => {
     if (!userId) return;
@@ -205,6 +228,32 @@ export function useProtocols(userId: string | null) {
     saveCustomers(updatedCustomers);
   };
 
+  const addEmployee = (newEmployeeData: Omit<Employee, 'id' | 'status'>): boolean => {
+    if (employees.some(e => e.name === newEmployeeData.name)) {
+        return false; // Already exists
+    }
+    const newEmployee: Employee = {
+      ...newEmployeeData,
+      id: new Date().toISOString() + Math.random(),
+      status: 'active',
+    };
+    const updatedEmployees = [...employees, newEmployee];
+    saveEmployees(updatedEmployees);
+    return true;
+  };
+
+  const updateEmployee = (employeeId: string, updatedData: Partial<Omit<Employee, 'id'>>) => {
+    const updatedEmployees = employees.map(e => 
+        e.id === employeeId ? { ...e, ...updatedData } : e
+    );
+    saveEmployees(updatedEmployees);
+  };
+
+  const deleteEmployee = (employeeId: string) => {
+    const updatedEmployees = employees.filter(e => e.id !== employeeId);
+    saveEmployees(updatedEmployees);
+  };
+
   const updateVehicle = (type: 'truck' | 'trailer', originalLicensePlate: string, updatedVehicleData: Partial<Vehicle>) => {
      const newVehiclesState = { ...vehicles };
      const index = newVehiclesState[type].findIndex(v => v.license_plate === originalLicensePlate);
@@ -239,5 +288,5 @@ export function useProtocols(userId: string | null) {
     return [...new Set([...protocolPlates, ...adminPlateStrings])];
   };
 
-  return { protocols, addProtocol, isLoading, getUniqueLicensePlates, addVehicle, vehicles, updateVehicle, updateVehicleStatus, tours, addTour, customers, addCustomer, updateCustomer, deleteCustomer };
+  return { protocols, addProtocol, isLoading, getUniqueLicensePlates, addVehicle, vehicles, updateVehicle, updateVehicleStatus, tours, addTour, customers, addCustomer, updateCustomer, deleteCustomer, employees, addEmployee, updateEmployee, deleteEmployee };
 }
