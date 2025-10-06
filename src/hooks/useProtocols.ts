@@ -217,3 +217,5 @@ export function useProtocols(userId: string | null) {
 
   return { protocols, addProtocol, isLoading, getUniqueLicensePlates, addVehicle, vehicles, updateVehicle, updateVehicleStatus, tours, addTour, customers, addCustomer };
 }
+
+    

@@ -5,7 +5,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Search, Truck, PlusCircle, Briefcase } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { de } from 'date-fns/locale';
 import { getWeek, getYear, eachWeekOfInterval, format, eachDayOfInterval, startOfWeek, endOfWeek } from 'date-fns';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -63,9 +63,9 @@ export default function PlanungPage() {
   const currentYear = getYear(new Date());
   const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
-  const [tours, setTours] = useState<Partial<Tour>[]>([]);
   const { user, getUsers, addUser } = useAuth();
-  const { vehicles, addVehicle, customers, addCustomer } = useProtocols(user);
+  const { vehicles, addVehicle, customers, addCustomer, tours, addTour } = useProtocols(user);
+  const [displayedTours, setDisplayedTours] = useState<Partial<Tour>[]>([]);
   const [isKmModalOpen, setIsKmModalOpen] = useState(false);
   const [selectedTour, setSelectedTour] = useState<Partial<Tour> | null>(null);
   const [isCreateTourModalOpen, setIsCreateTourModalOpen] = useState(false);
@@ -79,6 +79,10 @@ export default function PlanungPage() {
   const [customerOptions, setCustomerOptions] = useState(customers.map(c => ({ value: c.name, label: c.name })));
 
   const { toast } = useToast();
+  
+  useEffect(() => {
+    setDisplayedTours(tours);
+  }, [tours]);
 
   const userForm = useForm<UserFormValues>({
     resolver: zodResolver(userSchema),
@@ -130,17 +134,10 @@ export default function PlanungPage() {
       return eachDayOfInterval({start: weekStart, end: weekEnd});
   }
 
-  const getNextTourNumber = () => {
-    const lastTourNumber = tours.length > 0 
-        ? parseInt(tours[tours.length - 1].tourNr?.split('-')[1] || '10000', 10)
-        : 10000;
-    return `T-${String(lastTourNumber + 1).padStart(5, '0')}`;
-  };
-
   const handleInputChange = (index: number, field: keyof Tour, value: any) => {
-      const updatedTours = [...tours];
+      const updatedTours = [...displayedTours];
       updatedTours[index] = { ...updatedTours[index], [field]: value };
-      setTours(updatedTours);
+      setDisplayedTours(updatedTours);
   }
   
   const handleKmPreisDoubleClick = (tour: Partial<Tour>) => {
@@ -149,11 +146,20 @@ export default function PlanungPage() {
   }
 
   const handleSaveKmPreis = (tourNr: string, newPreis: number) => {
-    setTours(tours.map(t => 
+    setDisplayedTours(displayedTours.map(t => 
       t.tourNr === tourNr ? { ...t, kilometerpreis: newPreis } : t
     ));
     setIsKmModalOpen(false);
   }
+  
+  const handleTourCreated = (newTour: Tour) => {
+    addTour(newTour);
+    setIsCreateTourModalOpen(false);
+    toast({
+      title: "Tour erstellt",
+      description: `Die Tour ${newTour.tourNr} wurde erfolgreich geplant.`,
+    });
+  };
 
   const handleAddNewUser = (data: UserFormValues) => {
     const success = addUser({
@@ -321,7 +327,7 @@ export default function PlanungPage() {
                       Tour erstellen
                     </Button>
                   </DialogTrigger>
-                  <CreateTourModal onTourCreated={() => setIsCreateTourModalOpen(false)} />
+                  <CreateTourModal onTourCreated={handleTourCreated} />
                 </Dialog>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t">
@@ -569,14 +575,14 @@ export default function PlanungPage() {
               </TableRow>
               </TableHeader>
               <TableBody>
-                {tours.length === 0 ? (
+                {displayedTours.length === 0 ? (
                     <TableRow>
                         <TableCell colSpan={11} className="text-center text-muted-foreground">
                         Keine Touren für den ausgewählten Zeitraum. Fügen Sie eine neue Tour hinzu.
                         </TableCell>
                     </TableRow>
                 ) : (
-                  tours.map((tour, index) => (
+                  displayedTours.map((tour, index) => (
                     <TableRow key={tour.tourNr}>
                         <TableCell className="p-0"><Input value={tour.tourNr || ''} readOnly className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
                         <TableCell className="p-0"><Input type="date" value={tour.start_time ? format(new Date(tour.start_time), 'yyyy-MM-dd') : ''} onChange={e => handleInputChange(index, 'start_time', new Date(e.target.value))} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
@@ -647,3 +653,5 @@ export default function PlanungPage() {
     </div>
   );
 }
+
+    

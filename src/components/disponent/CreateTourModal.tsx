@@ -7,7 +7,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useAuth } from "@/context/AuthContext";
 import { useProtocols } from "@/hooks/useProtocols";
-import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { format, setHours, setMinutes } from "date-fns";
 
@@ -68,13 +67,12 @@ maut: z.coerce.number().optional(),
 type TourFormValues = z.infer<typeof tourSchema>;
 
 interface CreateTourModalProps {
-    onTourCreated: () => void;
+    onTourCreated: (tour: Tour) => void;
 }
 
 export function CreateTourModal({ onTourCreated }: CreateTourModalProps) {
-  const { toast } = useToast();
   const { getUsers, user } = useAuth();
-  const { vehicles, addTour, tours } = useProtocols(user);
+  const { vehicles, tours, customers } = useProtocols(user);
   const [isFinancesOpen, setIsFinancesOpen] = useState(false);
   const [isMainInfoOpen, setIsMainInfoOpen] = useState(true);
   const [isNotesOpen, setIsNotesOpen] = useState(false);
@@ -136,12 +134,7 @@ export function CreateTourModal({ onTourCreated }: CreateTourModalProps) {
   const euroPerKm = km > 0 ? rohertrag / km : 0;
 
   function onSubmit(data: TourFormValues) {
-    addTour(data as Tour);
-    toast({
-      title: "Tour erstellt",
-      description: `Die Tour ${data.tourNr} wurde erfolgreich geplant.`,
-    });
-    onTourCreated();
+    onTourCreated(data as Tour);
     form.reset({
       ...form.getValues(), // keep other values if needed
       tourNr: getNextTourNumber(), // update tour number for next form
@@ -242,9 +235,18 @@ export function CreateTourModal({ onTourCreated }: CreateTourModalProps) {
                                     render={({ field }) => (
                                     <FormItem>
                                         <LabelWithTooltip tooltipText="Der Kunde für diese Tour" className="flex items-center gap-2"><Briefcase className="w-4 h-4" />Kunde</LabelWithTooltip>
-                                        <FormControl>
-                                            <Input placeholder="Kundenname" {...field} />
-                                        </FormControl>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Kunde auswählen" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {customers.map(customer => (
+                                                    <SelectItem key={customer.name} value={customer.name}>{customer.name}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                         <FormMessage />
                                     </FormItem>
                                     )}
@@ -470,3 +472,5 @@ export function CreateTourModal({ onTourCreated }: CreateTourModalProps) {
     </DialogContent>
   );
 }
+
+    
