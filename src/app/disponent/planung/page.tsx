@@ -73,7 +73,7 @@ export default function PlanungPage() {
 
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pt-4">
       <h1 className="text-3xl font-bold font-headline">Tourenplanung</h1>
 
       <Card>
@@ -157,12 +157,13 @@ export default function PlanungPage() {
                   <TableHead className="h-10 px-2">Beschreibung</TableHead>
                   <TableHead className="h-10 px-2">Bemerkungen</TableHead>
                   <TableHead className="h-10 px-2">Kundenref.</TableHead>
+                  <TableHead className="h-10 px-2">Kilometerpreise</TableHead>
               </TableRow>
               </TableHeader>
               <TableBody>
                 {tours.length === 0 ? (
                     <TableRow>
-                        <TableCell colSpan={10} className="text-center text-muted-foreground">
+                        <TableCell colSpan={11} className="text-center text-muted-foreground">
                         Keine Touren für den ausgewählten Zeitraum. Fügen Sie eine neue Tour hinzu.
                         </TableCell>
                     </TableRow>
@@ -187,6 +188,7 @@ export default function PlanungPage() {
                         <TableCell className="p-0"><Input value={tour.description || ''} onChange={e => handleInputChange(index, 'description', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
                         <TableCell className="p-0"><Input value={tour.remarks || ''} onChange={e => handleInputChange(index, 'remarks', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
                         <TableCell className="p-0"><Input value={tour.customerRef || ''} onChange={e => handleInputChange(index, 'customerRef', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
+                        <TableCell className="p-0"><Input value={tour.km && tour.rohertrag ? (tour.rohertrag / tour.km).toFixed(2) + ' €' : ''} readOnly className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
                     </TableRow>
                   ))
                 )}

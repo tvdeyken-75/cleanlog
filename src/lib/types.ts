@@ -43,7 +43,6 @@ export interface Tour {
   rechnungRaus?: boolean;
   bezahlt?: boolean;
   bezahldatum?: Date;
-  // This is from the old tour type, might need to consolidate
   transport_order?: string; 
   truck_license_plate?: string;
   trailer_license_plate?: string;
