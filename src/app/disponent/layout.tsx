@@ -14,7 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { LayoutDashboard, Menu, Truck } from "lucide-react";
+import { LayoutDashboard, Menu, Truck, Users } from "lucide-react";
 import Link from 'next/link';
 
 export default function DisponentLayout({
@@ -79,6 +79,12 @@ export default function DisponentLayout({
                      <Button variant="ghost" className="w-full justify-start">
                         <Truck className="mr-2 h-4 w-4" />
                         Fuhrpark
+                    </Button>
+                </Link>
+                <Link href="/disponent/crm" passHref>
+                    <Button variant="ghost" className="w-full justify-start">
+                        <Users className="mr-2 h-4 w-4" />
+                        CRM (Kunden, Lieferanten)
                     </Button>
                 </Link>
               </div>
