@@ -67,11 +67,24 @@ export interface Employee {
   status: 'active' | 'inactive';
   email?: string;
   phone?: string;
+  // Address
   street?: string;
   zip?: string;
   city?: string;
   country?: string;
+  // Lohn
+  hourlyRate?: number;
+  monthlySalary?: number;
+  // Kosten
+  costCenter?: string;
+  // Versicherung
+  socialSecurityNumber?: string;
+  healthInsurance?: string;
+  // Arbeitszeiten
+  weeklyHours?: number;
+  vacationDays?: number;
 }
+
 
 export interface ContaminationDetails {
   types: string[];
