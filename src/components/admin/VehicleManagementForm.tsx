@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from '../ui/switch';
 import { cn } from '@/lib/utils';
+import { VehicleDetailsModal } from './VehicleDetailsModal';
 
 
 const vehicleSchema = z.object({
@@ -50,6 +51,7 @@ export function VehicleManagementForm() {
   const { addVehicle, vehicles, updateVehicle, updateVehicleStatus } = useProtocols(user);
   const { toast } = useToast();
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [editingVehicle, setEditingVehicle] = useState<{ vehicle: Vehicle; type: 'truck' | 'trailer' } | null>(null);
 
   const form = useForm<VehicleFormValues>({
@@ -97,6 +99,12 @@ export function VehicleManagementForm() {
     });
     setIsEditDialogOpen(true);
   };
+  
+  const handleDetailsClick = (vehicle: Vehicle, type: 'truck' | 'trailer') => {
+    setEditingVehicle({ vehicle, type });
+    setIsDetailsModalOpen(true);
+  };
+
 
   const handleUpdateVehicle = (data: EditVehicleFormValues) => {
     if (!editingVehicle) return;
@@ -115,6 +123,16 @@ export function VehicleManagementForm() {
     setIsEditDialogOpen(false);
     setEditingVehicle(null);
   };
+
+  const handleSaveDetails = (originalLicensePlate: string, data: Partial<Vehicle>) => {
+    if (!editingVehicle) return;
+    updateVehicle(editingVehicle.type, originalLicensePlate, data);
+     toast({
+      title: "Fahrzeugdetails gespeichert",
+      description: `Die Details für ${data.license_plate || originalLicensePlate} wurden aktualisiert.`,
+    });
+    setIsDetailsModalOpen(false);
+  }
   
   const handleStatusChange = (type: 'truck' | 'trailer', license_plate: string, active: boolean) => {
     updateVehicleStatus(type, license_plate, active);
@@ -221,7 +239,7 @@ export function VehicleManagementForm() {
                                 {trucks.length > 0 ? (
                                     trucks.map(truck => (
                                         <TableRow key={truck.license_plate} className={cn(!truck.active && "text-muted-foreground bg-muted/20")}>
-                                            <TableCell className='font-medium'>{truck.license_plate}</TableCell>
+                                            <TableCell className='font-medium cursor-pointer hover:underline' onClick={() => handleDetailsClick(truck, 'truck')}>{truck.license_plate}</TableCell>
                                             <TableCell>{truck.maintenance_number}</TableCell>
                                             <TableCell>
                                                 <Switch
@@ -262,7 +280,7 @@ export function VehicleManagementForm() {
                                 {trailers.length > 0 ? (
                                     trailers.map(trailer => (
                                         <TableRow key={trailer.license_plate} className={cn(!trailer.active && "text-muted-foreground bg-muted/20")}>
-                                            <TableCell className='font-medium'>{trailer.license_plate}</TableCell>
+                                            <TableCell className='font-medium cursor-pointer hover:underline' onClick={() => handleDetailsClick(trailer, 'trailer')}>{trailer.license_plate}</TableCell>
                                             <TableCell>{trailer.maintenance_number}</TableCell>
                                              <TableCell>
                                                 <Switch
@@ -346,6 +364,16 @@ export function VehicleManagementForm() {
                 </Form>
             </DialogContent>
         </Dialog>
+        
+        {editingVehicle && (
+            <VehicleDetailsModal
+                isOpen={isDetailsModalOpen}
+                onClose={() => setIsDetailsModalOpen(false)}
+                vehicle={editingVehicle.vehicle}
+                vehicleType={editingVehicle.type}
+                onSave={handleSaveDetails}
+            />
+        )}
     </div>
   );
 }

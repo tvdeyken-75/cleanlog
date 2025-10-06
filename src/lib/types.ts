@@ -9,11 +9,40 @@ export interface User {
 }
 
 export interface Vehicle {
+  // Basic Info
   license_plate: string;
   maintenance_number: string;
   api_key?: string;
   active: boolean;
+
+  // Detailed Info
+  manufacturer?: string;
+  model?: string;
+  vin?: string; // Vehicle Identification Number
+  first_registration?: string; // Date string
+
+  // Inspection Dates
+  next_hu?: string; // Hauptuntersuchung (technical inspection)
+  next_sp?: string; // Sicherheitsprüfung (safety inspection)
+  next_uvv?: string; // Unfallverhütungsvorschrift (accident prevention)
+  tachograph_check?: string; // Tachoprüfung
+
+  // Technical Specs
+  payload_kg?: number;
+  gross_vehicle_weight_kg?: number;
+  dimensions_m?: { length?: number; width?: number; height?: number; };
+  axles?: number;
+
+  // Trailer specific
+  cooling_unit?: string;
+  operating_hours?: number;
+
+  // Administrative
+  owner?: string;
+  insurance_number?: string;
+  green_sticker?: boolean;
 }
+
 
 export interface Customer {
   name: string;

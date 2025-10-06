@@ -24,7 +24,7 @@ export function useProtocols(userId: string | null) {
   const [isLoading, setIsLoading] = useState(true);
 
   const getProtocolsStorageKey = useCallback(() => `fahrerchecklisteProtocols_v4_${userId}`, [userId]);
-  const getVehiclesStorageKey = () => `fahrerchecklisteVehicles_v2`;
+  const getVehiclesStorageKey = () => `fahrerchecklisteVehicles_v3`;
   const getToursStorageKey = () => `fahrerchecklisteTours_v1`;
   const getCustomersStorageKey = () => `fahrerchecklisteCustomers_v1`;
 
@@ -189,14 +189,12 @@ export function useProtocols(userId: string | null) {
     return true;
   }
 
-  const updateVehicle = (type: 'truck' | 'trailer', originalLicensePlate: string, updatedVehicleData: Omit<Vehicle, 'active'>) => {
+  const updateVehicle = (type: 'truck' | 'trailer', originalLicensePlate: string, updatedVehicleData: Partial<Vehicle>) => {
      const newVehiclesState = { ...vehicles };
      const index = newVehiclesState[type].findIndex(v => v.license_plate === originalLicensePlate);
      
      if (index !== -1) {
-         // Preserve the active status
-         const currentActiveStatus = newVehiclesState[type][index].active;
-         newVehiclesState[type][index] = { ...updatedVehicleData, active: currentActiveStatus };
+         newVehiclesState[type][index] = { ...newVehiclesState[type][index], ...updatedVehicleData };
          saveVehicles(newVehiclesState);
      }
   };
