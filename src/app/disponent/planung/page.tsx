@@ -11,12 +11,38 @@ import { getWeek, getYear, eachWeekOfInterval, format, eachDayOfInterval, startO
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Tour, UserRole } from '@/lib/types';
+import { Tour, User, UserRole } from '@/lib/types';
 import { useAuth } from '@/context/AuthContext';
 import { Combobox } from '@/components/ui/combobox';
 import { KilometerpreisModal } from '@/components/disponent/KilometerpreisModal';
-import { Dialog, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
 import { CreateTourModal } from '@/components/disponent/CreateTourModal';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import { LabelWithTooltip } from '@/components/ui/label-with-tooltip';
+import { useToast } from '@/hooks/use-toast';
+import { UserPlus, Check, ChevronsUpDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+
+const userSchema = z.object({
+  username: z.string().min(3, "Benutzername muss mindestens 3 Zeichen lang sein."),
+  password: z.string().min(6, "Das Passwort muss mindestens 6 Zeichen lang sein."),
+  role: z.array(z.string()).refine(value => value.some(item => item), "Mindestens eine Rolle muss ausgewählt werden."),
+});
+type UserFormValues = z.infer<typeof userSchema>;
+
+const roleTranslations: { [key in UserRole]: string } = {
+    admin: 'Admin',
+    driver: 'Fahrer',
+    disponent: 'Disponent',
+    geschaftsfuhrer: 'Geschäftsführer',
+    buchhaltung: 'Buchhaltung',
+    qm_manager: 'QM-Manager'
+};
 
 
 export default function PlanungPage() {
@@ -24,10 +50,23 @@ export default function PlanungPage() {
   const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
   const [tours, setTours] = useState<Partial<Tour>[]>([]);
-  const { getUsers } = useAuth();
+  const { getUsers, addUser } = useAuth();
   const [isKmModalOpen, setIsKmModalOpen] = useState(false);
   const [selectedTour, setSelectedTour] = useState<Partial<Tour> | null>(null);
   const [isCreateTourModalOpen, setIsCreateTourModalOpen] = useState(false);
+  const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false);
+  const [drivers, setDrivers] = useState(getUsers().filter(u => u.role.includes('driver' as UserRole)).map(u => ({ value: u.username, label: u.username })));
+
+  const { toast } = useToast();
+
+  const userForm = useForm<UserFormValues>({
+    resolver: zodResolver(userSchema),
+    defaultValues: {
+      username: '',
+      password: '',
+      role: ['driver'],
+    },
+  });
 
   const getWeeksForYear = (year: number) => {
     const firstDayOfYear = new Date(year, 0, 1);
@@ -60,24 +99,12 @@ export default function PlanungPage() {
     return `T-${String(lastTourNumber + 1).padStart(5, '0')}`;
   };
 
-  const handleAddTour = () => {
-    const weekStartDate = weeks.find(w => w.weekNumber === selectedWeek)?.startDate || new Date();
-      setTours(prevTours => [
-          ...prevTours,
-          { tourNr: getNextTourNumber(), start_time: weekStartDate }
-      ]);
-  }
-
   const handleInputChange = (index: number, field: keyof Tour, value: any) => {
       const updatedTours = [...tours];
       updatedTours[index] = { ...updatedTours[index], [field]: value };
       setTours(updatedTours);
   }
   
-  const drivers = getUsers()
-    .filter(u => u.role.includes('driver' as UserRole))
-    .map(u => ({ value: u.username, label: u.username }));
-
   const handleKmPreisDoubleClick = (tour: Partial<Tour>) => {
     setSelectedTour(tour);
     setIsKmModalOpen(true);
@@ -89,6 +116,104 @@ export default function PlanungPage() {
     ));
     setIsKmModalOpen(false);
   }
+
+  const handleAddNewUser = (data: UserFormValues) => {
+    const success = addUser({
+        username: data.username,
+        password: data.password,
+        role: data.role as UserRole[]
+    });
+
+    if (success) {
+        toast({
+            title: "Benutzer erstellt",
+            description: `Der Benutzer ${data.username} wurde erfolgreich erstellt.`,
+        });
+        userForm.reset();
+        // Refresh driver list
+        setDrivers(getUsers().filter(u => u.role.includes('driver' as UserRole)).map(u => ({ value: u.username, label: u.username })));
+        setIsCreateUserModalOpen(false);
+    } else {
+        toast({
+            variant: "destructive",
+            title: "Fehler",
+            description: `Der Benutzer ${data.username} existiert bereits.`,
+        });
+    }
+  };
+
+
+  const RolesMultiSelect = ({form}: {form: typeof userForm }) => (
+    <FormField
+        control={form.control}
+        name="role"
+        render={({ field }) => (
+            <FormItem>
+                <LabelWithTooltip tooltipText="Роль пользователя">Rollen</LabelWithTooltip>
+                <Popover>
+                    <PopoverTrigger asChild>
+                        <FormControl>
+                            <Button
+                                variant="outline"
+                                role="combobox"
+                                className={cn(
+                                    "w-full justify-between",
+                                    !field.value?.length && "text-muted-foreground"
+                                )}
+                            >
+                                <span className='truncate'>
+                                    {field.value?.length 
+                                      ? field.value.map(role => roleTranslations[role as UserRole]).join(", ") 
+                                      : "Rollen auswählen"}
+                                </span>
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                        </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                        <Command>
+                            <CommandInput placeholder="Rollen suchen..." />
+                            <CommandList>
+                                <CommandEmpty>Keine Rollen gefunden.</CommandEmpty>
+                                <CommandGroup>
+                                    {Object.entries(roleTranslations).map(([value, label]) => (
+                                        <CommandItem
+                                            key={value}
+                                            onSelect={() => {
+                                                const roles = field.value || [];
+                                                const index = roles.indexOf(value);
+                                                if (index > -1) {
+                                                    roles.splice(index, 1);
+                                                } else {
+                                                    roles.push(value);
+                                                }
+                                                form.setValue('role', [...roles]);
+                                            }}
+                                        >
+                                            <div
+                                                className={cn(
+                                                    "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                                                    field.value?.includes(value)
+                                                        ? "bg-primary text-primary-foreground"
+                                                        : "opacity-50 [&_svg]:invisible"
+                                                )}
+                                            >
+                                                <Check className={cn("h-4 w-4")} />
+                                            </div>
+                                            <span>{label}</span>
+                                        </CommandItem>
+                                    ))}
+                                </CommandGroup>
+                            </CommandList>
+                        </Command>
+                    </PopoverContent>
+                </Popover>
+                <FormMessage />
+            </FormItem>
+        )}
+    />
+);
+
 
 
   return (
@@ -174,7 +299,61 @@ export default function PlanungPage() {
                   <TableHead className="h-10 px-2">Tour-Nr.</TableHead>
                   <TableHead className="h-10 px-2">Datum</TableHead>
                   <TableHead className="h-10 px-2">Anfangzeit</TableHead>
-                  <TableHead className="h-10 px-2">Fahrername</TableHead>
+                  <TableHead className="h-10 px-2">
+                    <div className="flex items-center gap-2">
+                        <span>Fahrername</span>
+                         <Dialog open={isCreateUserModalOpen} onOpenChange={setIsCreateUserModalOpen}>
+                            <DialogTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-6 w-6">
+                                    <PlusCircle className="h-4 w-4" />
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Neuen Mitarbeiter erstellen</DialogTitle>
+                                </DialogHeader>
+                                 <Form {...userForm}>
+                                    <form onSubmit={userForm.handleSubmit(handleAddNewUser)} className="space-y-4">
+                                        <FormField
+                                            control={userForm.control}
+                                            name="username"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                <LabelWithTooltip tooltipText="Benutzername">Benutzername</LabelWithTooltip>
+                                                <FormControl>
+                                                    <Input {...field} placeholder="z.B. max.mustermann" />
+                                                </FormControl>
+                                                <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={userForm.control}
+                                            name="password"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                <LabelWithTooltip tooltipText="Passwort">Passwort</LabelWithTooltip>
+                                                <FormControl>
+                                                    <Input type="password" {...field} />
+                                                </FormControl>
+                                                <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <RolesMultiSelect form={userForm} />
+                                        <DialogFooter>
+                                            <DialogClose asChild><Button type="button" variant="outline">Abbrechen</Button></DialogClose>
+                                            <Button type="submit">
+                                                <UserPlus className="mr-2 h-4 w-4" />
+                                                Benutzer anlegen
+                                            </Button>
+                                        </DialogFooter>
+                                    </form>
+                                </Form>
+                            </DialogContent>
+                         </Dialog>
+                    </div>
+                  </TableHead>
                   <TableHead className="h-10 px-2">LKW</TableHead>
                   <TableHead className="h-10 px-2">Auflieger</TableHead>
                   <TableHead className="h-10 px-2">Kunde</TableHead>
@@ -216,7 +395,7 @@ export default function PlanungPage() {
                           <Input 
                             value={tour.kilometerpreis ? tour.kilometerpreis.toFixed(2) + ' €' : (tour.km && tour.rohertrag ? (tour.rohertrag / tour.km).toFixed(2) + ' €' : '')} 
                             readOnly 
-                            className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" 
+                            className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring cursor-pointer" 
                           />
                         </TableCell>
                     </TableRow>
