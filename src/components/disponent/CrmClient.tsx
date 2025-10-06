@@ -50,7 +50,18 @@ export function CrmClient() {
 
   const form = useForm<CustomerFormValues>({
     resolver: zodResolver(customerSchema),
-    defaultValues: { type: 'customer' },
+    defaultValues: { 
+        type: 'customer',
+        name: '',
+        customerNumber: '',
+        contactPerson: '',
+        email: '',
+        phone: '',
+        street: '',
+        zip: '',
+        city: '',
+        country: '',
+    },
   });
 
   const editForm = useForm<CustomerFormValues>({
@@ -137,10 +148,23 @@ export function CrmClient() {
           <CardContent>
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleAddNewCustomer)} className="space-y-4">
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                  <FormField control={form.control} name="name" render={({ field }) => (<FormItem><LabelWithTooltip tooltipText="Name des Kunden/Lieferanten">Name</LabelWithTooltip><FormControl><Input {...field} placeholder="Firma ABC" /></FormControl><FormMessage /></FormItem>)} />
-                  <FormField control={form.control} name="type" render={({ field }) => (<FormItem><LabelWithTooltip tooltipText="Typ des Eintrags">Typ</LabelWithTooltip><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue/></SelectTrigger></FormControl><SelectContent><SelectItem value="customer">Kunde</SelectItem><SelectItem value="supplier">Lieferant</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
-                  <FormField control={form.control} name="customerNumber" render={({ field }) => (<FormItem><LabelWithTooltip tooltipText="Interne Kunden-/Lieferantennummer">Kundennummer</LabelWithTooltip><FormControl><Input {...field} placeholder="KD-12345" /></FormControl><FormMessage /></FormItem>)} />
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                    <FormField control={form.control} name="name" render={({ field }) => (<FormItem><LabelWithTooltip tooltipText="Name des Kunden/Lieferanten">Name</LabelWithTooltip><FormControl><Input {...field} placeholder="Firma ABC" /></FormControl><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="type" render={({ field }) => (<FormItem><LabelWithTooltip tooltipText="Typ des Eintrags">Typ</LabelWithTooltip><Select onValueChange={field.onChange} defaultValue={field.value}><FormControl><SelectTrigger><SelectValue/></SelectTrigger></FormControl><SelectContent><SelectItem value="customer">Kunde</SelectItem><SelectItem value="supplier">Lieferant</SelectItem></SelectContent></Select><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="customerNumber" render={({ field }) => (<FormItem><LabelWithTooltip tooltipText="Interne Kunden-/Lieferantennummer">Kundennummer</LabelWithTooltip><FormControl><Input {...field} placeholder="KD-12345" /></FormControl><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="contactPerson" render={({ field }) => (<FormItem><LabelWithTooltip tooltipText="Ansprechpartner" className="flex items-center gap-2"><UserIcon className='w-4 h-4'/>Ansprechpartner</LabelWithTooltip><FormControl><Input {...field} placeholder="Max Mustermann" /></FormControl><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="email" render={({ field }) => (<FormItem><LabelWithTooltip tooltipText="E-Mail-Adresse" className="flex items-center gap-2"><Mail className='w-4 h-4'/>E-Mail</LabelWithTooltip><FormControl><Input type="email" {...field} placeholder="max@firma.de" /></FormControl><FormMessage /></FormItem>)} />
+                    <FormField control={form.control} name="phone" render={({ field }) => (<FormItem><LabelWithTooltip tooltipText="Telefonnummer" className="flex items-center gap-2"><Phone className='w-4 h-4'/>Telefon</LabelWithTooltip><FormControl><Input {...field} placeholder="+49 123 456789" /></FormControl><FormMessage /></FormItem>)} />
+                </div>
+                <div className="pt-4">
+                    <p className='font-medium text-lg flex items-center gap-2'><Building className='w-5 h-5 text-primary'/>Adresse</p>
+                    <Separator className='my-2'/>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <FormField control={form.control} name="street" render={({ field }) => (<FormItem className='md:col-span-2'><LabelWithTooltip tooltipText="Straße und Hausnummer">Straße</LabelWithTooltip><FormControl><Input {...field} placeholder="Musterstraße 1" /></FormControl><FormMessage /></FormItem>)} />
+                        <FormField control={form.control} name="zip" render={({ field }) => (<FormItem><LabelWithTooltip tooltipText="Postleitzahl">PLZ</LabelWithTooltip><FormControl><Input {...field} placeholder="12345" /></FormControl><FormMessage /></FormItem>)} />
+                        <FormField control={form.control} name="city" render={({ field }) => (<FormItem className='md:col-span-2'><LabelWithTooltip tooltipText="Stadt">Stadt</LabelWithTooltip><FormControl><Input {...field} placeholder="Musterstadt" /></FormControl><FormMessage /></FormItem>)} />
+                        <FormField control={form.control} name="country" render={({ field }) => (<FormItem><LabelWithTooltip tooltipText="Land">Land</LabelWithTooltip><FormControl><Input {...field} placeholder="Deutschland" /></FormControl><FormMessage /></FormItem>)} />
+                    </div>
                 </div>
                 <Button type="submit"><PlusCircle className="mr-2 h-4 w-4" />Eintrag hinzufügen</Button>
               </form>
