@@ -46,7 +46,7 @@ export function Combobox({
           variant="ghost"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between h-8 px-2 font-normal focus-visible:ring-1 focus-visible:ring-ring"
+          className="w-full justify-between h-8 px-1 font-normal bg-transparent border-none focus-visible:ring-1 focus-visible:ring-ring"
         >
           <span className="truncate">
           {value

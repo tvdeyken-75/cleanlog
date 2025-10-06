@@ -11,7 +11,7 @@ import { getWeek, getYear, eachWeekOfInterval, format, eachDayOfInterval, startO
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Tour, User, UserRole } from '@/lib/types';
+import { Tour, User, UserRole, Vehicle } from '@/lib/types';
 import { useAuth } from '@/context/AuthContext';
 import { Combobox } from '@/components/ui/combobox';
 import { KilometerpreisModal } from '@/components/disponent/KilometerpreisModal';
@@ -23,10 +23,11 @@ import { z } from 'zod';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
 import { LabelWithTooltip } from '@/components/ui/label-with-tooltip';
 import { useToast } from '@/hooks/use-toast';
-import { UserPlus, Check, ChevronsUpDown } from 'lucide-react';
+import { UserPlus, Check, ChevronsUpDown, Hash, Key } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { useProtocols } from '@/hooks/useProtocols';
 
 const userSchema = z.object({
   username: z.string().min(3, "Benutzername muss mindestens 3 Zeichen lang sein."),
@@ -34,6 +35,14 @@ const userSchema = z.object({
   role: z.array(z.string()).refine(value => value.some(item => item), "Mindestens eine Rolle muss ausgewählt werden."),
 });
 type UserFormValues = z.infer<typeof userSchema>;
+
+const vehicleSchema = z.object({
+  license_plate: z.string().min(1, "Kennzeichen ist ein Pflichtfeld."),
+  maintenance_number: z.string().min(1, "Wartungsnummer ist ein Pflichtfeld."),
+  api_key: z.string().optional(),
+});
+type VehicleFormValues = z.infer<typeof vehicleSchema>;
+
 
 const roleTranslations: { [key in UserRole]: string } = {
     admin: 'Admin',
@@ -50,12 +59,17 @@ export default function PlanungPage() {
   const years = Array.from({ length: 10 }, (_, i) => currentYear - 5 + i);
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
   const [tours, setTours] = useState<Partial<Tour>[]>([]);
-  const { getUsers, addUser } = useAuth();
+  const { user, getUsers, addUser } = useAuth();
+  const { vehicles, addVehicle } = useProtocols(user);
   const [isKmModalOpen, setIsKmModalOpen] = useState(false);
   const [selectedTour, setSelectedTour] = useState<Partial<Tour> | null>(null);
   const [isCreateTourModalOpen, setIsCreateTourModalOpen] = useState(false);
   const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false);
+  const [isCreateVehicleModalOpen, setIsCreateVehicleModalOpen] = useState<'truck' | 'trailer' | null>(null);
+  
   const [drivers, setDrivers] = useState(getUsers().filter(u => u.role.includes('driver' as UserRole)).map(u => ({ value: u.username, label: u.username })));
+  const [trucks, setTrucks] = useState(vehicles.truck.map(v => ({ value: v.license_plate, label: v.license_plate })));
+  const [trailers, setTrailers] = useState(vehicles.trailer.map(v => ({ value: v.license_plate, label: v.license_plate })));
 
   const { toast } = useToast();
 
@@ -67,6 +81,16 @@ export default function PlanungPage() {
       role: ['driver'],
     },
   });
+
+  const vehicleForm = useForm<VehicleFormValues>({
+    resolver: zodResolver(vehicleSchema),
+    defaultValues: {
+      license_plate: '',
+      maintenance_number: '',
+      api_key: '',
+    }
+  });
+
 
   const getWeeksForYear = (year: number) => {
     const firstDayOfYear = new Date(year, 0, 1);
@@ -130,7 +154,6 @@ export default function PlanungPage() {
             description: `Der Benutzer ${data.username} wurde erfolgreich erstellt.`,
         });
         userForm.reset();
-        // Refresh driver list
         setDrivers(getUsers().filter(u => u.role.includes('driver' as UserRole)).map(u => ({ value: u.username, label: u.username })));
         setIsCreateUserModalOpen(false);
     } else {
@@ -138,6 +161,36 @@ export default function PlanungPage() {
             variant: "destructive",
             title: "Fehler",
             description: `Der Benutzer ${data.username} existiert bereits.`,
+        });
+    }
+  };
+
+  const handleAddNewVehicle = (data: VehicleFormValues) => {
+    if (!isCreateVehicleModalOpen) return;
+
+    const success = addVehicle(isCreateVehicleModalOpen, {
+        license_plate: data.license_plate,
+        maintenance_number: data.maintenance_number,
+        api_key: data.api_key,
+    });
+
+    if (success) {
+        toast({
+            title: "Fahrzeug hinzugefügt",
+            description: `Das Fahrzeug ${data.license_plate} wurde erfolgreich hinzugefügt.`,
+        });
+        vehicleForm.reset();
+        if (isCreateVehicleModalOpen === 'truck') {
+            setTrucks(vehicles.truck.map(v => ({ value: v.license_plate, label: v.license_plate })))
+        } else {
+            setTrailers(vehicles.trailer.map(v => ({ value: v.license_plate, label: v.license_plate })))
+        }
+        setIsCreateVehicleModalOpen(null);
+    } else {
+        toast({
+            variant: "destructive",
+            title: "Fehler",
+            description: `Ein Fahrzeug mit dem Kennzeichen ${data.license_plate} existiert bereits.`,
         });
     }
   };
@@ -354,8 +407,86 @@ export default function PlanungPage() {
                          </Dialog>
                     </div>
                   </TableHead>
-                  <TableHead className="h-10 px-2">LKW</TableHead>
-                  <TableHead className="h-10 px-2">Auflieger</TableHead>
+                  <TableHead className="h-10 px-2">
+                     <div className="flex items-center gap-2">
+                        <span>LKW</span>
+                         <Dialog open={isCreateVehicleModalOpen === 'truck'} onOpenChange={(isOpen) => setIsCreateVehicleModalOpen(isOpen ? 'truck' : null)}>
+                            <DialogTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-6 w-6">
+                                    <PlusCircle className="h-4 w-4" />
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Neuen LKW anlegen</DialogTitle>
+                                </DialogHeader>
+                                 <Form {...vehicleForm}>
+                                    <form onSubmit={vehicleForm.handleSubmit(handleAddNewVehicle)} className="space-y-4">
+                                         <FormField control={vehicleForm.control} name="license_plate" render={({ field }) => (
+                                            <FormItem>
+                                                <LabelWithTooltip tooltipText="Neues Kennzeichen">Neues Kennzeichen</LabelWithTooltip>
+                                                <FormControl><Input placeholder="z.B. B-XY-123" {...field} /></FormControl><FormMessage />
+                                            </FormItem>)} />
+                                        <FormField control={vehicleForm.control} name="maintenance_number" render={({ field }) => (
+                                            <FormItem>
+                                                <LabelWithTooltip tooltipText="Wartungsnummer des Fahrzeugs" className='flex items-center gap-2'><Hash className='w-4 h-4'/>Wartungsnummer</LabelWithTooltip>
+                                                <FormControl><Input placeholder="Wartungsnummer" {...field} /></FormControl><FormMessage />
+                                            </FormItem>)} />
+                                        <FormField control={vehicleForm.control} name="api_key" render={({ field }) => (
+                                            <FormItem>
+                                                <LabelWithTooltip tooltipText="API Key für externe Dienste (optional)" className='flex items-center gap-2'><Key className='w-4 h-4' />API Key</LabelWithTooltip>
+                                                <FormControl><Input placeholder="API Key" {...field} /></FormControl><FormMessage />
+                                            </FormItem>)} />
+                                        <DialogFooter>
+                                            <DialogClose asChild><Button type="button" variant="outline">Abbrechen</Button></DialogClose>
+                                            <Button type="submit"><PlusCircle className="mr-2 h-4 w-4" />Fahrzeug anlegen</Button>
+                                        </DialogFooter>
+                                    </form>
+                                </Form>
+                            </DialogContent>
+                         </Dialog>
+                    </div>
+                  </TableHead>
+                  <TableHead className="h-10 px-2">
+                    <div className="flex items-center gap-2">
+                        <span>Auflieger</span>
+                         <Dialog open={isCreateVehicleModalOpen === 'trailer'} onOpenChange={(isOpen) => setIsCreateVehicleModalOpen(isOpen ? 'trailer' : null)}>
+                            <DialogTrigger asChild>
+                                <Button variant="ghost" size="icon" className="h-6 w-6">
+                                    <PlusCircle className="h-4 w-4" />
+                                </Button>
+                            </DialogTrigger>
+                             <DialogContent>
+                                <DialogHeader>
+                                    <DialogTitle>Neuen Auflieger anlegen</DialogTitle>
+                                </DialogHeader>
+                                 <Form {...vehicleForm}>
+                                    <form onSubmit={vehicleForm.handleSubmit(handleAddNewVehicle)} className="space-y-4">
+                                         <FormField control={vehicleForm.control} name="license_plate" render={({ field }) => (
+                                            <FormItem>
+                                                <LabelWithTooltip tooltipText="Neues Kennzeichen">Neues Kennzeichen</LabelWithTooltip>
+                                                <FormControl><Input placeholder="z.B. B-XY-123" {...field} /></FormControl><FormMessage />
+                                            </FormItem>)} />
+                                        <FormField control={vehicleForm.control} name="maintenance_number" render={({ field }) => (
+                                            <FormItem>
+                                                <LabelWithTooltip tooltipText="Wartungsnummer des Fahrzeugs" className='flex items-center gap-2'><Hash className='w-4 h-4'/>Wartungsnummer</LabelWithTooltip>
+                                                <FormControl><Input placeholder="Wartungsnummer" {...field} /></FormControl><FormMessage />
+                                            </FormItem>)} />
+                                        <FormField control={vehicleForm.control} name="api_key" render={({ field }) => (
+                                            <FormItem>
+                                                <LabelWithTooltip tooltipText="API Key für externe Dienste (optional)" className='flex items-center gap-2'><Key className='w-4 h-4' />API Key</LabelWithTooltip>
+                                                <FormControl><Input placeholder="API Key" {...field} /></FormControl><FormMessage />
+                                            </FormItem>)} />
+                                        <DialogFooter>
+                                            <DialogClose asChild><Button type="button" variant="outline">Abbrechen</Button></DialogClose>
+                                            <Button type="submit"><PlusCircle className="mr-2 h-4 w-4" />Fahrzeug anlegen</Button>
+                                        </DialogFooter>
+                                    </form>
+                                </Form>
+                            </DialogContent>
+                         </Dialog>
+                    </div>
+                  </TableHead>
                   <TableHead className="h-10 px-2">Kunde</TableHead>
                   <TableHead className="h-10 px-2">Beschreibung</TableHead>
                   <TableHead className="h-10 px-2">Bemerkungen</TableHead>
@@ -385,8 +516,24 @@ export default function PlanungPage() {
                                 notFoundMessage="Kein Fahrer gefunden."
                             />
                         </TableCell>
-                        <TableCell className="p-0"><Input value={tour.truck || ''} onChange={e => handleInputChange(index, 'truck', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
-                        <TableCell className="p-0"><Input value={tour.trailer || ''} onChange={e => handleInputChange(index, 'trailer', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
+                        <TableCell className="p-0">
+                            <Combobox
+                                options={trucks}
+                                value={tour.truck || ''}
+                                onChange={(value) => handleInputChange(index, 'truck', value)}
+                                placeholder="LKW auswählen"
+                                notFoundMessage="Kein LKW gefunden."
+                            />
+                        </TableCell>
+                        <TableCell className="p-0">
+                             <Combobox
+                                options={trailers}
+                                value={tour.trailer || ''}
+                                onChange={(value) => handleInputChange(index, 'trailer', value)}
+                                placeholder="Auflieger auswählen"
+                                notFoundMessage="Kein Auflieger gefunden."
+                            />
+                        </TableCell>
                         <TableCell className="p-0"><Input value={tour.customer || ''} onChange={e => handleInputChange(index, 'customer', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
                         <TableCell className="p-0"><Input value={tour.description || ''} onChange={e => handleInputChange(index, 'description', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
                         <TableCell className="p-0"><Input value={tour.remarks || ''} onChange={e => handleInputChange(index, 'remarks', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
