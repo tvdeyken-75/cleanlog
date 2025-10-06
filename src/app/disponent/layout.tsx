@@ -87,6 +87,12 @@ export default function DisponentLayout({
                         CRM (Kunden, Lieferanten)
                     </Button>
                 </Link>
+                <Link href="/disponent/hr" passHref>
+                    <Button variant="ghost" className="w-full justify-start">
+                        <Users className="mr-2 h-4 w-4" />
+                        HR (Mitarbeiter)
+                    </Button>
+                </Link>
               </div>
             </DialogContent>
           </Dialog>
