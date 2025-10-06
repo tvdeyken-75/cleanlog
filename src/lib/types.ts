@@ -46,7 +46,17 @@ export interface Vehicle {
 
 
 export interface Customer {
+  id: string;
   name: string;
+  type: 'customer' | 'supplier';
+  customerNumber?: string;
+  contactPerson?: string;
+  email?: string;
+  phone?: string;
+  street?: string;
+  zip?: string;
+  city?: string;
+  country?: string;
 }
 
 export interface ContaminationDetails {

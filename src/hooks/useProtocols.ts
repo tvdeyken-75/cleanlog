@@ -26,7 +26,7 @@ export function useProtocols(userId: string | null) {
   const getProtocolsStorageKey = useCallback(() => `fahrerchecklisteProtocols_v4_${userId}`, [userId]);
   const getVehiclesStorageKey = () => `fahrerchecklisteVehicles_v3`;
   const getToursStorageKey = () => `fahrerchecklisteTours_v1`;
-  const getCustomersStorageKey = () => `fahrerchecklisteCustomers_v1`;
+  const getCustomersStorageKey = () => `fahrerchecklisteCustomers_v2`;
 
   useEffect(() => {
     // Load vehicles (global for all users)
@@ -180,14 +180,30 @@ export function useProtocols(userId: string | null) {
     return true;
   };
   
-  const addCustomer = (newCustomer: Customer): boolean => {
-    if (customers.some(c => c.name === newCustomer.name)) {
+  const addCustomer = (newCustomerData: Omit<Customer, 'id'>): boolean => {
+    if (customers.some(c => c.name === newCustomerData.name)) {
         return false; // Already exists
     }
+    const newCustomer: Customer = {
+      ...newCustomerData,
+      id: new Date().toISOString() + Math.random(),
+    };
     const updatedCustomers = [...customers, newCustomer];
     saveCustomers(updatedCustomers);
     return true;
-  }
+  };
+
+  const updateCustomer = (customerId: string, updatedData: Partial<Omit<Customer, 'id'>>) => {
+    const updatedCustomers = customers.map(c => 
+        c.id === customerId ? { ...c, ...updatedData } : c
+    );
+    saveCustomers(updatedCustomers);
+  };
+
+  const deleteCustomer = (customerId: string) => {
+    const updatedCustomers = customers.filter(c => c.id !== customerId);
+    saveCustomers(updatedCustomers);
+  };
 
   const updateVehicle = (type: 'truck' | 'trailer', originalLicensePlate: string, updatedVehicleData: Partial<Vehicle>) => {
      const newVehiclesState = { ...vehicles };
@@ -223,5 +239,5 @@ export function useProtocols(userId: string | null) {
     return [...new Set([...protocolPlates, ...adminPlateStrings])];
   };
 
-  return { protocols, addProtocol, isLoading, getUniqueLicensePlates, addVehicle, vehicles, updateVehicle, updateVehicleStatus, tours, addTour, customers, addCustomer };
+  return { protocols, addProtocol, isLoading, getUniqueLicensePlates, addVehicle, vehicles, updateVehicle, updateVehicleStatus, tours, addTour, customers, addCustomer, updateCustomer, deleteCustomer };
 }
