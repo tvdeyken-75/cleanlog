@@ -24,6 +24,7 @@ interface ComboboxProps {
     options: { value: string; label: string }[];
     value: string;
     onChange: (value: string) => void;
+    onBlur?: () => void;
     placeholder?: string;
     searchPlaceholder?: string;
     notFoundMessage?: string;
@@ -33,6 +34,7 @@ export function Combobox({
     options, 
     value, 
     onChange, 
+    onBlur,
     placeholder = "Select an option", 
     searchPlaceholder = "Search...", 
     notFoundMessage = "No results found." 
@@ -47,6 +49,7 @@ export function Combobox({
           role="combobox"
           aria-expanded={open}
           className="w-full justify-between h-8 px-1 font-normal bg-transparent border-none focus-visible:ring-1 focus-visible:ring-ring"
+          onBlur={onBlur}
         >
           <span className="truncate">
           {value
