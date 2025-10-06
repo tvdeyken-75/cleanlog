@@ -1,7 +1,6 @@
 
 "use client";
 
-import { PasswordManagementForm } from '@/components/admin/PasswordManagementForm';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users } from 'lucide-react';
 
@@ -15,7 +14,8 @@ export function HrClient() {
                 <CardTitle className="flex items-center gap-2"><Users className="text-primary"/>Mitarbeiter verwalten</CardTitle>
             </CardHeader>
             <CardContent>
-                <PasswordManagementForm />
+                <p>Hier können Sie die Stammdaten Ihrer Mitarbeiter verwalten.</p>
+                {/* Employee management UI will be built here */}
             </CardContent>
         </Card>
     </div>
