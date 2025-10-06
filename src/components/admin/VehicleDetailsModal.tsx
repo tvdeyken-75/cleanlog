@@ -128,7 +128,7 @@ export function VehicleDetailsModal({ isOpen, onClose, vehicle, vehicleType, onS
                                 <h3 className="text-lg font-medium border-b pb-2">Technische Daten</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <FormField control={form.control} name="payload_kg" render={({ field }) => (<FormItem><LabelWithTooltip tooltipText="Nutzlast in kg">Nutzlast (kg)</LabelWithTooltip><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
-                                    <FormField control={form.control} name="gross_vehicle_weight_kg" render={({ field }) => (<FormItem><LabelWithTooltip tooltipText="Zulässiges Gesamtgewicht in kg">zul. Gesamtgewicht (kg)</LabelWithTooltip><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormMessage /></FormItem>)} />
+                                    <FormField control={form.control} name="gross_vehicle_weight_kg" render={({ field }) => (<FormItem><LabelWithTooltip tooltipText="Zulässiges Gesamtgewicht in kg">zul. Gesamtgewicht (kg)</LabelWithTooltip><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
                                     <FormField control={form.control} name="axles" render={({ field }) => (<FormItem><LabelWithTooltip tooltipText="Anzahl der Achsen">Anzahl Achsen</LabelWithTooltip><FormControl><Input type="number" {...field} /></FormControl><FormMessage /></FormItem>)} />
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
