@@ -80,17 +80,41 @@ export function VehicleDetailsModal({ isOpen, onClose, vehicle, vehicleType, onS
     });
     
     useEffect(() => {
-        if(vehicle) {
+        if (vehicle) {
             form.reset({
                 ...vehicle,
-                length_m: vehicle.dimensions_m?.length,
-                width_m: vehicle.dimensions_m?.width,
-                height_m: vehicle.dimensions_m?.height,
+                // Ensure optional string values are not undefined
+                manufacturer: vehicle.manufacturer || '',
+                model: vehicle.model || '',
+                vin: vehicle.vin || '',
+                first_registration: vehicle.first_registration || '',
+                next_hu: vehicle.next_hu || '',
+                next_sp: vehicle.next_sp || '',
+                next_uvv: vehicle.next_uvv || '',
+                tachograph_check: vehicle.tachograph_check || '',
+                cooling_unit: vehicle.cooling_unit || '',
+                owner: vehicle.owner || '',
+                insurance_number: vehicle.insurance_number || '',
+                api_key: vehicle.api_key || '',
+
+                // Ensure optional number values are not undefined
+                payload_kg: vehicle.payload_kg ?? undefined,
+                gross_vehicle_weight_kg: vehicle.gross_vehicle_weight_kg ?? undefined,
+                axles: vehicle.axles ?? undefined,
+                operating_hours: vehicle.operating_hours ?? undefined,
+                
+                // Handle nested optional values
+                length_m: vehicle.dimensions_m?.length ?? undefined,
+                width_m: vehicle.dimensions_m?.width ?? undefined,
+                height_m: vehicle.dimensions_m?.height ?? undefined,
+
+                // Booleans and arrays
+                green_sticker: vehicle.green_sticker || false,
                 documents: vehicle.documents || [],
             });
             setDocuments(vehicle.documents || []);
         }
-    }, [vehicle, form])
+    }, [vehicle, form]);
 
 
     function onSubmit(data: VehicleDetailsFormValues) {
