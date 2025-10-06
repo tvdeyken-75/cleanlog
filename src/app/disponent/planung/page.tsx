@@ -1,5 +1,4 @@
 
-
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,7 +15,6 @@ import { useAuth } from '@/context/AuthContext';
 import { Combobox } from '@/components/ui/combobox';
 import { KilometerpreisModal } from '@/components/disponent/KilometerpreisModal';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogClose } from "@/components/ui/dialog";
-import { CreateTourModal } from '@/components/disponent/CreateTourModal';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -68,7 +66,6 @@ export default function PlanungPage() {
   const [displayedTours, setDisplayedTours] = useState<Partial<Tour>[]>([]);
   const [isKmModalOpen, setIsKmModalOpen] = useState(false);
   const [selectedTour, setSelectedTour] = useState<Partial<Tour> | null>(null);
-  const [isCreateTourModalOpen, setIsCreateTourModalOpen] = useState(false);
   const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false);
   const [isCreateVehicleModalOpen, setIsCreateVehicleModalOpen] = useState<'truck' | 'trailer' | null>(null);
   const [isCreateCustomerModalOpen, setIsCreateCustomerModalOpen] = useState(false);
@@ -146,19 +143,37 @@ export default function PlanungPage() {
   }
 
   const handleSaveKmPreis = (tourNr: string, newPreis: number) => {
-    setDisplayedTours(displayedTours.map(t => 
+    const updatedTours = displayedTours.map(t => 
       t.tourNr === tourNr ? { ...t, kilometerpreis: newPreis } : t
-    ));
+    );
+    setDisplayedTours(updatedTours);
+    addTour(updatedTours.find(t => t.tourNr === tourNr) as Tour);
     setIsKmModalOpen(false);
   }
   
-  const handleTourCreated = (newTour: Tour) => {
-    addTour(newTour);
-    setIsCreateTourModalOpen(false);
-    toast({
-      title: "Tour erstellt",
-      description: `Die Tour ${newTour.tourNr} wurde erfolgreich geplant.`,
-    });
+  const handleAddNewTourRow = () => {
+    const getNextTourNumber = () => {
+      const allTours = [...tours, ...displayedTours.filter(dt => !tours.find(t => t.tourNr === dt.tourNr))];
+      if (!allTours || allTours.length === 0) {
+        return "T-00001";
+      }
+      const lastTour = allTours.reduce((latest, current) => {
+        if (!current.tourNr || !latest.tourNr) return latest.tourNr ? latest : current;
+        const latestNum = parseInt(latest.tourNr.split('-')[1]);
+        const currentNum = parseInt(current.tourNr.split('-')[1]);
+        return currentNum > latestNum ? current : latest;
+      });
+
+      const lastNumber = parseInt(lastTour.tourNr!.split('-')[1]);
+      const nextNumber = lastNumber + 1;
+      return `T-${String(nextNumber).padStart(5, '0')}`;
+    };
+
+    const newTour: Partial<Tour> = {
+      tourNr: getNextTourNumber(),
+      start_time: new Date(),
+    };
+    setDisplayedTours(prev => [...prev, newTour]);
   };
 
   const handleAddNewUser = (data: UserFormValues) => {
@@ -234,6 +249,16 @@ export default function PlanungPage() {
         });
     }
   };
+
+  const handleSaveTour = (tour: Partial<Tour>) => {
+    if (tour.tourNr && tour.driver && tour.truck && tour.trailer && tour.customer) {
+        addTour(tour as Tour);
+        toast({
+            title: "Tour gespeichert",
+            description: `Die Tour ${tour.tourNr} wurde gespeichert.`
+        })
+    }
+  }
 
 
   const RolesMultiSelect = ({form}: {form: typeof userForm }) => (
@@ -320,15 +345,10 @@ export default function PlanungPage() {
                     <Truck className="h-5 w-5 text-primary" />
                     Tourenübersicht
                 </CardTitle>
-                <Dialog open={isCreateTourModalOpen} onOpenChange={setIsCreateTourModalOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm">
-                      <PlusCircle className="mr-2 h-4 w-4" />
-                      Tour erstellen
-                    </Button>
-                  </DialogTrigger>
-                  <CreateTourModal onTourCreated={handleTourCreated} />
-                </Dialog>
+                <Button size="sm" onClick={handleAddNewTourRow}>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Tour erstellen
+                </Button>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t">
                 <div className="flex items-center gap-2">
@@ -585,13 +605,14 @@ export default function PlanungPage() {
                   displayedTours.map((tour, index) => (
                     <TableRow key={tour.tourNr}>
                         <TableCell className="p-0"><Input value={tour.tourNr || ''} readOnly className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
-                        <TableCell className="p-0"><Input type="date" value={tour.start_time ? format(new Date(tour.start_time), 'yyyy-MM-dd') : ''} onChange={e => handleInputChange(index, 'start_time', new Date(e.target.value))} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
-                        <TableCell className="p-0"><Input type="time" value={tour.start_time ? format(new Date(tour.start_time), 'HH:mm') : ''} onChange={e => handleInputChange(index, 'start_time', new Date(`1970-01-01T${e.target.value}`))} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
+                        <TableCell className="p-0"><Input type="date" value={tour.start_time ? format(new Date(tour.start_time), 'yyyy-MM-dd') : ''} onChange={e => handleInputChange(index, 'start_time', new Date(e.target.value))} onBlur={() => handleSaveTour(tour)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
+                        <TableCell className="p-0"><Input type="time" value={tour.start_time ? format(new Date(tour.start_time), 'HH:mm') : ''} onChange={e => handleInputChange(index, 'start_time', new Date(`1970-01-01T${e.target.value}`))} onBlur={() => handleSaveTour(tour)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
                         <TableCell className="p-0">
                            <Combobox
                                 options={drivers}
                                 value={tour.driver || ''}
                                 onChange={(value) => handleInputChange(index, 'driver', value)}
+                                onBlur={() => handleSaveTour(tour)}
                                 placeholder="Fahrer auswählen"
                                 notFoundMessage="Kein Fahrer gefunden."
                             />
@@ -601,6 +622,7 @@ export default function PlanungPage() {
                                 options={trucks}
                                 value={tour.truck || ''}
                                 onChange={(value) => handleInputChange(index, 'truck', value)}
+                                onBlur={() => handleSaveTour(tour)}
                                 placeholder="LKW auswählen"
                                 notFoundMessage="Kein LKW gefunden."
                             />
@@ -610,6 +632,7 @@ export default function PlanungPage() {
                                 options={trailers}
                                 value={tour.trailer || ''}
                                 onChange={(value) => handleInputChange(index, 'trailer', value)}
+                                onBlur={() => handleSaveTour(tour)}
                                 placeholder="Auflieger auswählen"
                                 notFoundMessage="Kein Auflieger gefunden."
                             />
@@ -619,13 +642,14 @@ export default function PlanungPage() {
                                 options={customerOptions}
                                 value={tour.customer || ''}
                                 onChange={(value) => handleInputChange(index, 'customer', value)}
+                                onBlur={() => handleSaveTour(tour)}
                                 placeholder="Kunde auswählen"
                                 notFoundMessage="Kein Kunde gefunden."
                             />
                         </TableCell>
-                        <TableCell className="p-0"><Input value={tour.customerRef || ''} onChange={e => handleInputChange(index, 'customerRef', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
-                        <TableCell className="p-0"><Input value={tour.description || ''} onChange={e => handleInputChange(index, 'description', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
-                        <TableCell className="p-0"><Input value={tour.remarks || ''} onChange={e => handleInputChange(index, 'remarks', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
+                        <TableCell className="p-0"><Input value={tour.customerRef || ''} onChange={e => handleInputChange(index, 'customerRef', e.target.value)} onBlur={() => handleSaveTour(tour)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
+                        <TableCell className="p-0"><Input value={tour.description || ''} onChange={e => handleInputChange(index, 'description', e.target.value)} onBlur={() => handleSaveTour(tour)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
+                        <TableCell className="p-0"><Input value={tour.remarks || ''} onChange={e => handleInputChange(index, 'remarks', e.target.value)} onBlur={() => handleSaveTour(tour)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
                         <TableCell className="p-0" onDoubleClick={() => handleKmPreisDoubleClick(tour)}>
                           <Input 
                             value={tour.kilometerpreis ? tour.kilometerpreis.toFixed(2) + ' €' : (tour.km && tour.rohertrag ? (tour.rohertrag / tour.km).toFixed(2) + ' €' : '')} 
@@ -653,5 +677,3 @@ export default function PlanungPage() {
     </div>
   );
 }
-
-    

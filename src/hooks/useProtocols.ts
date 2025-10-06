@@ -151,9 +151,19 @@ export function useProtocols(userId: string | null) {
     });
   };
   
-  const addTour = (newTour: Tour) => {
-      const updatedTours = [...tours, newTour];
-      saveTours(updatedTours);
+  const addTour = (tour: Tour) => {
+      setTours(prevTours => {
+          const existingTourIndex = prevTours.findIndex(t => t.tourNr === tour.tourNr);
+          let updatedTours;
+          if (existingTourIndex > -1) {
+              updatedTours = [...prevTours];
+              updatedTours[existingTourIndex] = tour;
+          } else {
+              updatedTours = [...prevTours, tour];
+          }
+          saveTours(updatedTours);
+          return updatedTours;
+      });
   }
 
   const addVehicle = (type: 'truck' | 'trailer', newVehicle: Omit<Vehicle, 'active'>): boolean => {
@@ -217,5 +227,3 @@ export function useProtocols(userId: string | null) {
 
   return { protocols, addProtocol, isLoading, getUniqueLicensePlates, addVehicle, vehicles, updateVehicle, updateVehicleStatus, tours, addTour, customers, addCustomer };
 }
-
-    
