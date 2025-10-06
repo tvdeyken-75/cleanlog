@@ -38,7 +38,7 @@ export interface Tour {
   anSub?: number;
   km?: number;
   df?: number;
-  maut?: number;
+maut?: number;
   rechnungsnummer?: string;
   rechnungRaus?: boolean;
   bezahlt?: boolean;
@@ -46,6 +46,7 @@ export interface Tour {
   transport_order?: string; 
   truck_license_plate?: string;
   trailer_license_plate?: string;
+  kilometerpreis?: number;
 }
 
 export interface Photo {

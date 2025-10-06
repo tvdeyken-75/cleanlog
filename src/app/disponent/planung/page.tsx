@@ -13,6 +13,8 @@ import { Button } from '@/components/ui/button';
 import { Tour, UserRole } from '@/lib/types';
 import { useAuth } from '@/context/AuthContext';
 import { Combobox } from '@/components/ui/combobox';
+import { KilometerpreisModal } from '@/components/disponent/KilometerpreisModal';
+import { Dialog } from '@/components/ui/dialog';
 
 
 export default function PlanungPage() {
@@ -21,6 +23,8 @@ export default function PlanungPage() {
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
   const [tours, setTours] = useState<Partial<Tour>[]>([]);
   const { getUsers } = useAuth();
+  const [isKmModalOpen, setIsKmModalOpen] = useState(false);
+  const [selectedTour, setSelectedTour] = useState<Partial<Tour> | null>(null);
 
   const getWeeksForYear = (year: number) => {
     const firstDayOfYear = new Date(year, 0, 1);
@@ -70,6 +74,18 @@ export default function PlanungPage() {
   const drivers = getUsers()
     .filter(u => u.role.includes('driver' as UserRole))
     .map(u => ({ value: u.username, label: u.username }));
+
+  const handleKmPreisDoubleClick = (tour: Partial<Tour>) => {
+    setSelectedTour(tour);
+    setIsKmModalOpen(true);
+  }
+
+  const handleSaveKmPreis = (tourNr: string, newPreis: number) => {
+    setTours(tours.map(t => 
+      t.tourNr === tourNr ? { ...t, kilometerpreis: newPreis } : t
+    ));
+    setIsKmModalOpen(false);
+  }
 
 
   return (
@@ -188,7 +204,13 @@ export default function PlanungPage() {
                         <TableCell className="p-0"><Input value={tour.description || ''} onChange={e => handleInputChange(index, 'description', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
                         <TableCell className="p-0"><Input value={tour.remarks || ''} onChange={e => handleInputChange(index, 'remarks', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
                         <TableCell className="p-0"><Input value={tour.customerRef || ''} onChange={e => handleInputChange(index, 'customerRef', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
-                        <TableCell className="p-0"><Input value={tour.km && tour.rohertrag ? (tour.rohertrag / tour.km).toFixed(2) + ' €' : ''} readOnly className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
+                        <TableCell className="p-0" onDoubleClick={() => handleKmPreisDoubleClick(tour)}>
+                          <Input 
+                            value={tour.kilometerpreis ? tour.kilometerpreis.toFixed(2) + ' €' : (tour.km && tour.rohertrag ? (tour.rohertrag / tour.km).toFixed(2) + ' €' : '')} 
+                            readOnly 
+                            className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" 
+                          />
+                        </TableCell>
                     </TableRow>
                   ))
                 )}
@@ -196,6 +218,16 @@ export default function PlanungPage() {
           </Table>
           </CardContent>
       </Card>
+      
+      <Dialog open={isKmModalOpen} onOpenChange={setIsKmModalOpen}>
+        {selectedTour && (
+            <KilometerpreisModal 
+                tour={selectedTour} 
+                onSave={handleSaveKmPreis}
+                onClose={() => setIsKmModalOpen(false)}
+            />
+        )}
+      </Dialog>
     </div>
   );
 }
