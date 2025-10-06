@@ -1,4 +1,5 @@
 
+
 "use client"
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,7 +15,8 @@ import { Tour, UserRole } from '@/lib/types';
 import { useAuth } from '@/context/AuthContext';
 import { Combobox } from '@/components/ui/combobox';
 import { KilometerpreisModal } from '@/components/disponent/KilometerpreisModal';
-import { Dialog } from '@/components/ui/dialog';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
+import { CreateTourModal } from '@/components/disponent/CreateTourModal';
 
 
 export default function PlanungPage() {
@@ -25,6 +27,7 @@ export default function PlanungPage() {
   const { getUsers } = useAuth();
   const [isKmModalOpen, setIsKmModalOpen] = useState(false);
   const [selectedTour, setSelectedTour] = useState<Partial<Tour> | null>(null);
+  const [isCreateTourModalOpen, setIsCreateTourModalOpen] = useState(false);
 
   const getWeeksForYear = (year: number) => {
     const firstDayOfYear = new Date(year, 0, 1);
@@ -99,10 +102,15 @@ export default function PlanungPage() {
                     <Truck className="h-5 w-5 text-primary" />
                     Tourenübersicht
                 </CardTitle>
-                <Button size="sm" onClick={handleAddTour}>
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    Tour erstellen
-                </Button>
+                <Dialog open={isCreateTourModalOpen} onOpenChange={setIsCreateTourModalOpen}>
+                  <DialogTrigger asChild>
+                    <Button size="sm">
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      Tour erstellen
+                    </Button>
+                  </DialogTrigger>
+                  <CreateTourModal onTourCreated={() => setIsCreateTourModalOpen(false)} />
+                </Dialog>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4 border-t">
                 <div className="flex items-center gap-2">
