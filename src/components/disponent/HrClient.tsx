@@ -12,7 +12,7 @@ export function HrClient() {
         <h1 className="text-3xl font-bold font-headline">HR - Mitarbeiter verwalten</h1>
         <Card>
             <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Users className="text-primary"/>Benutzer- & Passwortverwaltung</CardTitle>
+                <CardTitle className="flex items-center gap-2"><Users className="text-primary"/>Mitarbeiter verwalten</CardTitle>
             </CardHeader>
             <CardContent>
                 <PasswordManagementForm />
