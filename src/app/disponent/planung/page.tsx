@@ -562,9 +562,9 @@ export default function PlanungPage() {
                        </Dialog>
                     </div>
                   </TableHead>
+                  <TableHead className="h-10 px-2">Kundenref.</TableHead>
                   <TableHead className="h-10 px-2">Beschreibung</TableHead>
                   <TableHead className="h-10 px-2">Bemerkungen</TableHead>
-                  <TableHead className="h-10 px-2">Kundenref.</TableHead>
                   <TableHead className="h-10 px-2">Kilometerpreise</TableHead>
               </TableRow>
               </TableHeader>
@@ -617,9 +617,9 @@ export default function PlanungPage() {
                                 notFoundMessage="Kein Kunde gefunden."
                             />
                         </TableCell>
+                        <TableCell className="p-0"><Input value={tour.customerRef || ''} onChange={e => handleInputChange(index, 'customerRef', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
                         <TableCell className="p-0"><Input value={tour.description || ''} onChange={e => handleInputChange(index, 'description', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
                         <TableCell className="p-0"><Input value={tour.remarks || ''} onChange={e => handleInputChange(index, 'remarks', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
-                        <TableCell className="p-0"><Input value={tour.customerRef || ''} onChange={e => handleInputChange(index, 'customerRef', e.target.value)} className="border-none bg-transparent p-1 h-8 min-w-[100px] focus-visible:ring-1 focus-visible:ring-ring" /></TableCell>
                         <TableCell className="p-0" onDoubleClick={() => handleKmPreisDoubleClick(tour)}>
                           <Input 
                             value={tour.kilometerpreis ? tour.kilometerpreis.toFixed(2) + ' €' : (tour.km && tour.rohertrag ? (tour.rohertrag / tour.km).toFixed(2) + ' €' : '')} 
